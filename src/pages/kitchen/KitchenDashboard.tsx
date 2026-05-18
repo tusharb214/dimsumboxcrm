@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ClipboardList, Clock, CheckCircle, Truck, RefreshCw } from 'lucide-react';
-import { kitchenApi } from '../../api/services';
+import { kitchenApi, dashboardApi } from '../../api/services';
 import { Order } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
 import StatCard from '../../components/common/StatCard';
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 
 const KitchenDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [dashStats, setDashStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
 
@@ -18,6 +19,9 @@ const KitchenDashboard: React.FC = () => {
     try {
       const r = await kitchenApi.getAssignedOrders();
       setOrders(r.data.data ?? []);
+      dashboardApi.getKitchenDashboard()
+        .then(res => setDashStats(res.data?.data))
+        .catch(() => {});
     }
     catch { toast.error('Failed to load orders'); }
     finally { setLoading(false); }
@@ -58,12 +62,12 @@ const KitchenDashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {loading ? Array.from({length:4}).map((_,i) => <CardSkeleton key={i} />) : (
+        {loading ? Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />) : (
           <>
-            <StatCard title="Total Assigned" value={orders.length} icon={ClipboardList} color="sky" />
-            <StatCard title="Preparing" value={byStatus('PREPARING')} icon={Clock} color="amber" />
-            <StatCard title="Ready" value={byStatus('READY')} icon={CheckCircle} color="emerald" />
-            <StatCard title="Dispatched" value={byStatus('DISPATCHED')} icon={Truck} color="purple" />
+            <StatCard title="Total Assigned" value={dashStats?.totalOrders ?? orders.length} icon={ClipboardList} color="sky" />
+            <StatCard title="Preparing" value={dashStats?.preparingNow ?? byStatus('PREPARING')} icon={Clock} color="amber" />
+            <StatCard title="Ready" value={dashStats?.readyNow ?? byStatus('READY')} icon={CheckCircle} color="emerald" />
+            <StatCard title="Completed" value={dashStats?.completedByMe ?? byStatus('DELIVERED')} icon={Truck} color="purple" />
           </>
         )}
       </div>
@@ -114,7 +118,6 @@ const KitchenDashboard: React.FC = () => {
                             Mark Ready
                           </button>
                         )}
-                        {/* {(order.status === 'READY' || order.status === 'DISPATCHED' || order.status === 'DELIVERED') && ( */}
                         {(order.status === 'READY' || order.status === 'DELIVERED') && (
                           <span className="text-xs text-slate-500">—</span>
                         )}

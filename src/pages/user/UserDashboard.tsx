@@ -5,7 +5,7 @@ import {
   ArrowRight, Clock, CheckCircle, Package,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { userApi } from '../../api/services';
+import { userApi, salesApi } from '../../api/services';
 import { Order } from '../../types';
 import StatCard from '../../components/common/StatCard';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -20,16 +20,36 @@ const DUMMY_STOCK_ALERTS = [
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [sales, setSales] = useState({ today: 0, monthly: 0 });
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   userApi.getMyOrders()
+  //     // .then(r => setOrders(r.data))
+  //     .then(r => setOrders(r.data.data ?? []))
+  //     .catch(() => setOrders([]))
+  //     .finally(() => setLoading(false));
+
+  // }, []);
+
+  // हे लिही:
   useEffect(() => {
     userApi.getMyOrders()
-      // .then(r => setOrders(r.data))
       .then(r => setOrders(r.data.data ?? []))
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
-  }, []);
 
+    // हे ADD कर:
+    Promise.all([
+      salesApi.getToday().catch(() => ({ data: { data: 0 } })),
+      salesApi.getMonthly().catch(() => ({ data: { data: 0 } })),
+    ]).then(([t, m]) => {
+      setSales({
+        today: t.data?.data ?? 0,
+        monthly: m.data?.data ?? 0,
+      });
+    });
+  }, []);
   // const pendingCount = orders.filter(o => o.status === 'PENDING').length;
   const pendingCount = orders.filter(o => o.status === 'REQUESTED').length;
   const deliveredCount = orders.filter(o => o.status === 'DELIVERED').length;
@@ -55,8 +75,11 @@ const UserDashboard: React.FC = () => {
           <>
             <StatCard title="Total Orders" value={orders.length} icon={ShoppingBag} color="sky" trend={{ value: 12, label: 'vs last month' }} />
             <StatCard title="Pending Orders" value={pendingCount} icon={Clock} color="amber" />
-            <StatCard title="Daily Revenue" value="₹0" icon={DollarSign} color="emerald" pending />
-            <StatCard title="Monthly Revenue" value="₹0" icon={TrendingUp} color="purple" pending />
+            {/* <StatCard title="Daily Revenue" value="₹0" icon={DollarSign} color="emerald" pending />
+            <StatCard title="Monthly Revenue" value="₹0" icon={TrendingUp} color="purple" pending /> */}
+          
+            <StatCard title="Daily Revenue" value={`₹${sales.today.toLocaleString('en-IN')}`} icon={DollarSign} color="emerald" />
+            <StatCard title="Monthly Revenue" value={`₹${sales.monthly.toLocaleString('en-IN')}`} icon={TrendingUp} color="purple" />
           </>
         )}
       </div>
@@ -72,7 +95,7 @@ const UserDashboard: React.FC = () => {
           </div>
           {loading ? (
             <div className="p-4 space-y-3">
-              {[1,2,3].map(i => <div key={i} className="skeleton h-12 rounded-xl" />)}
+              {[1, 2, 3].map(i => <div key={i} className="skeleton h-12 rounded-xl" />)}
             </div>
           ) : orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

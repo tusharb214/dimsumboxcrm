@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { RefreshCw, ChefHat, Settings2 } from 'lucide-react';
-import { adminApi } from '../../api/services';
+ import { adminApi, dashboardApi } from '../../api/services';
 import { Order, Kitchen, OrderStatus } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
 import SearchBar from '../../components/common/SearchBar';
@@ -11,28 +11,28 @@ import toast from 'react-hot-toast';
 
 const LIMIT = 10;
 // const STATUSES: OrderStatus[] = ['PENDING','ASSIGNED','PREPARING','READY','DISPATCHED','DELIVERED','CANCELLED'];
-const STATUSES: OrderStatus[] = ['REQUESTED','ACCEPTED','ASSIGNED','PREPARING','READY','DELIVERED','COMPLETED','REJECTED'];
+const STATUSES: OrderStatus[] = ['REQUESTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING', 'READY', 'DELIVERED', 'COMPLETED', 'REJECTED'];
 
 const AdminOrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [kitchens, setKitchens] = useState<Kitchen[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dashStats, setDashStats] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(1);
   const [updating, setUpdating] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [o, k] = await Promise.all([adminApi.getAllOrders(), adminApi.getAllKitchens()]);
-      const od = o.data as any;
-      const kd = k.data as any;
-      setOrders(Array.isArray(od) ? od : od?.orders ?? od?.data ?? []);
-      setKitchens(Array.isArray(kd) ? kd : kd?.kitchens ?? kd?.data ?? []);
-    } catch { toast.error('Failed to load data'); }
-    finally { setLoading(false); }
-  };
+   
+const fetchData = async () => {
+  setLoading(true);
+  try {
+    const [o, k] = await Promise.all([adminApi.getAllOrders(), adminApi.getAllKitchens()]);
+    setOrders(o.data?.data ?? []);
+    setKitchens(k.data?.data ?? []);
+  } catch { toast.error('Failed to load data'); }
+  finally { setLoading(false); }
+};
 
   useEffect(() => { fetchData(); }, []);
 
@@ -47,6 +47,15 @@ const AdminOrdersPage: React.FC = () => {
 
   const assignKitchen = async (orderId: string, kitchenId: string) => {
     if (!kitchenId) return;
+    const order = orders.find(o => String(o.id) === orderId);
+    if (order?.status !== 'ACCEPTED') {
+      toast.error('Order must be ACCEPTED to assign kitchen');
+      return;
+    }
+    dashboardApi.getAdminDashboard()
+  .then(r => setDashStats(r.data?.data))
+  .catch(() => {});
+    
     setUpdating(orderId);
     try {
       await adminApi.assignKitchenToOrder(orderId, kitchenId);
@@ -121,7 +130,9 @@ const AdminOrdersPage: React.FC = () => {
                           defaultValue={order.kitchenId || ''}
                           onChange={e => assignKitchen(String(order.id), e.target.value)}
                           className="text-xs bg-slate-800 border border-slate-700 text-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:border-sky-500 min-w-[130px]"
-                          disabled={updating === String(order.id)}
+                          // disabled={updating === String(order.id)}
+
+                          disabled={updating === String(order.id) || order.status !== 'ACCEPTED'}
                         >
                           <option value="">Select kitchen</option>
                           {kitchens.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}

@@ -50,28 +50,30 @@ export type OrderStatus =
   | 'COMPLETED'
   | 'REJECTED';
 
-// export interface OrderItem {
-//   productId: string;
-//   productName: string;
-//   quantity: number;
-//   price: number;
-// }
-export interface OrderItem {
+ export interface OrderItem {
+  id?: number;
   materialId: number;
   materialName: string;
+  category?: string;
+  brand?: string;
   quantity: number;
-  price: number;
+  priceAtOrder?: number;
+  price?: number;
+  lineTotal?: number;
 }
 
 export interface Order {
   id: string;
-  userId: string;
+  userId?: string;
   userName?: string;
+  userEmail?: string;
   kitchenId?: string;
   kitchenName?: string;
   status: OrderStatus;
   items: OrderItem[];
   totalAmount: number;
+  orderNotes?: string;
+  screenshotPath?: string;
   createdAt: string;
   updatedAt?: string;
 }

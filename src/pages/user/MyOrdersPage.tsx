@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { ClipboardList, RefreshCw, Download, CheckCircle, Edit2 } from 'lucide-react';
-import { userApi, pdfApi } from '../../api/services';
+import { ClipboardList, RefreshCw, Download, CheckCircle, Edit2, Upload } from 'lucide-react';
+import { userApi, pdfApi, orderMediaApi } from '../../api/services';
 import { Order } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
 import SearchBar from '../../components/common/SearchBar';
@@ -21,6 +21,7 @@ const MyOrdersPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(1);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [uploadingFor, setUploadingFor] = useState<string | null>(null);
 
   const fetchOrders = () => {
     setLoading(true);
@@ -38,7 +39,6 @@ const MyOrdersPage: React.FC = () => {
 
   useEffect(() => { fetchOrders(); }, []);
 
-  // ── PDF Download ──────────────────────────────────────────────
   const handleDownloadPdf = async (orderId: string) => {
     setActionLoading(`pdf-${orderId}`);
     try {
@@ -57,7 +57,18 @@ const MyOrdersPage: React.FC = () => {
     }
   };
 
-  // ── Confirm Delivery ──────────────────────────────────────────
+  const handleUploadScreenshot = async (orderId: string, file: File) => {
+    setUploadingFor(orderId);
+    try {
+      await orderMediaApi.uploadScreenshot(orderId, file);
+      toast.success('Screenshot uploaded!');
+    } catch {
+      toast.error('Failed to upload screenshot');
+    } finally {
+      setUploadingFor(null);
+    }
+  };
+
   const handleConfirmDelivery = async (orderId: string) => {
     setActionLoading(`confirm-${orderId}`);
     try {
@@ -71,7 +82,6 @@ const MyOrdersPage: React.FC = () => {
     }
   };
 
-  // ── Resubmit Rejected Order ───────────────────────────────────
   const handleResubmit = (order: Order) => {
     navigate('/dashboard/order', { state: { resubmitOrder: order } });
   };
@@ -159,53 +169,72 @@ const MyOrdersPage: React.FC = () => {
                       })}
                     </td>
 
-                    {/* ── Actions column ── */}
                     <td className="table-td">
                       <div className="flex items-center gap-2">
 
-                        {/* Confirm Delivery — only when DELIVERED */}
                         {order.status === 'DELIVERED' && (
                           <button
                             onClick={() => handleConfirmDelivery(String(order.id))}
                             disabled={actionLoading === `confirm-${order.id}`}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-                              bg-emerald-500/20 text-emerald-400 border border-emerald-500/30
-                              hover:bg-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                           >
                             <CheckCircle className="w-3 h-3" />
                             {actionLoading === `confirm-${order.id}` ? 'Confirming...' : 'Confirm'}
                           </button>
                         )}
 
-                        {/* PDF Download — only when COMPLETED */}
                         {order.status === 'COMPLETED' && (
                           <button
                             onClick={() => handleDownloadPdf(String(order.id))}
                             disabled={actionLoading === `pdf-${order.id}`}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-                              bg-sky-500/20 text-sky-400 border border-sky-500/30
-                              hover:bg-sky-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                           >
                             <Download className="w-3 h-3" />
                             {actionLoading === `pdf-${order.id}` ? 'Downloading...' : 'Invoice'}
                           </button>
                         )}
 
-                        {/* Edit & Resubmit — only when REJECTED */}
-                        {/* {order.status === 'REJECTED' && ( */}
-                        {['REQUESTED', 'REJECTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING'].includes(order.status) && (
+                        {order.status === 'REJECTED' && (
                           <button
                             onClick={() => handleResubmit(order)}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
-                              bg-amber-500/20 text-amber-400 border border-amber-500/30
-                              hover:bg-amber-500/30 transition-all"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 transition-all"
                           >
                             <Edit2 className="w-3 h-3" /> Edit & Resubmit
                           </button>
                         )}
 
-                        {/* No action for other statuses */}
-                        {order.status !== 'DELIVERED' && order.status !== 'COMPLETED' && order.status !== 'REJECTED' && (
+                        {['REQUESTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING'].includes(order.status) && (
+                          <>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              style={{ display: 'none' }}
+                              id={`ss-${order.id}`}
+                              onChange={e => {
+                                const file = e.target.files?.[0];
+                                if (file) handleUploadScreenshot(String(order.id), file);
+                                e.target.value = '';
+                              }}
+                            />
+                            <label
+                              htmlFor={`ss-${order.id}`}
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-500/20 text-violet-400 border border-violet-500/30 hover:bg-violet-500/30 cursor-pointer transition-all"
+                            >
+                              {uploadingFor === String(order.id) ? (
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Upload className="w-3 h-3" />
+                              )}
+                              SS
+                            </label>
+                          </>
+                        )}
+
+                        {['READY', 'COMPLETED', 'DELIVERED', 'REJECTED'].includes(order.status) === false &&
+                          order.status !== 'REQUESTED' &&
+                          order.status !== 'ACCEPTED' &&
+                          order.status !== 'ASSIGNED' &&
+                          order.status !== 'PREPARING' && (
                           <span className="text-xs text-slate-600">—</span>
                         )}
 
