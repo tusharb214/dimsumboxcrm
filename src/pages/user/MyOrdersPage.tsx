@@ -192,7 +192,8 @@ const MyOrdersPage: React.FC = () => {
                         )}
 
                         {/* Edit & Resubmit — only when REJECTED */}
-                        {order.status === 'REJECTED' && (
+                        {/* {order.status === 'REJECTED' && ( */}
+                        {['REQUESTED', 'REJECTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING'].includes(order.status) && (
                           <button
                             onClick={() => handleResubmit(order)}
                             className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium
