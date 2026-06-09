@@ -42,8 +42,10 @@ export const userApi = {
 
   getOrderById: (orderId: string) =>
     apiClient.get(`/orders/${orderId}`),
-  resubmitOrder: (orderId: string, data: CreateOrderPayload) =>
-  apiClient.put(`/orders/${orderId}/resubmit`, data),
+  // resubmitOrder: (orderId: string, data: CreateOrderPayload) =>
+  // apiClient.put(`/orders/${orderId}/resubmit`, data),
+  resubmitOrder: (data: CreateOrderPayload) =>
+  apiClient.post('/orders/resubmit', data),
 };
 
 // ─── MATERIALS (user + admin browse) ──────────────────────────────
