@@ -299,10 +299,14 @@ const PlaceOrderPage: React.FC = () => {
     setPlacing(true);
     try {
       if (isResubmit) {
-        await userApi.resubmitOrder(String(resubmitOrder.id), {
-          orderNotes: '',
-          items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
-        });
+        // await userApi.resubmitOrder(String(resubmitOrder.id), {
+        //   orderNotes: '',
+        //   items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
+        // });
+        await userApi.resubmitOrder({
+  orderNotes: '',
+  items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
+});
         toast.success('Order resubmitted successfully!');
       } else {
         await userApi.createOrder({
