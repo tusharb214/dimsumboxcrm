@@ -21,7 +21,8 @@ const AdminProductsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   // Form state
-  const [form, setForm] = useState({ name: '', category: '', brand: '', costPerItem: '' });
+  // const [form, setForm] = useState({ name: '', category: '', brand: '', costPerItem: '' });
+  const [form, setForm] = useState({ name: '', category: '', brand: '', costPerItem: '', unitsPerPacket: '' });
 
   const fetchMaterials = () => {
     setLoading(true);
@@ -38,17 +39,25 @@ const AdminProductsPage: React.FC = () => {
 
   const openAdd = () => {
     setEditItem(null);
-    setForm({ name: '', category: '', brand: '', costPerItem: '' });
+    // setForm({ name: '', category: '', brand: '', costPerItem: '' });
+    setForm({ name: '', category: '', brand: '', costPerItem: '', unitsPerPacket: '' });
     setModalOpen(true);
   };
 
   const openEdit = (item: any) => {
     setEditItem(item);
+    // setForm({
+    //   name: item.name,
+    //   category: item.category,
+    //   brand: item.brand ?? '',
+    //   costPerItem: String(item.costPerItem),
+    // });
     setForm({
       name: item.name,
       category: item.category,
       brand: item.brand ?? '',
       costPerItem: String(item.costPerItem),
+      unitsPerPacket: String(item.unitsPerPacket ?? ''),
     });
     setModalOpen(true);
   };
@@ -60,11 +69,18 @@ const AdminProductsPage: React.FC = () => {
     }
     setSaving(true);
     try {
+      // const payload = {
+      //   name: form.name,
+      //   category: form.category,
+      //   brand: form.brand,
+      //   costPerItem: Number(form.costPerItem),
+      // };
       const payload = {
         name: form.name,
         category: form.category,
         brand: form.brand,
         costPerItem: Number(form.costPerItem),
+        unitsPerPacket: form.unitsPerPacket ? Number(form.unitsPerPacket) : null,
       };
       if (editItem) {
         await adminApi.updateMaterial(editItem.id, payload);
@@ -165,7 +181,11 @@ const AdminProductsPage: React.FC = () => {
                     </td>
                     <td className="table-td"><span className="badge-neutral">{product.category}</span></td>
                     <td className="table-td text-slate-400">{product.brand || '—'}</td>
-                    <td className="table-td font-semibold text-white">₹{product.costPerItem}</td>
+                    {/* <td className="table-td font-semibold text-white">₹{product.costPerItem}</td> */}
+                    <td className="table-td font-semibold text-white">
+                      ₹{product.costPerItem}
+                      {product.unitsPerPacket ? <span className="block text-xs text-slate-500 font-normal">{product.unitsPerPacket} pcs/packet</span> : null}
+                    </td>
                     <td className="table-td">
                       <StatusBadge status={product.isActive ? 'ACTIVE' : 'INACTIVE'} />
                     </td>
@@ -239,13 +259,23 @@ const AdminProductsPage: React.FC = () => {
             </div>
           </div>
           <div>
-            <label className="label">Price (₹) *</label>
+            <label className="label">Price (₹) per Packet*</label>
             <input
               type="number"
               className="input-field"
               placeholder="e.g. 150"
               value={form.costPerItem}
               onChange={e => setForm(f => ({ ...f, costPerItem: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="label">Pieces per Packet</label>
+            <input
+              type="number"
+              className="input-field"
+              placeholder="e.g. 8 (momos per packet)"
+              value={form.unitsPerPacket}
+              onChange={e => setForm(f => ({ ...f, unitsPerPacket: e.target.value }))}
             />
           </div>
           <div className="flex gap-3 pt-2">

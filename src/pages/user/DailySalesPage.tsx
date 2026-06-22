@@ -430,7 +430,7 @@ const DailySalesPage: React.FC = () => {
               </div>
               {buildItemsSoldString() && (
                 <div className="mt-3 px-3 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700">
-                  <p className="text-xs text-slate-500 mb-1">Backend ला pathvla janar:</p>
+                 
                   <p className="text-xs text-slate-300 font-mono leading-5">{buildItemsSoldString()}</p>
                 </div>
               )}

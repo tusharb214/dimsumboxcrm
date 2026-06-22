@@ -110,6 +110,9 @@ export const adminApi = {
   getAllUsers: () =>
     apiClient.get('/admin/users'),
 
+  deleteUser: (id: string) =>
+    apiClient.delete(`/admin/users/${id}`),
+
   // Kitchens
   createKitchen: (data: CreateKitchenPayload) =>
     apiClient.post('/admin/kitchens', data),

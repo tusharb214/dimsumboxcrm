@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+ /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
@@ -11,16 +11,28 @@ module.exports = {
       },
       colors: {
         brand: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#e0282b',
+          600: '#c41e21',
+          700: '#a11619',
+          800: '#7f1315',
+          900: '#5c0d0f',
+        },
+        accent: {
+          50: '#fffbeb',
+          100: '#fff3c4',
+          200: '#ffe588',
+          300: '#ffd34d',
+          400: '#ffc72c',
+          500: '#f5b700',
+          600: '#cc9900',
+          700: '#a37a00',
+          800: '#7a5b00',
+          900: '#523d00',
         },
         surface: {
           DEFAULT: '#0f172a',
