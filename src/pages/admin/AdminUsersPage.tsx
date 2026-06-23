@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Users, RefreshCw, Loader2, Eye, X, ShoppingBag, TrendingUp, BarChart3, Calendar, Download } from 'lucide-react';
 import { adminApi } from '../../api/services';
 import { User, UserRole, Order } from '../../types';
@@ -20,6 +21,7 @@ interface DailyRevenue {
 
 const AdminUsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -36,7 +38,9 @@ const AdminUsersPage: React.FC = () => {
     try {
       const r = await adminApi.getAllUsers();
       const d = r.data as any;
-      setUsers(Array.isArray(d) ? d : d?.users ?? d?.data ?? []);
+      // setUsers(Array.isArray(d) ? d : d?.users ?? d?.data ?? []);
+      const allUsers = Array.isArray(d) ? d : d?.users ?? d?.data ?? [];
+setUsers(allUsers.filter((u: any) => u.role !== 'KITCHEN'));
     }
     catch { toast.error('Failed to load users'); }
     finally { setLoading(false); }
@@ -104,25 +108,25 @@ const AdminUsersPage: React.FC = () => {
     .filter(o => ['DELIVERED', 'COMPLETED'].includes(o.status))
     .reduce((s, o) => s + (o.totalAmount || 0), 0);
 
-const downloadUserExcel = () => {
-  if (dailyRevenue.length === 0) return toast.error('No data to download');
-  const rows = dailyRevenue.map(row => ({
-    'Date': new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-    'Revenue (₹)': row.revenue,
-    'Orders': row.orderCount,
-  }));
-  rows.push({
-    'Date': 'TOTAL',
-    'Revenue (₹)': dailyRevenue.reduce((s, r) => s + r.revenue, 0),
-    'Orders': dailyRevenue.reduce((s, r) => s + r.orderCount, 0),
-  });
-  const ws = XLSX.utils.json_to_sheet(rows);
-  ws['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 10 }];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Daily Revenue');
-  XLSX.writeFile(wb, `${selectedUser?.name}-revenue-log.xlsx`);
-  toast.success('Excel downloaded!');
-};
+  const downloadUserExcel = () => {
+    if (dailyRevenue.length === 0) return toast.error('No data to download');
+    const rows = dailyRevenue.map(row => ({
+      'Date': new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      'Revenue (₹)': row.revenue,
+      'Orders': row.orderCount,
+    }));
+    rows.push({
+      'Date': 'TOTAL',
+      'Revenue (₹)': dailyRevenue.reduce((s, r) => s + r.revenue, 0),
+      'Orders': dailyRevenue.reduce((s, r) => s + r.orderCount, 0),
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 10 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Daily Revenue');
+    XLSX.writeFile(wb, `${selectedUser?.name}-revenue-log.xlsx`);
+    toast.success('Excel downloaded!');
+  };
 
 
 
@@ -178,7 +182,7 @@ const downloadUserExcel = () => {
                     <td className="table-td text-slate-500 text-xs">{new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
                     <td className="table-td">
                       <button
-                        onClick={() => openUserDetail(user)}
+                        onClick={() => navigate(`/admin/users/${user.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/20 transition-all"
                       >
                         <Eye className="w-3 h-3" /> See Details
@@ -211,12 +215,12 @@ const downloadUserExcel = () => {
               <option value="KITCHEN">Kitchen Staff</option>
             </select> */}
             <select value={form.role} onChange={set('role')} className="input-field">
-  <option value="USER">Franchise User</option>
-  <option value="ADMIN">Administrator</option>
-</select>
-<p className="text-xs text-amber-400 mt-1.5 flex items-center gap-1">
-  ⚠ Kitchen staff create karnyasathi Kitchens page var ja — tithech Kitchen entity + login dono create hote.
-</p>
+              <option value="USER">Franchise User</option>
+              <option value="ADMIN">Administrator</option>
+            </select>
+            <p className="text-xs text-amber-400 mt-1.5 flex items-center gap-1">
+              kitchen role is not available for creation here. Please go to the kitchen management page to create kitchen users.
+            </p>
           </div>
           <div>
             <label className="label">Password</label>
@@ -230,126 +234,7 @@ const downloadUserExcel = () => {
           </div>
         </form>
       </Modal>
-      {selectedUser && (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelectedUser(null)}>
-          <div
-            className="w-full max-w-lg bg-slate-900 border-l border-slate-800 h-full overflow-y-auto shadow-2xl animate-[slideInRight_0.25s_ease-out]"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                  {selectedUser.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-white">{selectedUser.name}</h2>
-                  <p className="text-xs text-slate-400">{selectedUser.email}</p>
-                </div>
-              </div>
-              <button onClick={() => setSelectedUser(null)} className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-all">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {detailLoading ? (
-                <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-16 rounded-xl" />)}</div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40">
-                      <p className="text-xs text-slate-500 mb-1">Role</p>
-                      <span className="badge-info text-xs">{selectedUser.role}</span>
-                    </div>
-                    <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40">
-                      <p className="text-xs text-slate-500 mb-1">Status</p>
-                      <StatusBadge status={selectedUser.status || 'ACTIVE'} />
-                    </div>
-                    <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 col-span-2">
-                      <p className="text-xs text-slate-500 mb-1">Joined</p>
-                      <p className="text-sm font-medium text-white">
-                        {new Date(selectedUser.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Order Overview</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 rounded-xl p-4 text-center">
-                        <ShoppingBag className="w-4 h-4 text-sky-400 mx-auto mb-1" />
-                        <p className="text-2xl font-bold text-white">{userOrders.length}</p>
-                        <p className="text-xs text-slate-500">Total Orders</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 text-center">
-                        <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                        <p className="text-2xl font-bold text-white">{fmt(totalRevenue)}</p>
-                        <p className="text-xs text-slate-500">Total Revenue</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {dailyRevenue.length > 0 && (
-                    <div>
-                     <div className="flex items-center justify-between mb-3">
-  <div className="flex items-center gap-2">
-    <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
-    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Daily Revenue Log</h3>
-  </div>
-  <button
-    onClick={downloadUserExcel}
-    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
-  >
-    <Download className="w-3 h-3" /> Export Excel
-  </button>
-</div>
-
-                      <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                        {dailyRevenue.map(row => (
-                          <div key={row.date} className="flex items-center justify-between bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-3 h-3 text-slate-500" />
-                              <p className="text-xs text-slate-300">
-                                {new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-emerald-400">{fmt(row.revenue)}</p>
-                              <p className="text-xs text-slate-500">{row.orderCount} order{row.orderCount > 1 ? 's' : ''}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Orders</h3>
-                    {userOrders.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500 text-sm">No orders placed yet</div>
-                    ) : (
-                      <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                        {userOrders.slice(0, 15).map(order => (
-                          <div key={order.id} className="flex items-center justify-between bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40">
-                            <div>
-                              <p className="text-xs font-mono text-sky-400">#{String(order.id).slice(-6).toUpperCase()}</p>
-                              <p className="text-xs text-slate-500 mt-0.5">{order.items?.length || 0} items · {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-white mb-1">{fmt(order.totalAmount || 0)}</p>
-                              <StatusBadge status={order.status} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+       
     </div>
 
   );

@@ -6,7 +6,8 @@ import { Order, Kitchen, User } from '../../types';
 import StatCard from '../../components/common/StatCard';
 import StatusBadge from '../../components/common/StatusBadge';
 import { CardSkeleton } from '../../components/common/Skeleton';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const chartData = [
   { day: 'Mon', orders: 24 }, { day: 'Tue', orders: 38 }, { day: 'Wed', orders: 29 },
@@ -16,7 +17,8 @@ const chartData = [
 const AdminDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [kitchens, setKitchens] = useState<Kitchen[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  // const [users, setUsers] = useState<User[]>([]);
+  const [, setUsers] = useState<User[]>([]);
   const [dashStats, setDashStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
