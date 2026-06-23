@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { RefreshCw, ChefHat, Settings2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { RefreshCw, ChefHat, Settings2, Eye  } from 'lucide-react';
  import { adminApi, dashboardApi } from '../../api/services';
 import { Order, Kitchen, OrderStatus } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -13,7 +14,8 @@ const LIMIT = 10;
 // const STATUSES: OrderStatus[] = ['PENDING','ASSIGNED','PREPARING','READY','DISPATCHED','DELIVERED','CANCELLED'];
 const STATUSES: OrderStatus[] = ['REQUESTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING', 'READY', 'DELIVERED', 'COMPLETED', 'REJECTED'];
 
-const AdminOrdersPage: React.FC = () => {
+ const AdminOrdersPage: React.FC = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [kitchens, setKitchens] = useState<Kitchen[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,9 +115,10 @@ const fetchData = async () => {
                   <th className="table-th">User</th>
                   <th className="table-th">Status</th>
                   <th className="table-th">Assign Kitchen</th>
-                  <th className="table-th">Actions</th>
+                  {/* <th className="table-th">Actions</th> */}
                   <th className="table-th">Amount</th>
                   <th className="table-th">Date</th>
+                  <th className="table-th">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -124,60 +127,26 @@ const fetchData = async () => {
                     <td className="table-td font-mono text-sky-400 text-xs">#{String(order.id).slice(-8).toUpperCase()}</td>
                     <td className="table-td">{order.userName || '—'}</td>
                     <td className="table-td"><StatusBadge status={order.status} /></td>
-                    <td className="table-td">
-                      <div className="flex items-center gap-2">
-                        <select
-                          defaultValue={order.kitchenId || ''}
-                          onChange={e => assignKitchen(String(order.id), e.target.value)}
-                          className="text-xs bg-slate-800 border border-slate-700 text-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:border-sky-500 min-w-[130px]"
-                          // disabled={updating === String(order.id)}
-
-                          disabled={updating === String(order.id) || order.status !== 'ACCEPTED'}
-                        >
-                          <option value="">Select kitchen</option>
-                          {kitchens.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-                        </select>
-                        <ChefHat className="w-3.5 h-3.5 text-slate-600" />
-                      </div>
+                     <td className="table-td">
+                      {order.kitchenName ? (
+                        <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+                          <ChefHat className="w-3.5 h-3.5" />{order.kitchenName}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-500">Not Assigned</span>
+                      )}
                     </td>
-                    <td className="table-td">
-                      <div className="flex items-center gap-1">
-                        {/* {order.status === 'PENDING' && ( */}
-                        {order.status === 'REQUESTED' && (
-                          <>
-                            <button
-                              onClick={() => acceptOrder(String(order.id))}
-                              disabled={updating === String(order.id)}
-                              className="px-2 py-1 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40"
-                            >
-                              Accept
-                            </button>
-                            <button
-                              onClick={() => rejectOrder(String(order.id))}
-                              disabled={updating === String(order.id)}
-                              className="px-2 py-1 rounded text-xs bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 disabled:opacity-40"
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {order.status === 'READY' && (
-                          <button
-                            onClick={() => markDelivered(String(order.id))}
-                            disabled={updating === String(order.id)}
-                            className="px-2 py-1 rounded text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 disabled:opacity-40"
-                          >
-                            Deliver
-                          </button>
-                        )}
-                        {/* {!['PENDING', 'READY'].includes(order.status) && ( */}
-                        {!['REQUESTED', 'READY'].includes(order.status) && (
-                          <span className="text-xs text-slate-500">—</span>
-                        )}
-                      </div>
-                    </td>
+                     
                     <td className="table-td font-semibold text-white">₹{order.totalAmount}</td>
-                    <td className="table-td text-slate-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+             <td className="table-td text-slate-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="table-td">
+                      <button
+                        onClick={() => navigate(`/admin/orders/${order.id}`)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/20 transition-all"
+                      >
+                        <Eye className="w-3 h-3" /> View
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

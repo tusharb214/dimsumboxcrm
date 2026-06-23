@@ -7,6 +7,7 @@ import SearchBar from '../../components/common/SearchBar';
 import Modal from '../../components/common/Modal';
 import EmptyState from '../../components/common/EmptyState';
 import { TableSkeleton } from '../../components/common/Skeleton';
+import Pagination from '../../components/common/Pagination';
 import toast from 'react-hot-toast';
 
 // ── Kitchen Detail Types ─────────────────────────────────────────
@@ -16,6 +17,8 @@ interface KitchenDetail {
   assignedUsers: any[];
 }
 
+
+const LIMIT = 9;
 const AdminKitchensPage: React.FC = () => {
   const [kitchens, setKitchens] = useState<Kitchen[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +30,8 @@ const AdminKitchensPage: React.FC = () => {
   // ── FIX 4: Kitchen detail panel ──────────────────────────────────
   const [selectedKitchen, setSelectedKitchen] = useState<KitchenDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [page, setPage] = useState(1);
+
 
   const fetchKitchens = async () => {
     setLoading(true);
@@ -44,6 +49,8 @@ const AdminKitchensPage: React.FC = () => {
     k.name.toLowerCase().includes(search.toLowerCase()) ||
     k.location.toLowerCase().includes(search.toLowerCase())
   );
+
+  const paginated = filtered.slice((page - 1) * LIMIT, page * LIMIT);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
@@ -131,34 +138,38 @@ const AdminKitchensPage: React.FC = () => {
           />
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(kitchen => (
-            <div key={kitchen.id} className="card-hover p-5 group">
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <ChefHat className="w-5 h-5 text-emerald-400" />
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* {filtered.map(kitchen => ( */}
+            {paginated.map(kitchen => (
+              <div key={kitchen.id} className="card-hover p-5 group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                    <ChefHat className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <StatusBadge status={kitchen.status} />
                 </div>
-                <StatusBadge status={kitchen.status} />
+                <h3 className="font-semibold text-white mb-1">{kitchen.name}</h3>
+                <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                  <MapPin className="w-3.5 h-3.5" />
+                  {kitchen.location}
+                </div>
+                <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                  <span>Orders: <span className="text-white font-semibold">{kitchen.assignedOrders ?? 0}</span></span>
+                  <span>Added: {new Date(kitchen.createdAt).toLocaleDateString('en-IN')}</span>
+                </div>
+                {/* FIX 4: View details button */}
+                <button
+                  onClick={() => openKitchenDetail(kitchen)}
+                  className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:border-sky-500/40 hover:bg-sky-500/10 transition-all"
+                >
+                  <Eye className="w-3 h-3" /> View Details
+                </button>
               </div>
-              <h3 className="font-semibold text-white mb-1">{kitchen.name}</h3>
-              <div className="flex items-center gap-1.5 text-slate-500 text-sm">
-                <MapPin className="w-3.5 h-3.5" />
-                {kitchen.location}
-              </div>
-              <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                <span>Orders: <span className="text-white font-semibold">{kitchen.assignedOrders ?? 0}</span></span>
-                <span>Added: {new Date(kitchen.createdAt).toLocaleDateString('en-IN')}</span>
-              </div>
-              {/* FIX 4: View details button */}
-              <button
-                onClick={() => openKitchenDetail(kitchen)}
-                className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:border-sky-500/40 hover:bg-sky-500/10 transition-all"
-              >
-                <Eye className="w-3 h-3" /> View Details
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <Pagination page={page} total={filtered.length} limit={LIMIT} onChange={p => { setPage(p); }} />
+        </>
       )}
 
       {/* ── FIX 4: Kitchen Detail Slide Panel ─────────────────────── */}
