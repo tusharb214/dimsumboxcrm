@@ -31,6 +31,7 @@ const AdminKitchensPage: React.FC = () => {
   const [selectedKitchen, setSelectedKitchen] = useState<KitchenDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
 
 
   const fetchKitchens = async () => {
@@ -39,10 +40,15 @@ const AdminKitchensPage: React.FC = () => {
       const r = await adminApi.getAllKitchens();
       const d = r.data as any;
       setKitchens(Array.isArray(d) ? d : d?.kitchens ?? d?.data ?? []);
-    } catch { toast.error('Failed to load kitchens'); }
-    finally { setLoading(false); }
-  };
-
+     const ordersRes = await adminApi.getAllOrders();
+    const allOrdersData = ordersRes.data as any;
+    const ordersList: Order[] = Array.isArray(allOrdersData)
+      ? allOrdersData
+      : allOrdersData?.orders ?? allOrdersData?.data ?? [];
+    setAllOrders(ordersList);
+  } catch { toast.error('Failed to load kitchens'); }
+  finally { setLoading(false); }
+};
   useEffect(() => { fetchKitchens(); }, []);
 
   const filtered = kitchens.filter(k =>
@@ -155,7 +161,13 @@ const AdminKitchensPage: React.FC = () => {
                   {kitchen.location}
                 </div>
                 <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                  <span>Orders: <span className="text-white font-semibold">{kitchen.assignedOrders ?? 0}</span></span>
+                  {/* <span>Orders: <span className="text-white font-semibold">{kitchen.assignedOrders ?? 0}</span></span> */}
+                  <span>Live Orders: <span className="text-emerald-400 font-semibold">
+  {allOrders.filter(o =>
+    (String(o.kitchenId) === String(kitchen.id) || o.kitchenName === kitchen.name) &&
+    ['PENDING', 'PREPARING', 'READY'].includes(o.status)
+  ).length}
+</span></span>
                   <span>Added: {new Date(kitchen.createdAt).toLocaleDateString('en-IN')}</span>
                 </div>
                 {/* FIX 4: View details button */}

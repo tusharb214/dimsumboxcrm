@@ -1,6 +1,6 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, ChefHat, User, RefreshCw, Download } from 'lucide-react';
+import { ArrowLeft, Package, ChefHat, User, RefreshCw, Download, MapPin, Truck } from 'lucide-react';
 import { adminApi } from '../../api/services';
 import { Order, Kitchen } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -14,6 +14,7 @@ const AdminOrderDetailPage: React.FC = () => {
   const [kitchens, setKitchens] = useState<Kitchen[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [addressModal, setAddressModal] = useState<{ address: string } | null>(null);
 
   const fetchOrder = async () => {
     setLoading(true);
@@ -22,10 +23,8 @@ const AdminOrderDetailPage: React.FC = () => {
         adminApi.getOrderById(orderId!),
         adminApi.getAllKitchens(),
       ]);
-    //   setOrder(o.data?.data ?? o.data);
-     const orderData = o.data?.data ?? o.data;
-      console.log('ORDER DATA:', orderData);
-       setOrder(orderData);
+      const orderData = o.data?.data ?? o.data;
+      setOrder(orderData);
       setKitchens(k.data?.data ?? []);
     } catch { toast.error('Failed to load order'); }
     finally { setLoading(false); }
@@ -60,18 +59,20 @@ const AdminOrderDetailPage: React.FC = () => {
     catch { toast.error('Failed to reject'); } finally { setUpdating(false); }
   };
 
-  const markDelivered = async () => {
+  const confirmApproveDelivery = async () => {
+    if (!addressModal || !order) return;
     setUpdating(true);
-    try { await adminApi.markDelivered(String(order!.id)); toast.success('Marked as delivered!'); fetchOrder(); }
-    catch { toast.error('Failed to mark delivered'); } finally { setUpdating(false); }
+    try {
+      await adminApi.approveDelivery(String(order.id), addressModal.address);
+      toast.success('Delivery approved! Address sent to kitchen.');
+      setAddressModal(null);
+      fetchOrder();
+    } catch { toast.error('Failed to approve delivery'); }
+    finally { setUpdating(false); }
   };
 
-  // ── Excel Download ─────────────────────────────────────────────
   const downloadExcel = () => {
     if (!order) return;
-
-    // Items sheet
- 
     const itemRows = (order.items || []).map((item: any, i: number) => ({
       'Sr No': i + 1,
       'Item Name': item.materialName || '—',
@@ -81,26 +82,13 @@ const AdminOrderDetailPage: React.FC = () => {
       'Price Per Unit (₹)': item.priceAtOrder ?? item.price ?? 0,
       'Line Total (₹)': item.lineTotal ?? 0,
     }));
-    
-    // Summary rows at bottom
     itemRows.push({} as any);
     itemRows.push({
-      'Sr No': '' as any,
-      'Item Name': 'TOTAL',
-      'Category': '',
-      'Brand': '',
-      'Quantity': '' as any,
-      'Price Per Unit (₹)': '' as any,
-      'Line Total (₹)': order.totalAmount,
+      'Sr No': '' as any, 'Item Name': 'TOTAL', 'Category': '', 'Brand': '',
+      'Quantity': '' as any, 'Price Per Unit (₹)': '' as any, 'Line Total (₹)': order.totalAmount,
     });
-
     const ws = XLSX.utils.json_to_sheet(itemRows);
-    ws['!cols'] = [
-      { wch: 6 }, { wch: 22 }, { wch: 14 }, { wch: 14 },
-      { wch: 10 }, { wch: 18 }, { wch: 14 },
-    ];
-
-    // Order Info sheet
+    ws['!cols'] = [{ wch: 6 }, { wch: 22 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }];
     const infoRows = [
       { Field: 'Order ID', Value: `#${String(order.id).slice(-8).toUpperCase()}` },
       { Field: 'Date', Value: new Date(order.createdAt).toLocaleDateString('en-IN') },
@@ -108,44 +96,36 @@ const AdminOrderDetailPage: React.FC = () => {
       { Field: 'Email', Value: order.userEmail || '—' },
       { Field: 'Kitchen', Value: order.kitchenName || 'Not Assigned' },
       { Field: 'Status', Value: order.status },
+      { Field: 'Delivery Address', Value: order.deliveryAddress || '—' },
+      { Field: 'Driver Name', Value: order.driverName || '—' },
+      { Field: 'Vehicle Number', Value: order.vehicleNumber || '—' },
       { Field: 'Total Amount (₹)', Value: order.totalAmount },
       { Field: 'Amount Paid (₹)', Value: (order as any).amountPaid ?? 0 },
       { Field: 'Amount Remaining (₹)', Value: (order as any).amountRemaining ?? 0 },
       { Field: 'Order Notes', Value: order.orderNotes || '—' },
     ];
-
     const ws2 = XLSX.utils.json_to_sheet(infoRows);
     ws2['!cols'] = [{ wch: 22 }, { wch: 30 }];
-
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws2, 'Order Info');
     XLSX.utils.book_append_sheet(wb, ws, 'Items');
-
     XLSX.writeFile(wb, `Order-${String(order.id).slice(-8).toUpperCase()}.xlsx`);
     toast.success('Excel downloaded!');
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-64 text-slate-400">Loading...</div>
-  );
-
-  if (!order) return (
-    <div className="flex items-center justify-center h-64 text-slate-400">Order not found</div>
-  );
+  if (loading) return <div className="flex items-center justify-center h-64 text-slate-400">Loading...</div>;
+  if (!order) return <div className="flex items-center justify-center h-64 text-slate-400">Order not found</div>;
 
   return (
     <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/admin/orders')} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-white">
-              Order #{String(order.id).slice(-8).toUpperCase()}
-            </h1>
+            <h1 className="text-xl font-bold text-white">Order #{String(order.id).slice(-8).toUpperCase()}</h1>
             <p className="text-slate-400 text-sm mt-0.5">
               {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}
             </p>
@@ -153,18 +133,13 @@ const AdminOrderDetailPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={order.status} />
-          <button onClick={downloadExcel} className="btn-secondary">
-            <Download className="w-4 h-4" /> Download Excel
-          </button>
-          <button onClick={fetchOrder} className="btn-secondary">
-            <RefreshCw className="w-4 h-4" /> Refresh
-          </button>
+          <button onClick={downloadExcel} className="btn-secondary"><Download className="w-4 h-4" /> Download Excel</button>
+          <button onClick={fetchOrder} className="btn-secondary"><RefreshCw className="w-4 h-4" /> Refresh</button>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
 
-        {/* LEFT — Items */}
         <div className="lg:col-span-2 space-y-5">
 
           {/* Order Items */}
@@ -182,8 +157,7 @@ const AdminOrderDetailPage: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-white">{item.materialName}</p>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        {item.category || ''}
-                        {item.brand ? ` • ${item.brand}` : ''}
+                        {item.category || ''}{item.brand ? ` • ${item.brand}` : ''}
                       </p>
                     </div>
                     <div className="text-right">
@@ -201,7 +175,45 @@ const AdminOrderDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Notes */}
+          {/* Dispatch Info — visible once dispatched */}
+          {(order.deliveryAddress || order.driverName || order.currentLocation) && (
+            <div className="card px-5 py-4 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Truck className="w-4 h-4 text-sky-400" />
+                <h2 className="text-sm font-semibold text-white">Dispatch Info</h2>
+              </div>
+              {order.deliveryAddress && (
+                <div>
+                  <p className="text-xs text-slate-400">Delivery Address</p>
+                  <p className="text-sm text-slate-300">{order.deliveryAddress}</p>
+                </div>
+              )}
+              {order.driverName && (
+                <div className="flex gap-6">
+                  <div>
+                    <p className="text-xs text-slate-400">Driver</p>
+                    <p className="text-sm text-slate-300">{order.driverName}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">Vehicle</p>
+                    <p className="text-sm text-slate-300">{order.vehicleNumber || '—'}</p>
+                  </div>
+                  {order.estimatedDeliveryTime && (
+                    <div>
+                      <p className="text-xs text-slate-400">ETA</p>
+                      <p className="text-sm text-slate-300">{order.estimatedDeliveryTime}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {order.currentLocation && (
+                <div className="flex items-center gap-1.5 text-amber-400 text-xs">
+                  <MapPin className="w-3.5 h-3.5" /> {order.currentLocation}
+                </div>
+              )}
+            </div>
+          )}
+
           {order.orderNotes && (
             <div className="card px-5 py-4">
               <p className="text-xs text-slate-400 mb-1">Order Notes</p>
@@ -215,18 +227,18 @@ const AdminOrderDetailPage: React.FC = () => {
               <>
                 <button onClick={acceptOrder} disabled={updating}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 transition-all">
-                  ✓ Accept Order
+                  Accept Order
                 </button>
                 <button onClick={rejectOrder} disabled={updating}
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 disabled:opacity-40 transition-all">
-                  ✕ Reject Order
+                  Reject Order
                 </button>
               </>
             )}
             {order.status === 'READY' && (
-              <button onClick={markDelivered} disabled={updating}
-                className="w-full py-2.5 rounded-xl text-sm font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 disabled:opacity-40 transition-all">
-                Mark as Delivered
+              <button onClick={() => setAddressModal({ address: '' })} disabled={updating}
+                className="w-full py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 transition-all">
+                Approve for Delivery
               </button>
             )}
           </div>
@@ -235,7 +247,6 @@ const AdminOrderDetailPage: React.FC = () => {
         {/* RIGHT — Info */}
         <div className="space-y-4">
 
-          {/* User Info */}
           <div className="card px-5 py-4 space-y-3">
             <div className="flex items-center gap-2 mb-1">
               <User className="w-4 h-4 text-sky-400" />
@@ -251,7 +262,6 @@ const AdminOrderDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Kitchen Info */}
           <div className="card px-5 py-4 space-y-3">
             <div className="flex items-center gap-2 mb-1">
               <ChefHat className="w-4 h-4 text-emerald-400" />
@@ -280,7 +290,6 @@ const AdminOrderDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* Payment Info */}
           <div className="card px-5 py-4 space-y-3">
             <h2 className="text-sm font-semibold text-white mb-1">Payment</h2>
             <div className="flex justify-between">
@@ -296,9 +305,36 @@ const AdminOrderDetailPage: React.FC = () => {
               <span className="text-sm font-bold text-amber-400">₹{(order as any).amountRemaining ?? 0}</span>
             </div>
           </div>
-
         </div>
       </div>
+
+      {/* Address Modal */}
+      {addressModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="card w-full max-w-sm p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-white">Approve for Delivery</h3>
+            <p className="text-xs text-slate-400">Enter the delivery address. Kitchen will see this on their Dispatch page.</p>
+            <textarea
+              value={addressModal.address}
+              onChange={e => setAddressModal({ address: e.target.value })}
+              placeholder="Full delivery address..."
+              className="input-field w-full py-2 text-sm resize-none"
+              rows={3}
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button onClick={() => setAddressModal(null)} className="flex-1 py-2 rounded-xl text-xs text-slate-400 border border-slate-700 hover:bg-slate-800 transition-all">Cancel</button>
+              <button
+                onClick={confirmApproveDelivery}
+                disabled={!addressModal.address.trim() || updating}
+                className="flex-1 py-2 rounded-xl text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 transition-all"
+              >
+                Confirm & Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

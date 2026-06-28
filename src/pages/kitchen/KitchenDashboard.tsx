@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import { ClipboardList, Clock, CheckCircle, Truck, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { kitchenApi, dashboardApi } from '../../api/services';
 import { Order } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -9,6 +10,7 @@ import { CardSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 import toast from 'react-hot-toast';
 
 const KitchenDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [dashStats, setDashStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ const KitchenDashboard: React.FC = () => {
           <>
             <StatCard title="Total Assigned" value={dashStats?.totalOrders ?? orders.length} icon={ClipboardList} color="sky" />
             <StatCard title="Preparing" value={dashStats?.preparingNow ?? byStatus('PREPARING')} icon={Clock} color="amber" />
-            <StatCard title="Ready" value={dashStats?.readyNow ?? byStatus('READY')} icon={CheckCircle} color="emerald" />
+            <StatCard title="Ready / Approved" value={dashStats?.readyNow ?? (byStatus('READY') + byStatus('APPROVAL_PENDING'))} icon={CheckCircle} color="emerald" />
             <StatCard title="Completed" value={dashStats?.completedByMe ?? byStatus('DELIVERED')} icon={Truck} color="purple" />
           </>
         )}
@@ -116,6 +118,14 @@ const KitchenDashboard: React.FC = () => {
                             className="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                           >
                             Mark Ready
+                          </button>
+                        )}
+                        {order.status === 'APPROVAL_PENDING' && (
+                          <button
+                            onClick={() => navigate('/kitchen/dispatch')}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
+                          >
+                            Go to Dispatch →
                           </button>
                         )}
                         {(order.status === 'READY' || order.status === 'DELIVERED') && (

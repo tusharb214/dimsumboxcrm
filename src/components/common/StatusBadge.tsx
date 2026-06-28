@@ -1,4 +1,4 @@
-import React from 'react';
+ import React from 'react';
 import { OrderStatus } from '../../types';
 
 interface StatusBadgeProps {
@@ -6,15 +6,22 @@ interface StatusBadgeProps {
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  PENDING:    { label: 'Pending',    className: 'badge-warning' },
-  ASSIGNED:   { label: 'Assigned',   className: 'badge-info' },
-  PREPARING:  { label: 'Preparing',  className: 'badge-purple' },
-  READY:      { label: 'Ready',      className: 'badge-success' },
-  DISPATCHED: { label: 'Dispatched', className: 'badge-info' },
-  DELIVERED:  { label: 'Delivered',  className: 'badge-success' },
-  CANCELLED:  { label: 'Cancelled',  className: 'badge-danger' },
-  ACTIVE:     { label: 'Active',     className: 'badge-success' },
-  INACTIVE:   { label: 'Inactive',   className: 'badge-neutral' },
+  // Order statuses
+  REQUESTED:        { label: 'Requested',       className: 'badge-warning' },
+  ACCEPTED:         { label: 'Accepted',         className: 'badge-info' },
+  ASSIGNED:         { label: 'Assigned',         className: 'badge-info' },
+  PREPARING:        { label: 'Preparing',        className: 'badge-purple' },
+  READY:            { label: 'Ready',            className: 'badge-success' },
+  APPROVAL_PENDING: { label: 'Admin Approved ✓', className: 'badge-success' },
+  DISPATCHED:       { label: 'Dispatched',       className: 'badge-info' },
+  DELIVERED:        { label: 'Delivered',        className: 'badge-success' },
+  COMPLETED:        { label: 'Completed',        className: 'badge-success' },
+  REJECTED:         { label: 'Rejected',         className: 'badge-danger' },
+  CANCELLED:        { label: 'Cancelled',        className: 'badge-danger' },
+  // User/Kitchen statuses
+  PENDING:          { label: 'Pending',          className: 'badge-warning' },
+  ACTIVE:           { label: 'Active',           className: 'badge-success' },
+  INACTIVE:         { label: 'Inactive',         className: 'badge-neutral' },
 };
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {

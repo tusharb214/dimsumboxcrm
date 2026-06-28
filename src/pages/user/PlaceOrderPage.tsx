@@ -4,14 +4,7 @@ import { userApi, materialApi } from '../../api/services';
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// interface Material {
-//   id: number;
-//   name: string;
-//   category: string;
-//   brand: string;
-//   costPerItem: number;
-//   isActive: boolean;
-// }
+ 
 interface Material {
   id: number;
   name: string;

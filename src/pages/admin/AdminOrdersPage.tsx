@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
+ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RefreshCw, ChefHat, Settings2, Eye  } from 'lucide-react';
- import { adminApi, dashboardApi } from '../../api/services';
+import { RefreshCw, ChefHat, Settings2, Eye, CheckCircle2 } from 'lucide-react';
+import { adminApi, dashboardApi } from '../../api/services';
 import { Order, Kitchen, OrderStatus } from '../../types';
 import StatusBadge from '../../components/common/StatusBadge';
 import SearchBar from '../../components/common/SearchBar';
@@ -11,30 +11,28 @@ import EmptyState from '../../components/common/EmptyState';
 import toast from 'react-hot-toast';
 
 const LIMIT = 10;
-// const STATUSES: OrderStatus[] = ['PENDING','ASSIGNED','PREPARING','READY','DISPATCHED','DELIVERED','CANCELLED'];
-const STATUSES: OrderStatus[] = ['REQUESTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING', 'READY', 'DELIVERED', 'COMPLETED', 'REJECTED'];
+const STATUSES: OrderStatus[] = ['REQUESTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING', 'READY', 'APPROVAL_PENDING', 'DISPATCHED', 'DELIVERED', 'COMPLETED', 'REJECTED'];
 
- const AdminOrdersPage: React.FC = () => {
+const AdminOrdersPage: React.FC = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [kitchens, setKitchens] = useState<Kitchen[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dashStats, setDashStats] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(1);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [addressModal, setAddressModal] = useState<{ orderId: string; address: string } | null>(null);
 
-   
-const fetchData = async () => {
-  setLoading(true);
-  try {
-    const [o, k] = await Promise.all([adminApi.getAllOrders(), adminApi.getAllKitchens()]);
-    setOrders(o.data?.data ?? []);
-    setKitchens(k.data?.data ?? []);
-  } catch { toast.error('Failed to load data'); }
-  finally { setLoading(false); }
-};
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [o, k] = await Promise.all([adminApi.getAllOrders(), adminApi.getAllKitchens()]);
+      setOrders(o.data?.data ?? []);
+      setKitchens(k.data?.data ?? []);
+    } catch { toast.error('Failed to load data'); }
+    finally { setLoading(false); }
+  };
 
   useEffect(() => { fetchData(); }, []);
 
@@ -47,42 +45,16 @@ const fetchData = async () => {
 
   const paginated = filtered.slice((page - 1) * LIMIT, page * LIMIT);
 
-  const assignKitchen = async (orderId: string, kitchenId: string) => {
-    if (!kitchenId) return;
-    const order = orders.find(o => String(o.id) === orderId);
-    if (order?.status !== 'ACCEPTED') {
-      toast.error('Order must be ACCEPTED to assign kitchen');
-      return;
-    }
-    dashboardApi.getAdminDashboard()
-  .then(r => setDashStats(r.data?.data))
-  .catch(() => {});
-    
-    setUpdating(orderId);
+  const confirmApproveDelivery = async () => {
+    if (!addressModal) return;
+    setUpdating(addressModal.orderId);
     try {
-      await adminApi.assignKitchenToOrder(orderId, kitchenId);
-      toast.success('Kitchen assigned!');
+      await adminApi.approveDelivery(addressModal.orderId, addressModal.address);
+      toast.success('Delivery approved! Address sent to kitchen.');
+      setAddressModal(null);
       fetchData();
-    } catch { toast.error('Failed to assign kitchen'); }
+    } catch { toast.error('Failed to approve delivery'); }
     finally { setUpdating(null); }
-  };
-
-  const acceptOrder = async (orderId: string) => {
-    setUpdating(orderId);
-    try { await adminApi.acceptOrder(orderId); toast.success('Order accepted!'); fetchData(); }
-    catch { toast.error('Failed to accept'); } finally { setUpdating(null); }
-  };
-
-  const rejectOrder = async (orderId: string) => {
-    setUpdating(orderId);
-    try { await adminApi.rejectOrder(orderId); toast.success('Order rejected!'); fetchData(); }
-    catch { toast.error('Failed to reject'); } finally { setUpdating(null); }
-  };
-
-  const markDelivered = async (orderId: string) => {
-    setUpdating(orderId);
-    try { await adminApi.markDelivered(orderId); toast.success('Marked as delivered!'); fetchData(); }
-    catch { toast.error('Failed to mark delivered'); } finally { setUpdating(null); }
   };
 
   return (
@@ -114,11 +86,10 @@ const fetchData = async () => {
                   <th className="table-th">Order ID</th>
                   <th className="table-th">User</th>
                   <th className="table-th">Status</th>
-                  <th className="table-th">Assign Kitchen</th>
-                  {/* <th className="table-th">Actions</th> */}
+                  <th className="table-th">Kitchen</th>
                   <th className="table-th">Amount</th>
                   <th className="table-th">Date</th>
-                  <th className="table-th">Details</th>
+                  <th className="table-th">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -127,7 +98,7 @@ const fetchData = async () => {
                     <td className="table-td font-mono text-sky-400 text-xs">#{String(order.id).slice(-8).toUpperCase()}</td>
                     <td className="table-td">{order.userName || '—'}</td>
                     <td className="table-td"><StatusBadge status={order.status} /></td>
-                     <td className="table-td">
+                    <td className="table-td">
                       {order.kitchenName ? (
                         <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
                           <ChefHat className="w-3.5 h-3.5" />{order.kitchenName}
@@ -136,16 +107,26 @@ const fetchData = async () => {
                         <span className="text-xs text-slate-500">Not Assigned</span>
                       )}
                     </td>
-                     
                     <td className="table-td font-semibold text-white">₹{order.totalAmount}</td>
-             <td className="table-td text-slate-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="table-td text-slate-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
                     <td className="table-td">
-                      <button
-                        onClick={() => navigate(`/admin/orders/${order.id}`)}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/20 transition-all"
-                      >
-                        <Eye className="w-3 h-3" /> View
-                      </button>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          onClick={() => navigate(`/admin/orders/${order.id}`)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/20 transition-all"
+                        >
+                          <Eye className="w-3 h-3" /> View
+                        </button>
+                        {order.status === 'READY' && (
+                          <button
+                            onClick={() => setAddressModal({ orderId: String(order.id), address: '' })}
+                            disabled={updating === String(order.id)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 disabled:opacity-40 transition-all"
+                          >
+                            <CheckCircle2 className="w-3 h-3" /> Approve for Delivery
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -155,6 +136,34 @@ const fetchData = async () => {
         </div>
         <Pagination page={page} total={filtered.length} limit={LIMIT} onChange={setPage} />
       </div>
+
+      {/* Address Modal */}
+      {addressModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="card w-full max-w-sm p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-white">Approve for Delivery</h3>
+            <p className="text-xs text-slate-400">Enter the delivery address. Kitchen will see this on their Dispatch page.</p>
+            <textarea
+              value={addressModal.address}
+              onChange={e => setAddressModal(prev => prev ? { ...prev, address: e.target.value } : null)}
+              placeholder="Full delivery address..."
+              className="input-field w-full py-2 text-sm resize-none"
+              rows={3}
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button onClick={() => setAddressModal(null)} className="flex-1 py-2 rounded-xl text-xs text-slate-400 border border-slate-700 hover:bg-slate-800 transition-all">Cancel</button>
+              <button
+                onClick={confirmApproveDelivery}
+                disabled={!addressModal.address.trim() || !!updating}
+                className="flex-1 py-2 rounded-xl text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 transition-all"
+              >
+                Confirm & Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
