@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ShoppingBag, TrendingUp, BarChart3, Calendar, Download,
-  ChevronDown, ChevronUp, LayoutDashboard
+  ChevronDown, ChevronUp, LayoutDashboard, Package
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
@@ -81,7 +81,8 @@ const AdminUserDetailPage: React.FC = () => {
   const [userOrders, setUserOrders] = useState<Order[]>([]);
   const [dailyRevenue, setDailyRevenue] = useState<DailyRevenue[]>([]);
   const [detailLoading, setDetailLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'orders' | 'daily'>('dashboard');
+  // const [activeTab, setActiveTab] = useState<'dashboard' | 'orders' | 'daily'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'orders' | 'daily' | 'stock'>('dashboard');
 
   // orders tab
   const [orderPage, setOrderPage] = useState(1);
@@ -94,6 +95,12 @@ const AdminUserDetailPage: React.FC = () => {
   const [dailyFrom, setDailyFrom] = useState('');
   const [dailyTo, setDailyTo] = useState('');
   const [expandedDate, setExpandedDate] = useState<string | null>(null);
+  const [stockItems, setStockItems] = useState<any[]>([]);
+  const [stockLoading, setStockLoading] = useState(false);
+  const [stockLoaded, setStockLoaded] = useState(false);
+  const [expandedStockId, setExpandedStockId] = useState<string | null>(null);
+
+
 
   // dashboard
   const [chartRange, setChartRange] = useState<'monthly' | 'yearly'>('monthly');
@@ -256,18 +263,34 @@ const AdminUserDetailPage: React.FC = () => {
     { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-3.5 h-3.5" />, color: 'violet' },
     { key: 'orders',    label: 'Orders',    icon: <ShoppingBag className="w-3.5 h-3.5" />,    color: 'sky'    },
     { key: 'daily',     label: 'Daily Sales', icon: <BarChart3 className="w-3.5 h-3.5" />,   color: 'emerald'},
+    { key: 'stock',     label: 'Stock',      icon: <Package className="w-3.5 h-3.5" />,         color: 'amber'   },
   ] as const;
 
+  // const tabActive: Record<string, string> = {
+  //   dashboard: 'text-violet-400 border-b-2 border-violet-400 bg-violet-500/5',
+  //   orders:    'text-sky-400 border-b-2 border-sky-400 bg-sky-500/5',
+  //   daily:     'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5',
+  // };
+  // const badgeActive: Record<string, string> = {
+  //   dashboard: 'bg-violet-500/20 text-violet-400',
+  //   orders:    'bg-sky-500/20 text-sky-400',
+  //   daily:     'bg-emerald-500/20 text-emerald-400',
+  // };
+
+
+
   const tabActive: Record<string, string> = {
-    dashboard: 'text-violet-400 border-b-2 border-violet-400 bg-violet-500/5',
-    orders:    'text-sky-400 border-b-2 border-sky-400 bg-sky-500/5',
-    daily:     'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5',
-  };
-  const badgeActive: Record<string, string> = {
-    dashboard: 'bg-violet-500/20 text-violet-400',
-    orders:    'bg-sky-500/20 text-sky-400',
-    daily:     'bg-emerald-500/20 text-emerald-400',
-  };
+  dashboard: 'text-violet-400 border-b-2 border-violet-400 bg-violet-500/5',
+  orders:    'text-sky-400 border-b-2 border-sky-400 bg-sky-500/5',
+  daily:     'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5',
+  stock:     'text-amber-400 border-b-2 border-amber-400 bg-amber-500/5',
+};
+const badgeActive: Record<string, string> = {
+  dashboard: 'bg-violet-500/20 text-violet-400',
+  orders:    'bg-sky-500/20 text-sky-400',
+  daily:     'bg-emerald-500/20 text-emerald-400',
+  stock:     'bg-amber-500/20 text-amber-400',
+};
 
   return (
     <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
@@ -313,7 +336,20 @@ const AdminUserDetailPage: React.FC = () => {
         {/* Tab Bar */}
         <div className="flex border-b border-slate-800">
           {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+            // <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+            <button key={tab.key} onClick={async () => {
+  setActiveTab(tab.key);
+  if (tab.key === 'stock' && !stockLoaded) {
+    setStockLoading(true);
+    try {
+      const res = await adminApi.getUserSales(userId!);
+      const raw = res.data as any;
+      const sales: any[] = Array.isArray(raw) ? raw : raw?.data ?? [];
+      setStockItems(sales);
+    } catch { toast.error('Failed to load sales data'); }
+    finally { setStockLoading(false); setStockLoaded(true); }
+  }
+}}
               className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors ${
                 activeTab === tab.key ? tabActive[tab.key] : 'text-slate-500 hover:text-slate-300'
               }`}
@@ -331,6 +367,13 @@ const AdminUserDetailPage: React.FC = () => {
                   {dailyRevenue.length}
                 </span>
               )}
+              {tab.key === 'stock' && stockLoaded && (
+  <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-slate-800 text-slate-500'}`}>
+    {stockItems.length}
+  </span>
+)}
+
+              
             </button>
           ))}
         </div>
@@ -610,6 +653,114 @@ const AdminUserDetailPage: React.FC = () => {
               )}
             </div>
           )}
+
+        {/* ══════════════════════════════════════
+    STOCK TAB — Stock Remaining (IN - OUT)
+══════════════════════════════════════ */}
+{activeTab === 'stock' && (() => {
+  // ── IN: delivered orders मधून ──
+  const inMap: Record<string, { name: string; category: string; qty: number }> = {};
+  userOrders
+    .filter(o => ['DELIVERED', 'COMPLETED'].includes(o.status))
+    .forEach(o => {
+      (o.items || []).forEach((item: any) => {
+        const key = (item.materialName || 'unknown').toUpperCase();
+        if (!inMap[key]) inMap[key] = { name: item.materialName || key, category: item.category || '—', qty: 0 };
+        inMap[key].qty += item.quantity || 0;
+      });
+    });
+
+
+  const outMap: Record<string, number> = {};
+  stockItems.forEach((report: any) => {
+    if (!report.itemsSold) return;
+    report.itemsSold.split(',').forEach((part: string) => {
+      const match = part.trim().match(/^(.+?)\s*[x:×]\s*(\d+)$/i);
+      if (match) {
+        const name = match[1].trim().toUpperCase();
+        const qty = parseInt(match[2]);
+        outMap[name] = (outMap[name] || 0) + qty;
+      }
+    });
+  });
+
+  const stockList = Object.values(inMap).map(item => {
+    const soldQty = outMap[item.name.toUpperCase()] || 0;
+    const remaining = Math.max(0, item.qty - soldQty);
+    const pct = item.qty > 0 ? (remaining / item.qty) * 100 : 0;
+    const status = pct === 0 ? 'critical' : pct <= 20 ? 'low' : 'ok';
+    return { ...item, soldQty, remaining, pct, status };
+  }).sort((a, b) => a.pct - b.pct);
+
+  return stockList.length === 0 ? (
+    <div className="text-center py-10 text-slate-500 text-sm">No delivered stock found</div>
+  ) : (
+    <div className="space-y-3">
+      <p className="text-xs text-slate-500">{stockList.length} materials received via orders</p>
+      <div className="space-y-2">
+        {stockList.map(item => {
+          const isOpen = expandedStockId === item.name;
+          const barColor = item.status === 'critical' ? 'bg-red-500' : item.status === 'low' ? 'bg-amber-400' : 'bg-emerald-400';
+          const badge = item.status === 'critical'
+            ? <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30">⚠ Critical</span>
+            : item.status === 'low'
+            ? <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">Low</span>
+            : <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Ok</span>;
+
+          return (
+            <div key={item.name} className="rounded-xl border border-slate-700/40 overflow-hidden">
+              <button
+                onClick={() => setExpandedStockId(isOpen ? null : item.name)}
+                className="w-full bg-slate-800/60 hover:bg-slate-800/80 px-4 py-3 transition-colors text-left"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-white uppercase tracking-wide">{item.name}</p>
+                    {badge}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <span className="text-sm font-bold text-white">{item.remaining}</span>
+                      <span className="text-xs text-slate-500"> / {item.qty} units</span>
+                    </div>
+                    {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                  </div>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${item.pct}%` }} />
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-xs text-slate-500">Sold: {item.soldQty} units</p>
+                  <p className="text-xs text-slate-500">{Math.round(item.pct)}% remaining</p>
+                </div>
+              </button>
+
+              {isOpen && (
+                <div className="bg-slate-900/60 px-4 py-3 grid grid-cols-3 gap-3">
+                  <div className="bg-slate-800/50 rounded-lg px-3 py-2">
+                    <p className="text-xs text-slate-500 mb-0.5">Category</p>
+                    <p className="text-xs text-white font-medium">{item.category}</p>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-lg px-3 py-2">
+                    <p className="text-xs text-slate-500 mb-0.5">Total Received</p>
+                    <p className="text-xs text-amber-400 font-bold">{item.qty} units</p>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-lg px-3 py-2">
+                    <p className="text-xs text-slate-500 mb-0.5">Remaining</p>
+                    <p className={`text-xs font-bold ${item.status === 'critical' ? 'text-red-400' : item.status === 'low' ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {item.remaining} units
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+})()}
 
         </div>
       </div>
