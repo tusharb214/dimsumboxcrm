@@ -83,12 +83,25 @@ const AdminNotificationsPage: React.FC = () => {
           <h1 className="text-xl font-bold text-white">Notifications</h1>
           <p className="text-slate-400 text-sm mt-0.5">System and activity alerts</p>
         </div>
-        <button
-          onClick={fetchNotifications}
-          className="btn-secondary"
-        >
-          <RefreshCw className="w-4 h-4" /> Refresh
-        </button>
+         <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              try {
+                await notificationApi.triggerCheck();
+                toast.success('Notification check triggered!');
+                setTimeout(fetchNotifications, 1000);
+              } catch {
+                toast.error('Failed to trigger check');
+              }
+            }}
+            className="btn-secondary"
+          >
+            <AlertTriangle className="w-4 h-4" /> Trigger Check
+          </button>
+          <button onClick={fetchNotifications} className="btn-secondary">
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
+        </div>
       </div>
 
       <div className="card overflow-hidden">
