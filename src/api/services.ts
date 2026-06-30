@@ -21,6 +21,25 @@ export const authApi = {
 
 
 // ─── USER ORDERS ──────────────────────────────────────────────────
+// export const userApi = {
+//   getMyOrders: () =>
+//     apiClient.get('/orders'),
+
+//   createOrder: (data: CreateOrderPayload) =>
+//     apiClient.post('/orders', data),
+
+//   confirmDelivery: (orderId: string) =>
+//     apiClient.put(`/orders/${orderId}/confirm-delivery`),
+
+//   getOrderById: (orderId: string) =>
+//     apiClient.get(`/orders/${orderId}`),
+//   // resubmitOrder: (orderId: string, data: CreateOrderPayload) =>
+//   // apiClient.put(`/orders/${orderId}/resubmit`, data),
+//   resubmitOrder: (data: CreateOrderPayload) =>
+//   apiClient.post('/orders/resubmit', data),
+// };
+
+ // ─── USER ORDERS ──────────────────────────────────────────────────
 export const userApi = {
   getMyOrders: () =>
     apiClient.get('/orders'),
@@ -33,10 +52,12 @@ export const userApi = {
 
   getOrderById: (orderId: string) =>
     apiClient.get(`/orders/${orderId}`),
-  // resubmitOrder: (orderId: string, data: CreateOrderPayload) =>
-  // apiClient.put(`/orders/${orderId}/resubmit`, data),
+
   resubmitOrder: (data: CreateOrderPayload) =>
-  apiClient.post('/orders/resubmit', data),
+    apiClient.post('/orders/resubmit', data),
+
+  getMinOrderAmount: () =>
+    apiClient.get('/orders/min-amount'),
 };
 
 // ─── MATERIALS (user + admin browse) ──────────────────────────────
@@ -54,6 +75,70 @@ export const materialApi = {
     apiClient.get(`/materials/${id}`),
 };
 
+// ─── ADMIN ────────────────────────────────────────────────────────
+// export const adminApi = {
+//   // Orders
+//   getAllOrders: () =>
+//     apiClient.get('/admin/orders'),
+
+//   getOrderById: (id: string) =>
+//     apiClient.get(`/admin/orders/${id}`),
+
+//   acceptOrder: (orderId: string) =>
+//     apiClient.put(`/admin/orders/${orderId}/accept`),
+
+//   rejectOrder: (orderId: string) =>
+//     apiClient.put(`/admin/orders/${orderId}/reject`),
+
+//   assignKitchenToOrder: (orderId: string, kitchenId: string) =>
+//     apiClient.put(`/admin/orders/${orderId}/assign`, { kitchenId }),
+
+//   markDelivered: (orderId: string) =>
+//     apiClient.put(`/admin/orders/${orderId}/deliver`),
+
+//   approveDelivery: (orderId: string, deliveryAddress: string) =>
+//     apiClient.put(`/admin/orders/${orderId}/approve-delivery`, { deliveryAddress }),
+
+//   getOrderHistory: (orderId: string) =>
+//     apiClient.get(`/admin/orders/${orderId}/history`),
+  
+
+//   // Materials
+//   addMaterial: (data: any) =>
+//     apiClient.post('/admin/materials', data),
+
+//   updateMaterial: (id: string, data: any) =>
+//     apiClient.put(`/admin/materials/${id}`, data),
+
+//   deleteMaterial: (id: string) =>
+//     apiClient.delete(`/admin/materials/${id}`),
+
+//   restoreMaterial: (id: string) =>
+//     apiClient.put(`/admin/materials/${id}/restore`),
+
+//   getAllMaterials: () =>
+//     apiClient.get('/admin/materials'),
+
+//   // Users
+//   createUser: (data: CreateUserPayload) =>
+//     apiClient.post('/admin/users', data),
+
+//   getAllUsers: () =>
+//     apiClient.get('/admin/users'),
+
+//   deleteUser: (id: string) =>
+//     apiClient.delete(`/admin/users/${id}`),
+
+//   // Kitchens
+//   createKitchen: (data: CreateKitchenPayload) =>
+//     apiClient.post('/admin/kitchens', data),
+
+//   getAllKitchens: () =>
+//     apiClient.get('/admin/kitchens'),
+
+//    getUserSales: (userId: string) =>
+//     apiClient.get(`/admin/users/${userId}/sales`),
+// };
 // ─── ADMIN ────────────────────────────────────────────────────────
 export const adminApi = {
   // Orders
@@ -80,7 +165,6 @@ export const adminApi = {
 
   getOrderHistory: (orderId: string) =>
     apiClient.get(`/admin/orders/${orderId}/history`),
-  
 
   // Materials
   addMaterial: (data: any) =>
@@ -115,8 +199,15 @@ export const adminApi = {
   getAllKitchens: () =>
     apiClient.get('/admin/kitchens'),
 
-   getUserSales: (userId: string) =>
+  getUserSales: (userId: string) =>
     apiClient.get(`/admin/users/${userId}/sales`),
+
+  // Settings
+  getSettings: () =>
+    apiClient.get('/admin/settings'),
+
+  updateMinOrderAmount: (minOrderAmount: number) =>
+    apiClient.put('/admin/settings/min-order-amount', { minOrderAmount }),
 };
 
 // ─── KITCHEN ──────────────────────────────────────────────────────

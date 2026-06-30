@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Plus, Minus, Trash2, ShoppingBag, Loader2, RefreshCw, Eye, X } from 'lucide-react';
 import { userApi, materialApi } from '../../api/services';
 import toast from 'react-hot-toast';
@@ -33,6 +33,7 @@ const PlaceOrderPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
+  const [minOrderAmount, setMinOrderAmount] = useState(0);
 
   // Detect resubmit state from MyOrdersPage
   const resubmitOrder = (location.state as any)?.resubmitOrder;
@@ -65,6 +66,13 @@ const PlaceOrderPage: React.FC = () => {
       })
       .catch(() => toast.error('Failed to load materials'))
       .finally(() => setLoadingMaterials(false));
+
+    userApi.getMinOrderAmount()
+      .then(r => {
+        const data = (r.data as any)?.data ?? r.data;
+        setMinOrderAmount(Number(data?.minOrderAmount) || 0);
+      })
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -106,6 +114,8 @@ const PlaceOrderPage: React.FC = () => {
 
   const placeOrder = async () => {
     if (cart.length === 0) return toast.error('Cart is empty');
+    if (minOrderAmount > 0 && total < minOrderAmount)
+      return toast.error(`Minimum order amount is ₹${minOrderAmount}. Add ₹${minOrderAmount - total} more.`);
     setPlacing(true);
     try {
       if (isResubmit) {
@@ -128,8 +138,9 @@ const PlaceOrderPage: React.FC = () => {
       // FIX 1: Clear form after submit
       clearCart();
       navigate('/dashboard/orders', { replace: true });
-    } catch {
-      toast.error(isResubmit ? 'Failed to resubmit order' : 'Failed to place order');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      toast.error(msg || (isResubmit ? 'Failed to resubmit order' : 'Failed to place order'));
     } finally {
       setPlacing(false);
     }
@@ -357,7 +368,16 @@ const PlaceOrderPage: React.FC = () => {
                   <span className="text-sm text-slate-400">Total</span>
                   <span className="text-lg font-bold text-white">₹{total}</span>
                 </div>
-                <button onClick={placeOrder} className="btn-primary w-full justify-center py-3" disabled={placing}>
+                {minOrderAmount > 0 && total < minOrderAmount && (
+                  <p className="text-xs text-amber-400">
+                    Minimum order amount is ₹{minOrderAmount}. Add ₹{minOrderAmount - total} more to place this order.
+                  </p>
+                )}
+                <button
+                  onClick={placeOrder}
+                  className="btn-primary w-full justify-center py-3"
+                  disabled={placing || (minOrderAmount > 0 && total < minOrderAmount)}
+                >
                   {placing
                     ? <Loader2 className="w-4 h-4 animate-spin" />
                     : <><ShoppingBag className="w-4 h-4" /> {isResubmit ? 'Resubmit Order' : 'Place Order'}</>
