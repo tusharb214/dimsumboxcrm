@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import {
+ import {
   LayoutDashboard, ShoppingBag, Users, ChefHat, Package,
   BarChart3, Bell, Settings, LogOut, X, Boxes, Tags,
-  Truck, ClipboardList, Globe, Shield, ChevronRight, TrendingUp,
+  Truck, ClipboardList, Globe, Shield, ChevronRight, TrendingUp, Store,
 } from 'lucide-react';
 import { UserRole } from '../../types';
 import { notificationApi } from '../../api/services';
@@ -17,23 +17,14 @@ interface SidebarProps {
 const navItems: Record<UserRole, { label: string; icon: React.ElementType; path: string; }[]> = {
   USER: [
     { label: 'Dashboard',     icon: LayoutDashboard, path: '/dashboard' },
+    { label: 'POS',           icon: Store,           path: '/dashboard/pos' },
     { label: 'Place Order',   icon: ShoppingBag,     path: '/dashboard/order' },
     { label: 'My Orders',     icon: ClipboardList,   path: '/dashboard/orders' },
     { label: 'Daily Sales',   icon: TrendingUp,      path: '/dashboard/sales' },
     { label: 'Analytics',     icon: BarChart3,       path: '/dashboard/analytics' },
     { label: 'Notifications', icon: Bell,            path: '/dashboard/notifications' },
   ],
-  // ADMIN: [
-  //   { label: 'Dashboard',     icon: LayoutDashboard, path: '/admin' },
-  //   { label: 'Orders',        icon: ClipboardList,   path: '/admin/orders' },
-  //   { label: 'Kitchens',      icon: ChefHat,         path: '/admin/kitchens' },
-  //   { label: 'Users',         icon: Users,           path: '/admin/users' },
-  //   { label: 'Products',      icon: Package,         path: '/admin/products' },
-  //   { label: 'Categories',    icon: Tags,            path: '/admin/categories' },
-  //   { label: 'Reports',       icon: BarChart3,       path: '/admin/reports' },
-  //   { label: 'Notifications', icon: Bell,            path: '/admin/notifications' },
-  //   {label: 'Settings',      icon: Settings,        path: '/admin/settings' },
-  // ],
+ 
    ADMIN: [
      { label: 'Dashboard',    icon: LayoutDashboard, path: '/admin' },
     { label: 'Orders',       icon: ClipboardList,   path: '/admin/orders' },

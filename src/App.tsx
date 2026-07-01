@@ -16,6 +16,8 @@ import PlaceOrderPage from './pages/user/PlaceOrderPage';
 import UserAnalyticsPage from './pages/user/UserAnalyticsPage';
 import NotificationsPage from './pages/user/NotificationsPage';
 import DailySalesPage from './pages/user/DailySalesPage';
+import { PosSetupWizard } from './pages/pos/setup/PosSetupWizard';
+import { PosEntry } from './pages/pos/PosEntry';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
@@ -73,6 +75,8 @@ const App: React.FC = () => (
           <Route path="analytics" element={<UserAnalyticsPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="/dashboard/sales" element={<DailySalesPage />} />
+      <Route path="pos/setup" element={<PosSetupWizard />} />
+          <Route path="pos" element={<PosEntry />} />
         </Route>
 
         <Route path="/admin" element={<ProtectedRoute allowedRoles={['ADMIN']}><DashboardLayout /></ProtectedRoute>}>
