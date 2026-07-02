@@ -330,7 +330,7 @@ const [loadingStock, setLoadingStock] = useState(true);
   );
 
   const downloadDailyExcel = () => {
-    if (filteredDailyHistory.length === 0) return toast.error('Download करायला data नाही');
+    if (filteredDailyHistory.length === 0) return toast.error('There is no data to download');
     const rows = filteredDailyHistory.map(log => ({
       'Date': log.reportDate,
       'Total Sales (₹)': log.totalSales || 0,
@@ -556,7 +556,7 @@ const [loadingStock, setLoadingStock] = useState(true);
             ) : paginatedDailyHistory.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <History className="w-10 h-10 text-slate-700 mb-3" />
-                <p className="text-slate-400 text-sm">कोणतीही entries नाहीत</p>
+                <p className="text-slate-400 text-sm">No entries found</p>
               </div>
             ) : (
               <>
@@ -647,7 +647,7 @@ const [loadingStock, setLoadingStock] = useState(true);
           ) : paginatedOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
               <History className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-400 text-sm">कोणतेही bills नाहीत</p>
+              <p className="text-slate-400 text-sm">No bills found</p>
             </div>
           ) : (
             <>
@@ -749,7 +749,7 @@ const [loadingStock, setLoadingStock] = useState(true);
           {filteredStock.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
               <AlertTriangle className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-400 text-sm">Stock data नाही</p>
+              <p className="text-slate-400 text-sm">No stock data available</p>
             </div>
           ) : (
             <>

@@ -61,10 +61,7 @@ const NotificationsPage: React.FC = () => (
         })}
       </div>
     </div>
-
-    <div className="card p-6 text-center">
-      <p className="text-slate-500 text-sm">Showing static demo notifications. Real-time notifications will be available after backend integration.</p>
-    </div>
+ 
   </div>
 );
 
