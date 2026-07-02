@@ -18,6 +18,7 @@ const navItems: Record<UserRole, { label: string; icon: React.ElementType; path:
   USER: [
     { label: 'Dashboard',     icon: LayoutDashboard, path: '/dashboard' },
     { label: 'POS',           icon: Store,           path: '/dashboard/pos' },
+    { label: 'POS Settings',  icon: Settings,        path: '/dashboard/pos/settings' },
     { label: 'Place Order',   icon: ShoppingBag,     path: '/dashboard/order' },
     { label: 'My Orders',     icon: ClipboardList,   path: '/dashboard/orders' },
     { label: 'Daily Sales',   icon: TrendingUp,      path: '/dashboard/sales' },
