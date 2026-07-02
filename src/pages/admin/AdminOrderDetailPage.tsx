@@ -59,6 +59,13 @@ const AdminOrderDetailPage: React.FC = () => {
     catch { toast.error('Failed to reject'); } finally { setUpdating(false); }
   };
 
+  const markDelivered = async () => {
+    setUpdating(true);
+    try { await adminApi.markDelivered(String(order!.id)); toast.success('Order marked as Delivered!'); fetchOrder(); }
+    catch (err: any) { toast.error(err?.response?.data?.message || 'Failed to mark delivered'); }
+    finally { setUpdating(false); }
+  };
+
   const confirmApproveDelivery = async () => {
     if (!addressModal || !order) return;
     setUpdating(true);
@@ -140,7 +147,7 @@ const AdminOrderDetailPage: React.FC = () => {
 
       <div className="grid lg:grid-cols-3 gap-5">
 
-        <div className="lg:col-span-2 space-y-5">
+   <div className="lg:col-span-2 space-y-5">
 
           {/* Order Items */}
           <div className="card overflow-hidden">
@@ -235,10 +242,16 @@ const AdminOrderDetailPage: React.FC = () => {
                 </button>
               </>
             )}
-            {order.status === 'READY' && (
+           {order.status === 'READY' && (
               <button onClick={() => setAddressModal({ address: '' })} disabled={updating}
                 className="w-full py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 transition-all">
                 Approve for Delivery
+              </button>
+            )}
+            {order.status === 'DISPATCHED' && (
+              <button onClick={markDelivered} disabled={updating}
+                className="w-full py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 transition-all">
+                {updating ? 'Marking...' : 'Mark as Delivered'}
               </button>
             )}
           </div>
@@ -336,6 +349,7 @@ const AdminOrderDetailPage: React.FC = () => {
         </div>
       )}
     </div>
+    
   );
 };
 

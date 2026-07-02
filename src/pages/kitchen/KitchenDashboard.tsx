@@ -51,6 +51,16 @@ const KitchenDashboard: React.FC = () => {
     finally { setUpdating(null); }
   };
 
+  const markDelivered = async (orderId: string) => {
+    setUpdating(orderId);
+    try {
+      await kitchenApi.markDelivered(orderId);
+      toast.success('Order marked as Delivered!');
+      fetchOrders();
+    } catch (err: any) { toast.error(err?.response?.data?.message || 'Failed to mark delivered'); }
+    finally { setUpdating(null); }
+  };
+
   const byStatus = (s: string) => orders.filter(o => o.status === s).length;
 
   return (
@@ -127,6 +137,18 @@ const KitchenDashboard: React.FC = () => {
                           >
                             Go to Dispatch →
                           </button>
+                        )}
+                        {order.status === 'DISPATCHED' && (
+                          <button
+                            onClick={() => markDelivered(String(order.id))}
+                            disabled={updating === order.id}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                          >
+                            Mark Delivered
+                          </button>
+                        )}
+                        {(order.status === 'READY' || order.status === 'DELIVERED') && (
+                          <span className="text-xs text-slate-500">—</span>
                         )}
                         {(order.status === 'READY' || order.status === 'DELIVERED') && (
                           <span className="text-xs text-slate-500">—</span>

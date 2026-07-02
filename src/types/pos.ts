@@ -44,30 +44,41 @@ export interface RestaurantTable {
   currentPosOrderId?: number;
 }
 
-// export interface FranchiseProduct {
-//   id: number;
-//   materialId: number;
-//   name: string;
-//   category: string;
-//   brand?: string;
-//   sellingPrice: number;
-//   isAvailable: boolean;
-// }
-
-export interface FranchiseProduct {
+ export interface FranchiseProduct {
   id: number;
-  materialId: number;
+  materialId?: number;
   name: string;
   category: string;
   brand?: string;
   sellingPrice: number;
   isAvailable: boolean;
+  unitsPerPacket?: number;
+  piecesPerPlate?: number;
+  stockPieces?: number;
+  lowStockThreshold?: number;
 }
 
-// Billing cart line item — built from a real FranchiseProduct, never mock data.
+export interface UpdateFranchiseProductPayload {
+  sellingPrice?: number;
+  isAvailable?: boolean;
+  piecesPerPlate?: number;
+  lowStockThreshold?: number;
+ 
+
+}
+ export interface CreateFranchiseProductPayload {
+  name: string;
+  category?: string;
+  sellingPrice: number;
+  piecesPerPlate?: number;
+  stockPieces?: number;
+  lowStockThreshold?: number;
+}
+ // Billing cart line item — built from a real FranchiseProduct, never mock data.
+// materialId is optional — franchise-created products (no admin Material link) won't have one.
 export interface CartItem {
   productId: number;
-  materialId: number;
+  materialId?: number;
   name: string;
   category: string;
   sellingPrice: number;

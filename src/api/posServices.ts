@@ -30,6 +30,16 @@ export const posSetupApi = {
 
   completeSetup: () =>
     apiClient.post('/pos/setup/complete'),
+  getAllProducts: () =>
+    apiClient.get('/pos/products'),
+
+  updateProduct: (id: number, data: import('../types/pos').UpdateFranchiseProductPayload) =>
+    apiClient.put(`/pos/products/${id}`, data),
+  addCustomProduct: (data: import('../types/pos').CreateFranchiseProductPayload) =>
+    apiClient.post('/pos/products', data),
+
+  deleteProduct: (id: number) =>
+    apiClient.delete(`/pos/products/${id}`),
 };
 
  export const posBillingApi = {
@@ -43,4 +53,6 @@ export const posSetupApi = {
     apiClient.get('/pos/billing/customers', { params: { query } }),
    checkout: (payload: import('../types/pos').PosCheckoutPayload) =>
     apiClient.post('/pos/billing/checkout', payload),
+   getOrderHistory: () =>
+    apiClient.get('/pos/billing/orders'),
 };

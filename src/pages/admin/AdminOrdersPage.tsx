@@ -57,6 +57,16 @@ const AdminOrdersPage: React.FC = () => {
     finally { setUpdating(null); }
   };
 
+  const markDelivered = async (orderId: string) => {
+    setUpdating(orderId);
+    try {
+      await adminApi.markDelivered(orderId);
+      toast.success('Order marked as Delivered!');
+      fetchData();
+    } catch (err: any) { toast.error(err?.response?.data?.message || 'Failed to mark delivered'); }
+    finally { setUpdating(null); }
+  };
+
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
@@ -117,13 +127,22 @@ const AdminOrdersPage: React.FC = () => {
                         >
                           <Eye className="w-3 h-3" /> View
                         </button>
-                        {order.status === 'READY' && (
+                     {order.status === 'READY' && (
                           <button
                             onClick={() => setAddressModal({ orderId: String(order.id), address: '' })}
                             disabled={updating === String(order.id)}
                             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 disabled:opacity-40 transition-all"
                           >
                             <CheckCircle2 className="w-3 h-3" /> Approve for Delivery
+                          </button>
+                        )}
+                        {order.status === 'DISPATCHED' && (
+                          <button
+                            onClick={() => markDelivered(String(order.id))}
+                            disabled={updating === String(order.id)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 disabled:opacity-40 transition-all"
+                          >
+                            <CheckCircle2 className="w-3 h-3" /> Mark Delivered
                           </button>
                         )}
                       </div>
