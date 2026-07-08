@@ -4,10 +4,11 @@ import { useAuth } from '../../context/AuthContext';
  import {
   LayoutDashboard, ShoppingBag, Users, ChefHat, Package,
   BarChart3, Bell, Settings, LogOut, X, Boxes, Tags,
-  Truck, ClipboardList, Globe, Shield, ChevronRight, TrendingUp, Store,
+  Truck, ClipboardList, Globe, Shield, ChevronRight, TrendingUp, Store, Wallet
 } from 'lucide-react';
 import { UserRole } from '../../types';
-import { notificationApi } from '../../api/services';
+// import { notificationApi } from '../../api/services';
+import { notificationApi, franchiseNotificationApi } from '../../api/services';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -29,8 +30,10 @@ const navItems: Record<UserRole, { label: string; icon: React.ElementType; path:
    ADMIN: [
      { label: 'Dashboard',    icon: LayoutDashboard, path: '/admin' },
     { label: 'Orders',       icon: ClipboardList,   path: '/admin/orders' },
+    { label: 'Dispatched',   icon: Truck,           path: '/admin/dispatched' },
      { label: 'Kitchens',     icon: ChefHat,         path: '/admin/kitchens' },
      { label: 'Users',        icon: Users,           path: '/admin/users' },
+     { label: 'Pending Payments',     icon: Wallet,   path: '/admin/pending-payments' },
      { label: 'Products',     icon: Package,         path: '/admin/products' },  
    { label: 'Categories',   icon: Tags,            path: '/admin/categories' },
      { label: 'Reports',      icon: BarChart3,       path: '/admin/reports' },
@@ -75,11 +78,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   // Poll unread count every 60 seconds — only for ADMIN
   useEffect(() => {
-    if (role !== 'ADMIN') return;
+    // if (role !== 'ADMIN') return;
+    if (role !== 'ADMIN' && role !== 'USER') return;
 
-    const fetchUnread = async () => {
+     const fetchUnread = async () => {
       try {
-        const r = await notificationApi.getUnreadCount();
+        const r = role === 'ADMIN'
+          ? await notificationApi.getUnreadCount()
+          : await franchiseNotificationApi.getUnreadCount();
         setUnreadCount(r.data?.data ?? 0);
       } catch {
         // silent fail
@@ -159,13 +165,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 {/* Bell icon with unread dot */}
                 <span className="relative flex-shrink-0">
                   <item.icon className="w-4 h-4" />
-                  {isNotification && role === 'ADMIN' && unreadCount > 0 && (
+                  {/* {isNotification && role === 'ADMIN' && unreadCount > 0 && ( */}
+                  {isNotification && (role === 'ADMIN' || role === 'USER') && unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-2 h-2 bg-sky-500 rounded-full" />
                   )}
                 </span>
                 {item.label}
                 {/* Count badge next to label */}
-                {isNotification && role === 'ADMIN' && unreadCount > 0 && (
+                {/* {isNotification && role === 'ADMIN' && unreadCount > 0 && ( */}
+                {isNotification && (role === 'ADMIN' || role === 'USER') && unreadCount > 0 && (
                   <span className="ml-auto px-1.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">
                     {unreadCount}
                   </span>

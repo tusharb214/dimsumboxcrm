@@ -33,5 +33,10 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
+export const getFileUrl = (relativePath?: string | null): string => {
+  if (!relativePath) return '';
+  const rootUrl = API_BASE_URL.replace(/\/api\/?$/, '');
+  const cleanPath = relativePath.replace(/\\/g, '/').replace(/^\/+/, '');
+  return `${rootUrl}/${cleanPath}`;
+};
 export default apiClient;

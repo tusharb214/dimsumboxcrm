@@ -21,18 +21,20 @@ const colorMap = {
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, color = 'sky', pending }) => {
   const colors = colorMap[color];
   return (
-    <div className="stat-card relative overflow-hidden group hover:border-slate-700 transition-all duration-200">
+    // <div className="stat-card relative overflow-hidden group hover:border-slate-700 transition-all duration-200">
+    <div className="stat-card relative overflow-hidden group hover:border-slate-700 transition-all duration-200 p-4 rounded-xl">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{title}</p>
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">{title}</p>
           {pending ? (
             <div className="skeleton h-7 w-24 rounded-lg mt-2" />
           ) : (
-            <p className="text-2xl font-bold text-white">{value}</p>
+            <p className="text-xl font-bold text-white mt-1">{value}</p>
           )}
         </div>
-        <div className={`p-2.5 rounded-xl ${colors.bg} border ${colors.border}`}>
-          <Icon className={`w-5 h-5 ${colors.icon}`} />
+        {/* <div className={`p-2.5 rounded-xl ${colors.bg} border ${colors.border}`}> */}
+        <div className={`w-10 h-10 flex items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}>
+          <Icon className={`w-4 h-4 ${colors.icon}`} />
         </div>
       </div>
       {trend && !pending && (

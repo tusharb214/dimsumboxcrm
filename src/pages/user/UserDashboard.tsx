@@ -1,45 +1,38 @@
-import React, { useEffect, useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShoppingBag, TrendingUp, DollarSign, AlertTriangle,
-  ArrowRight, Clock, CheckCircle, Package,
+  ArrowRight, Clock, Package,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { userApi, salesApi } from '../../api/services';
+import { posSetupApi } from '../../api/posServices';
 import { Order } from '../../types';
 import StatCard from '../../components/common/StatCard';
 import StatusBadge from '../../components/common/StatusBadge';
 import { CardSkeleton } from '../../components/common/Skeleton';
 
-const DUMMY_STOCK_ALERTS = [
-  { name: 'Tomato Sauce', stock: 3, unit: 'kg', threshold: 10 },
-  { name: 'Cheese Block', stock: 1, unit: 'kg', threshold: 5 },
-  { name: 'Pizza Dough', stock: 5, unit: 'pcs', threshold: 20 },
-];
+interface StockAlertItem {
+  name: string;
+  stockPieces: number;
+  lowStockThreshold: number;
+}
 
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [sales, setSales] = useState({ today: 0, monthly: 0 });
   const [loading, setLoading] = useState(true);
+  const [stockAlerts, setStockAlerts] = useState<StockAlertItem[]>([]);
 
-  // useEffect(() => {
-  //   userApi.getMyOrders()
-  //     // .then(r => setOrders(r.data))
-  //     .then(r => setOrders(r.data.data ?? []))
-  //     .catch(() => setOrders([]))
-  //     .finally(() => setLoading(false));
-
-  // }, []);
-
-  // हे लिही:
+  
   useEffect(() => {
     userApi.getMyOrders()
       .then(r => setOrders(r.data.data ?? []))
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
 
-    // हे ADD कर:
+    
     Promise.all([
       salesApi.getToday().catch(() => ({ data: { data: 0 } })),
       salesApi.getMonthly().catch(() => ({ data: { data: 0 } })),
@@ -50,6 +43,16 @@ const UserDashboard: React.FC = () => {
       });
     });
   }, []);
+
+  posSetupApi.getAllProducts()
+      .then((r: any) => {
+        const products = r.data?.data ?? [];
+        const lowStock = products.filter((p: any) =>
+          p.stockPieces != null && p.lowStockThreshold != null && p.stockPieces <= p.lowStockThreshold
+        );
+        setStockAlerts(lowStock);
+      })
+      .catch(() => setStockAlerts([]));
   // const pendingCount = orders.filter(o => o.status === 'PENDING').length;
   const pendingCount = orders.filter(o => o.status === 'REQUESTED').length;
   const deliveredCount = orders.filter(o => o.status === 'DELIVERED').length;
@@ -122,36 +125,46 @@ const UserDashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Stock Alerts */}
+      
+         {/* Stock Alerts */}
         <div className="card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
             <h2 className="font-semibold text-white text-sm">Stock Alerts</h2>
-            <span className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg">API Pending</span>
           </div>
-          <div className="divide-y divide-slate-800/60">
-            {DUMMY_STOCK_ALERTS.map((item, i) => (
-              <div key={i} className="px-5 py-3.5">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="text-sm font-medium text-white">{item.name}</p>
-                    <p className="text-xs text-slate-500">{item.stock} {item.unit} remaining</p>
+          {stockAlerts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center px-5">
+              <Package className="w-8 h-8 text-slate-700 mb-2" />
+              <p className="text-slate-400 text-sm">No low-stock items right now</p>
+            </div>
+          ) : (
+            <>
+              <div className="divide-y divide-slate-800/60">
+                {stockAlerts.slice(0, 5).map((item, i) => (
+                  <div key={i} className="px-5 py-3.5">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-medium text-white">{item.name}</p>
+                        <p className="text-xs text-slate-500">{item.stockPieces} pcs remaining</p>
+                      </div>
+                      <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-1.5">
+                      <div
+                        className="bg-amber-500 h-1.5 rounded-full"
+                        style={{ width: `${Math.min(100, (item.stockPieces / item.lowStockThreshold) * 100)}%` }}
+                      />
+                    </div>
                   </div>
-                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                </div>
-                <div className="w-full bg-slate-800 rounded-full h-1.5">
-                  <div
-                    className="bg-amber-500 h-1.5 rounded-full"
-                    style={{ width: `${(item.stock / item.threshold) * 100}%` }}
-                  />
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="px-5 py-3 bg-slate-900/50 border-t border-slate-800">
-            <p className="text-xs text-slate-600 flex items-center gap-1.5">
-              <CheckCircle className="w-3 h-3" /> Showing static demo data
-            </p>
-          </div>
+              <Link
+                to="/dashboard/sales?tab=stock"
+                className="flex items-center justify-center gap-1 px-5 py-3 text-xs text-sky-400 hover:text-sky-300 border-t border-slate-800 transition-colors"
+              >
+                Show more <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>

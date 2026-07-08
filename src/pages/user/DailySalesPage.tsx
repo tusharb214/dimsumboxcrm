@@ -1,4 +1,6 @@
- import React, { useEffect, useState, useMemo } from 'react';
+//  import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { TrendingUp, RefreshCw, AlertTriangle, History, Download, ChevronLeft, ChevronRight, Receipt, Printer, X, FileDown, Eye } from 'lucide-react';
  import { salesApi } from '../../api/services';
 import { posBillingApi, posSetupApi } from '../../api/posServices';
@@ -235,7 +237,10 @@ const ItemsBreakdownModal: React.FC<{ log: SalesReport; onClose: () => void }> =
 };
 
 const DailySalesPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'log' | 'history' | 'stock'>('log');
+  // const [activeTab, setActiveTab] = useState<'log' | 'history' | 'stock'>('log');
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'stock' ? 'stock' : 'log';
+  const [activeTab, setActiveTab] = useState<'log' | 'history' | 'stock'>(initialTab);
 const [salesHistory, setSalesHistory] = useState<SalesReport[]>([]);
    const [franchiseProducts, setFranchiseProducts] = useState<FranchiseProduct[]>([]);
 const [loadingStock, setLoadingStock] = useState(true);

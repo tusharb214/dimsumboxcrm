@@ -22,6 +22,7 @@ import PosProductSettingsPage from './pages/pos/settings/PosProductSettingsPage'
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
+import AdminDispatchedOrdersPage from './pages/admin/AdminDispatchedOrdersPage';
 import AdminOrderDetailPage from './pages/admin/AdminOrderDetailPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminUserDetailPage from './pages/admin/AdminUserDetailPage';
@@ -31,6 +32,7 @@ import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminReportsPage from './pages/admin/AdminReportsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminPendingPaymentsPage from './pages/admin/AdminPendingPaymentsPage';
 
 import KitchenDashboard from './pages/kitchen/KitchenDashboard';
 import { KitchenApprovalsPage } from "./pages/kitchen/KitchenSubPages";
@@ -85,9 +87,11 @@ const App: React.FC = () => (
           <Route index element={<AdminDashboard />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="orders/:orderId" element={<AdminOrderDetailPage />} />
+          <Route path="dispatched" element={<AdminDispatchedOrdersPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="users/:userId" element={<AdminUserDetailPage />} />
           <Route path="kitchens" element={<AdminKitchensPage />} />
+          <Route path="pending-payments" element={<AdminPendingPaymentsPage />} />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="reports" element={<AdminReportsPage />} />

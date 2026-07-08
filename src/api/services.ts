@@ -1,4 +1,4 @@
- import apiClient from './client';
+import apiClient from './client';
 
 import {
   LoginPayload,
@@ -120,7 +120,7 @@ export const adminApi = {
   getUserPosOrders: (userId: string) =>
     apiClient.get(`/admin/users/${userId}/pos-orders`),
 
-  getUserProducts: (userId: string) => 
+  getUserProducts: (userId: string) =>
     apiClient.get(`/pos/admin/products/${userId}`),
 
   // Settings
@@ -129,6 +129,11 @@ export const adminApi = {
 
   updateMinOrderAmount: (minOrderAmount: number) =>
     apiClient.put('/admin/settings/min-order-amount', { minOrderAmount }),
+
+  getPendingPayments: () =>
+    apiClient.get('/admin/orders/pending-payments'),
+  markPaymentReceived: (orderId: string) =>
+    apiClient.put(`/admin/orders/${orderId}/mark-payment-received`),
 };
 
 // ─── KITCHEN ──────────────────────────────────────────────────────
@@ -145,7 +150,7 @@ export const kitchenApi = {
   dispatchOrder: (orderId: string, data: { driverName: string; vehicleNumber: string; estimatedDeliveryTime: string }) =>
     apiClient.put(`/kitchen/orders/${orderId}/dispatch`, data),
 
- updateLocation: (orderId: string, currentLocation: string) =>
+  updateLocation: (orderId: string, currentLocation: string) =>
     apiClient.put(`/kitchen/orders/${orderId}/location`, { currentLocation }),
 
   markDelivered: (orderId: string) =>
@@ -176,7 +181,7 @@ export const salesApi = {
 
   getMonthly: () =>
     apiClient.get('/sales/monthly'),
-   getMySales: () =>
+  getMySales: () =>
     apiClient.get('/sales'),
 };
 export const pdfApi = {
@@ -206,6 +211,16 @@ export const notificationApi = {
   markAllAsRead: () =>
     apiClient.put('/admin/notifications/read-all'),
 
+  sendCustom: (data: { targetUserId?: number | null; title: string; message: string }) =>
+    apiClient.post('/admin/notifications/send', data),
+
   triggerCheck: () =>
     apiClient.post('/admin/notifications/trigger-check'),
+};
+
+export const franchiseNotificationApi = {
+  getAll: () => apiClient.get('/user/notifications'),
+  getUnreadCount: () => apiClient.get('/user/notifications/unread-count'),
+  markAsRead: (id: number) => apiClient.put(`/user/notifications/${id}/read`),
+  markAllAsRead: () => apiClient.put('/user/notifications/read-all'),
 };

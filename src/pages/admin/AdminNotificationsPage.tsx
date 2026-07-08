@@ -1,6 +1,6 @@
  import React, { useEffect, useState, useCallback } from 'react';
-import { Bell, AlertTriangle, TrendingUp, RefreshCw, CheckCheck, Check } from 'lucide-react';
-import { notificationApi } from '../../api/services';
+import { Bell, AlertTriangle, TrendingUp, RefreshCw, CheckCheck, Check, Send, X } from 'lucide-react';
+import { notificationApi, adminApi } from '../../api/services';
 import toast from 'react-hot-toast';
 
 interface Notification {
@@ -28,6 +28,12 @@ const AdminNotificationsPage: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingAll, setMarkingAll] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
+  const [sendTarget, setSendTarget] = useState<string>('');
+  const [sendTitle, setSendTitle] = useState('');
+  const [sendMessage, setSendMessage] = useState('');
+  const [sending, setSending] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
     try {
