@@ -35,8 +35,16 @@ export const userApi = {
   resubmitOrder: (data: CreateOrderPayload) =>
     apiClient.post('/orders/resubmit', data),
 
-  getMinOrderAmount: () =>
+   getMinOrderAmount: () =>
     apiClient.get('/orders/min-amount'),
+
+  uploadOrderScreenshot: (orderId: string | number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post(`/orders/${orderId}/screenshot`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 // ─── MATERIALS (user + admin browse) ──────────────────────────────
@@ -130,6 +138,20 @@ export const adminApi = {
   updateMinOrderAmount: (minOrderAmount: number) =>
     apiClient.put('/admin/settings/min-order-amount', { minOrderAmount }),
 
+  updateAccountNumber: (accountNumber: string) =>
+    apiClient.put('/admin/settings/account-number', { accountNumber }),
+
+  updateBankDetails: (data: { accountHolderName: string; bankName: string; ifscCode: string }) =>
+    apiClient.put('/admin/settings/bank-details', data),
+
+  uploadUpiQr: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post('/admin/settings/upi-qr', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
   getPendingPayments: () =>
     apiClient.get('/admin/orders/pending-payments'),
   markPaymentReceived: (orderId: string) =>
@@ -188,13 +210,13 @@ export const pdfApi = {
   downloadOrderPdf: (orderId: string) =>
     apiClient.get(`/pdf/order/${orderId}`, { responseType: 'blob' }),
 };
+ 
+
 export const orderMediaApi = {
   uploadScreenshot: (orderId: string, file: File) => {
     const form = new FormData();
     form.append('file', file);
-    return apiClient.post(`/orders/${orderId}/screenshot`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return apiClient.post(`/orders/${orderId}/screenshot`, form);
   },
 };
 

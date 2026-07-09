@@ -1,6 +1,7 @@
  import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Minus, Trash2, ShoppingBag, Loader2, RefreshCw, Eye, X } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, ShoppingBag, Loader2, RefreshCw, Eye, X, QrCode, Copy, UploadCloud, CheckCircle2 } from 'lucide-react';
 import { userApi, materialApi } from '../../api/services';
+import { getFileUrl } from '../../api/client';
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -35,10 +36,21 @@ const PlaceOrderPage: React.FC = () => {
   const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
   const [minOrderAmount, setMinOrderAmount] = useState(0);
 
+  // ── UPI Payment Modal state ──────────────────────────────────
+  const [accountNumber, setAccountNumber] = useState<string | null>(null);
+  const [accountHolderName, setAccountHolderName] = useState<string | null>(null);
+  const [bankName, setBankName] = useState<string | null>(null);
+  const [ifscCode, setIfscCode] = useState<string | null>(null);
+  const [upiQrImagePath, setUpiQrImagePath] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentFile, setPaymentFile] = useState<File | null>(null);
+  const [paymentPreview, setPaymentPreview] = useState<string | null>(null);
+  const [submittingPayment, setSubmittingPayment] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+
   // Detect resubmit state from MyOrdersPage
   const resubmitOrder = (location.state as any)?.resubmitOrder;
   const isResubmit = !!resubmitOrder;
-
 
 
   useEffect(() => {
@@ -71,6 +83,11 @@ const PlaceOrderPage: React.FC = () => {
       .then(r => {
         const data = (r.data as any)?.data ?? r.data;
         setMinOrderAmount(Number(data?.minOrderAmount) || 0);
+        setAccountNumber(data?.accountNumber ?? null);
+        setAccountHolderName(data?.accountHolderName ?? null);
+        setBankName(data?.bankName ?? null);
+        setIfscCode(data?.ifscCode ?? null);
+        setUpiQrImagePath(data?.upiQrImagePath ?? null);
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,37 +129,67 @@ const PlaceOrderPage: React.FC = () => {
     setCategoryFilter('All');
   };
 
-  const placeOrder = async () => {
+   // Step 1: cart validate करून payment modal उघडतो. Order अजून create होत नाही.
+  const placeOrder = () => {
     if (cart.length === 0) return toast.error('Cart is empty');
     if (minOrderAmount > 0 && total < minOrderAmount)
       return toast.error(`Minimum order amount is ₹${minOrderAmount}. Add ₹${minOrderAmount - total} more.`);
-    setPlacing(true);
+    setPaymentFile(null);
+    setPaymentPreview(null);
+    setPendingOrderId(null);
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setPaymentFile(file);
+    setPaymentPreview(file ? URL.createObjectURL(file) : null);
+  };
+
+  const handleCopyAccountNumber = () => {
+    if (!accountNumber) return;
+    navigator.clipboard.writeText(accountNumber);
+    toast.success('Account number copied');
+  };
+  const handleCopyIfsc = () => {
+    if (!ifscCode) return;
+    navigator.clipboard.writeText(ifscCode);
+    toast.success('IFSC code copied');
+  };
+
+  // Step 2: modal मधून call होतो. Order create करतो (आधी नसेल तर) + screenshot अपलोड करतो.
+  const confirmPaymentAndPlaceOrder = async () => {
+    if (!paymentFile) return toast.error('Please upload the payment screenshot to continue');
+    setSubmittingPayment(true);
     try {
-      if (isResubmit) {
-        // await userApi.resubmitOrder(String(resubmitOrder.id), {
-        //   orderNotes: '',
-        //   items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
-        // });
-        await userApi.resubmitOrder({
-          orderNotes: '',
-          items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
-        });
-        toast.success('Order resubmitted successfully!');
-      } else {
-        await userApi.createOrder({
-          orderNotes: '',
-          items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
-        });
-        toast.success('Order placed successfully!');
+      let orderId = pendingOrderId;
+
+      if (!orderId) {
+        const res = isResubmit
+          ? await userApi.resubmitOrder({
+              orderNotes: '',
+              items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
+            })
+          : await userApi.createOrder({
+              orderNotes: '',
+              items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
+            });
+        const orderData = (res.data as any)?.data ?? res.data;
+        orderId = String(orderData?.id);
+        setPendingOrderId(orderId);
       }
-      // FIX 1: Clear form after submit
+
+      await userApi.uploadOrderScreenshot(orderId, paymentFile);
+
+      toast.success(isResubmit ? 'Order resubmitted successfully!' : 'Order placed successfully!');
+      setShowPaymentModal(false);
       clearCart();
       navigate('/dashboard/orders', { replace: true });
     } catch (err: any) {
       const msg = err?.response?.data?.message;
-      toast.error(msg || (isResubmit ? 'Failed to resubmit order' : 'Failed to place order'));
+      toast.error(msg || 'Failed to submit payment screenshot. Please try again.');
     } finally {
-      setPlacing(false);
+      setSubmittingPayment(false);
     }
   };
 
@@ -203,12 +250,7 @@ const PlaceOrderPage: React.FC = () => {
                 return (
 
                   <div key={material.id} className="card-hover p-4 flex items-start gap-4 relative">
-                    {/* <button
-                      onClick={() => setViewMaterial(material)}
-                      className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 transition-all"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </button> */}
+                     
 
                     <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-lg font-bold text-sky-400 flex-shrink-0">
                       {material.name.charAt(0)}
@@ -227,23 +269,7 @@ const PlaceOrderPage: React.FC = () => {
                         <Eye className="w-3 h-3" /> Details
                       </button>
                     </div>
-                    {/* <div className="flex-shrink-0">
-                      {qty === 0 ? (
-                        <button onClick={() => addToCart(material)} className="p-2 rounded-xl bg-sky-500/15 border border-sky-500/20 text-sky-400 hover:bg-sky-500/25 transition-all">
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => updateQty(material.id, -1)} className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all">
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="text-sm font-bold text-white w-5 text-center">{qty}</span>
-                          <button onClick={() => updateQty(material.id, 1)} className="w-7 h-7 rounded-lg bg-sky-500/15 border border-sky-500/20 text-sky-400 hover:bg-sky-500/25 flex items-center justify-center transition-all">
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
-                      )}
-                    </div> */}
+                     
 
                     <div className="flex-shrink-0">
                       {qty === 0 ? (
@@ -330,6 +356,109 @@ const PlaceOrderPage: React.FC = () => {
             </div>
           </div>
         )}
+
+
+        {showPaymentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <QrCode className="w-4 h-4 text-sky-400" /> Scan & Pay
+                </h2>
+                {!submittingPayment && (
+                  <button onClick={() => setShowPaymentModal(false)} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-all">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 text-center">
+                <p className="text-xs text-slate-500 mb-1">Amount to Pay</p>
+                <p className="text-xl font-bold text-white">₹{total}</p>
+              </div>
+
+              {upiQrImagePath ? (
+                <img
+                  src={getFileUrl(upiQrImagePath)}
+                  alt="UPI QR Code"
+                  className="w-48 h-48 object-contain rounded-xl border border-slate-700 bg-white mx-auto"
+                />
+              ) : (
+                <p className="text-xs text-amber-400 text-center">QR code not set up yet — use the account number below.</p>
+              )}
+
+              {accountNumber && (
+                <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-xs text-slate-500 mb-0.5">Account Number</p>
+                    <p className="text-sm font-semibold text-white truncate">{accountNumber}</p>
+                  </div>
+                  {(accountHolderName || bankName) && (
+                <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 space-y-2">
+                  {accountHolderName && (
+                    <div>
+                      <p className="text-xs text-slate-500 mb-0.5">Account Holder Name</p>
+                      <p className="text-sm font-semibold text-white truncate">{accountHolderName}</p>
+                    </div>
+                  )}
+                  {bankName && (
+                    <div>
+                      <p className="text-xs text-slate-500 mb-0.5">Bank Name</p>
+                      <p className="text-sm font-semibold text-white truncate">{bankName}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {ifscCode && (
+                <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-xs text-slate-500 mb-0.5">IFSC Code</p>
+                    <p className="text-sm font-semibold text-white truncate">{ifscCode}</p>
+                  </div>
+                  <button onClick={handleCopyIfsc} className="p-2 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all flex-shrink-0">
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+                  <button onClick={handleCopyAccountNumber} className="p-2 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all flex-shrink-0">
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              <div className="border-t border-slate-800 pt-4">
+                <label className="label">Upload Payment Screenshot</label>
+                <p className="text-xs text-slate-500 mb-2">Your order will be placed only after the screenshot is uploaded.</p>
+
+                {paymentPreview && (
+                  <img src={paymentPreview} alt="Payment screenshot preview" className="w-full max-h-48 object-contain rounded-xl border border-sky-500/40 bg-slate-950 mb-2" />
+                )}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePaymentFileChange}
+                  disabled={submittingPayment}
+                  className="text-xs text-slate-400 w-full mb-3"
+                />
+
+                <button
+                  onClick={confirmPaymentAndPlaceOrder}
+                  disabled={submittingPayment || !paymentFile}
+                  className="btn-primary w-full justify-center py-3"
+                >
+                  {submittingPayment
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : <><CheckCircle2 className="w-4 h-4" /> I've Paid, Submit</>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        
 
         <div className="card overflow-hidden h-fit sticky top-24">
           <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-800">
