@@ -10,12 +10,12 @@ interface StatCardProps {
   pending?: boolean;
 }
 
-const colorMap = {
-  sky:     { bg: 'bg-sky-500/10',     icon: 'text-sky-400',    border: 'border-sky-500/20' },
-  emerald: { bg: 'bg-emerald-500/10', icon: 'text-emerald-400', border: 'border-emerald-500/20' },
-  amber:   { bg: 'bg-amber-500/10',   icon: 'text-amber-400',  border: 'border-amber-500/20' },
-  purple:  { bg: 'bg-purple-500/10',  icon: 'text-purple-400', border: 'border-purple-500/20' },
-  rose:    { bg: 'bg-rose-500/10',    icon: 'text-rose-400',   border: 'border-rose-500/20' },
+ const colorMap = {
+  sky:     { bg: 'bg-sky-500/10',     icon: 'text-sky-400',    border: 'border-slate-700' },
+  emerald: { bg: 'bg-emerald-500/10', icon: 'text-emerald-400', border: 'border-slate-700' },
+  amber:   { bg: 'bg-amber-500/10',   icon: 'text-amber-400',  border: 'border-slate-700' },
+  purple:  { bg: 'bg-purple-500/10',  icon: 'text-purple-400', border: 'border-slate-700' },
+  rose:    { bg: 'bg-rose-500/10',    icon: 'text-rose-400',   border: 'border-slate-700' },
 };
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, color = 'sky', pending }) => {
@@ -29,7 +29,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, co
           {pending ? (
             <div className="skeleton h-7 w-24 rounded-lg mt-2" />
           ) : (
-            <p className="text-xl font-bold text-white mt-1">{value}</p>
+            <p className="text-xl font-bold text-black mt-1">{value}</p>
           )}
         </div>
         {/* <div className={`p-2.5 rounded-xl ${colors.bg} border ${colors.border}`}> */}

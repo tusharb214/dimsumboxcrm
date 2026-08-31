@@ -22,8 +22,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, maxWidt
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className={`bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full ${maxWidth} animate-[fadeIn_0.2s_ease-out]`}>
         <div className="flex items-center justify-between p-5 border-b border-slate-800">
-          <h2 className="text-base font-semibold text-white">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+          <h2 className="text-base font-semibold text-black">{title}</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-black hover:bg-slate-800 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>

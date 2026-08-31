@@ -56,7 +56,7 @@ const App: React.FC = () => (
           style: {
             background: '#1e293b',
             color: '#f1f5f9',
-            border: '1px solid #334155',
+            border: '1px solid #ffeee7',
             borderRadius: '12px',
             fontSize: '14px',
             fontFamily: 'Sora, sans-serif',

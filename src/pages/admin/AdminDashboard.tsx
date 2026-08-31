@@ -109,8 +109,8 @@ const AdminDashboard: React.FC = () => {
         {/* Recent orders table */}
         {/* <div className="lg:col-span-2 card overflow-hidden"> */}
         <div className="lg:col-span-2 card overflow-hidden min-w-0">
-          <div className="px-5 py-4 border-b border-slate-800">
-            <h2 className="text-sm font-semibold text-white">Recent Orders</h2>
+          <div className="px-5 py-4 border-b border-[#ffeee7]">
+            <h2 className="text-sm font-semibold text-black">Recent Orders</h2>
           </div>
 
           {loading ? (
@@ -119,7 +119,7 @@ const AdminDashboard: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-slate-500 border-b border-slate-800">
+                  <tr className="text-left text-xs text-slate-500 border-b  border-[#ffeee7]">
                     {/* <th className="px-5 py-3 font-medium">Order ID</th> */}
                     <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">order ID</th>
                     <th className="px-4 py-2.5 font-medium">Outlet</th>
@@ -178,10 +178,10 @@ const AdminDashboard: React.FC = () => {
             </div>
           )}
 
-          <div className="px-5 py-4 border-t border-slate-800">
+          <div className="px-5 py-4 border-t  border-[#ffeee7]">
             <Link
               to="/admin/orders"
-              className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-slate-700 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+              className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-[#ffeee7] text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
             >
               View All Orders
             </Link>
@@ -213,7 +213,7 @@ const AdminDashboard: React.FC = () => {
                     {dashStats?.paymentOverview?.overdueOutlets ?? 0}
                   </p>
                 </div>
-                <button className="mt-4 w-full py-2 rounded-xl border border-sky-500/30 text-sky-400 text-sm font-medium hover:bg-sky-500/10 transition-colors">
+                <button className="mt-4 w-full py-2 rounded-xl border  border-[#ffeee7] text-sky-400 text-sm font-medium hover:bg-sky-500/10 transition-colors">
                   View Outstanding Report
                 </button>
               </>
@@ -275,7 +275,7 @@ const AdminDashboard: React.FC = () => {
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#1e293b',
-                  border: '1px solid #334155',
+                  border: '1px solid #ffeee7',  
                   borderRadius: '12px',
                   color: '#f1f5f9',
                   fontSize: '12px',

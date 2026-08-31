@@ -12,8 +12,9 @@ interface NavbarProps {
 
 type Shortcut = 'NEW_PRODUCT' | 'PAYMENT_PENDING' | 'STOCK_OUT' | null;
 
+
 const fieldClass =
-  'w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-slate-200 placeholder-slate-600 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-colors';
+  'w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-black placeholder-slate-600 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-colors';
 
 const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
   const { user } = useAuth();
@@ -142,10 +143,10 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
 
       <div className="hidden md:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 w-64">
         <Search className="w-4 h-4 text-slate-500" />
-        <input
+           <input
           type="text"
           placeholder="Quick search..."
-          className="bg-transparent text-sm text-slate-300 placeholder-slate-600 outline-none w-full"
+          className="bg-transparent text-sm text-black placeholder-slate-600 outline-none w-full"
         />
         <span className="text-xs text-slate-600 font-mono bg-slate-800 px-1.5 py-0.5 rounded">⌘K</span>
       </div>
