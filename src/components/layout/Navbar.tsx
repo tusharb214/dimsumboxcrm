@@ -128,11 +128,12 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
   };
 
   return (
-    <header className="h-14 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/60 flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
+    // <header className="h-14 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/60 flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
+    <header className="h-14 bg-[#FFEEE7] border-b border-[#E3422C] flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+          className="lg:hidden p-2 rounded-xl text-black/60 hover:text-black hover:bg-black/5 transition-all"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -141,7 +142,8 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
         )}
       </div>
 
-      <div className="hidden md:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 w-64">
+      {/* <div className="hidden md:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 w-64"> */}
+      <div className="hidden md:flex items-center gap-2 bg-white/70 border border-[#E3422C] rounded-xl px-3 py-2 w-64">
         <Search className="w-4 h-4 text-slate-500" />
            <input
           type="text"
@@ -154,7 +156,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
       <div className="flex items-center gap-2">
         <button
           onClick={() => setDark(!dark)}
-          className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+          className="p-2 rounded-xl text-slate-400 hover:text-black hover:bg-black/5 transition-all"
         >
           {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
@@ -163,7 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
           <button
             onClick={openPanel}
             title={role === 'ADMIN' ? 'Send Notification' : 'Notifications'}
-            className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+            className="relative p-2 rounded-xl text-slate-400 hover:text-black hover:bg-black/5 transition-all"
           >
             {role === 'ADMIN' ? <Megaphone className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
             {unreadCount > 0 && (

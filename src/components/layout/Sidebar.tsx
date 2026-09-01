@@ -113,35 +113,35 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       )}
 
       <aside className={`
-        fixed top-0 left-0 h-screen w-64 bg-slate-950 border-r border-slate-800/60
+        fixed top-0 left-0 h-screen w-64 bg-[#FFEEE7] border-r border-[#E3422C]
         flex flex-col z-50 transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:z-auto
       `}>
         {/* Logo */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800/60">
+        <div className="flex items-center justify-between p-5 border-b border-[#E3422C]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
-              <Boxes className="w-4 h-4 text-white" />
+              <Boxes className="w-4 h-4 text-black" />
             </div>
             <div>
-              <p className="text-sm font-bold text-white tracking-tight">FranchiseCRM</p>
-              <p className="text-xs text-slate-500">Management Suite</p>
+              <p className="text-sm font-bold text-black tracking-tight">FranchiseCRM</p>
+              <p className="text-xs text-black/50">Management Suite</p>
             </div>
           </div>
-          <button onClick={onClose} className="lg:hidden p-1 rounded-lg text-slate-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="lg:hidden p-1 rounded-lg text-slate-500 hover:text-black transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* User info */}
-        <div className="px-4 py-4 border-b border-slate-800/60">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-900">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+        <div className="px-4 py-4 border-b  border-[#E3422C]">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-black/50">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-black text-xs font-bold flex-shrink-0">
               {user?.name?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+              <p className="text-sm font-semibold text-black truncate">{user?.name}</p>
               <span className={`text-xs ${roleBadgeClass[role]}`}>{roleLabel[role]}</span>
             </div>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
@@ -184,7 +184,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </nav>
 
         {/* Bottom actions */}
-         <div className="px-3 py-4 border-t border-slate-800/60 space-y-1">
+         <div className="px-3 py-4 border-t border-[#E3422C] space-y-1">
           {role === 'ADMIN' && (
             <button
               onClick={() => { navigate('/admin/settings'); onClose(); }}
@@ -194,7 +194,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               Settings
             </button>
           )}
-          <button onClick={handleLogout} className="sidebar-link w-full text-rose-400 hover:text-rose-300 hover:bg-rose-500/10">
+          <button onClick={handleLogout}  className="sidebar-link w-full text-black hover:text-black hover:bg-black/5">
             <LogOut className="w-4 h-4" />
             Logout
           </button>
