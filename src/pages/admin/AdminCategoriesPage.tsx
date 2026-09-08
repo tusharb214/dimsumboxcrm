@@ -106,8 +106,8 @@ const AdminCategoriesPage: React.FC = () => {
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Categories</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Manage product categories</p>
+          <h1 className="text-xl font-bold text-black">Categories</h1>
+          <p className="text-black/60 text-sm mt-0.5">Manage product categories</p>
         </div>
         <button onClick={() => { setNewCat(''); setAddOpen(true); }} className="btn-primary">
           <Plus className="w-4 h-4" /> Add Category
@@ -119,13 +119,13 @@ const AdminCategoriesPage: React.FC = () => {
           {[1,2,3,4,5,6].map(i => <div key={i} className="skeleton h-28 rounded-2xl" />)}
         </div>
       ) : categories.length === 0 ? (
-        <div className="text-center py-16 text-slate-500 text-sm">No categories found</div>
+        <div className="text-center py-16 text-black text-sm">No categories found</div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map(cat => {
             const color = CAT_COLORS[cat.colorIdx];
             return (
-              <div key={cat.name} className="card-hover p-5">
+              <div key={cat.name} className="card-hover p-5 border border-[#E3422C]">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ backgroundColor: `${color}20`, border: `1px solid ${color}30` }}>
@@ -134,7 +134,7 @@ const AdminCategoriesPage: React.FC = () => {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => { setEditOldName(cat.name); setEditNewName(cat.name); setEditOpen(true); }}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all"
+                      className="p-1.5 rounded-lg text-black hover:text-black hover:bg-[#E3422C]/10 transition-all"
                     ><Edit2 className="w-3.5 h-3.5" /></button>
                     <button
                       onClick={() => { setDeleteCat(cat.name); setDeleteOpen(true); }}
@@ -142,8 +142,8 @@ const AdminCategoriesPage: React.FC = () => {
                     ><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
-                <h3 className="font-semibold text-white">{cat.name}</h3>
-                <p className="text-sm text-slate-500 mt-1">{cat.count} products</p>
+                <h3 className="font-semibold text-black">{cat.name}</h3>
+                <p className="text-sm text-black/60 mt-1">{cat.count} products</p>
               </div>
             );
           })}
@@ -175,8 +175,8 @@ const AdminCategoriesPage: React.FC = () => {
       {/* Edit Modal */}
       <Modal isOpen={editOpen} onClose={() => setEditOpen(false)} title="Rename Category">
         <div className="space-y-4">
-          <p className="text-xs text-slate-400">
-            This will rename <span className="text-white font-semibold">"{editOldName}"</span> across all {materials.filter(m => m.category === editOldName).length} products.
+          <p className="text-xs text-black/60">
+            This will rename <span className="text-black font-semibold">"{editOldName}"</span> across all {materials.filter(m => m.category === editOldName).length} products.
           </p>
           <div>
             <label className="label">New Name</label>

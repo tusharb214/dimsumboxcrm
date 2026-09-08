@@ -35,11 +35,11 @@ const DateFilter: React.FC<{
   <div className="flex items-center gap-1.5 flex-wrap">
     <input type="date" value={from} onChange={e => onFrom(e.target.value)}
       className="input-field py-1 px-2 text-xs min-w-0 w-[130px]" />
-    <span className="text-xs text-slate-600">–</span>
+    <span className="text-xs text-black/40">–</span>
     <input type="date" value={to} onChange={e => onTo(e.target.value)}
       className="input-field py-1 px-2 text-xs min-w-0 w-[130px]" />
     {(from || to) && (
-      <button onClick={onClear} className="text-xs text-slate-500 hover:text-white underline leading-none">Clear</button>
+      <button onClick={onClear} className="text-xs text-black/60 hover:text-black underline leading-none">Clear</button>
     )}
   </div>
 );
@@ -48,10 +48,10 @@ const DateFilter: React.FC<{
 const PieTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs">
-        <p className="text-white font-semibold">{payload[0].name}</p>
-        <p className="text-emerald-400">₹{Number(payload[0].value).toLocaleString('en-IN')}</p>
-        <p className="text-slate-400">{payload[0].payload.qty} units</p>
+      <div className="bg-[#fff] border border-[#E3422C] rounded-lg px-3 py-2 text-xs shadow-lg">
+        <p className="text-black font-semibold">{payload[0].name}</p>
+        <p className="text-emerald-500">₹{Number(payload[0].value).toLocaleString('en-IN')}</p>
+        <p className="text-black/60">{payload[0].payload.qty} units</p>
       </div>
     );
   }
@@ -62,10 +62,10 @@ const PieTooltip = ({ active, payload }: any) => {
 const BarTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs">
-        <p className="text-slate-400 mb-1">{label}</p>
-        <p className="text-emerald-400 font-semibold">₹{Number(payload[0]?.value || 0).toLocaleString('en-IN')}</p>
-        <p className="text-sky-400">{payload[1]?.value || 0} orders</p>
+      <div className="bg-[#fff] border border-[#E3422C] rounded-lg px-3 py-2 text-xs shadow-lg">
+        <p className="text-black/60 mb-1">{label}</p>
+        <p className="text-emerald-500 font-semibold">₹{Number(payload[0]?.value || 0).toLocaleString('en-IN')}</p>
+        <p className="text-sky-500">{payload[1]?.value || 0} orders</p>
       </div>
     );
   }
@@ -304,7 +304,7 @@ const AdminUserDetailPage: React.FC = () => {
   if (!selectedUser) return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <button onClick={() => navigate('/admin/users')} className="btn-secondary"><ArrowLeft className="w-4 h-4" /> Back to Users</button>
-      <div className="text-center py-16 text-slate-500 text-sm">User not found</div>
+      <div className="text-center py-16 text-black/60 text-sm">User not found</div>
     </div>
   );
 
@@ -337,32 +337,32 @@ const AdminUserDetailPage: React.FC = () => {
       {/* ── User Info Card ── */}
       <div className="card p-4">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center text-[#fff] font-bold text-sm shrink-0">
             {selectedUser.name.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <h2 className="text-base font-bold text-white truncate">{selectedUser.name}</h2>
-            <p className="text-xs text-slate-400 truncate">{selectedUser.email}</p>
+            <h2 className="text-base font-bold text-black truncate">{selectedUser.name}</h2>
+            <p className="text-xs text-black/60 truncate">{selectedUser.email}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="bg-slate-800/60 rounded-xl px-3 py-2 border border-slate-700/40">
-            <p className="text-xs text-slate-500 mb-1">Role</p>
+          <div className="bg-[#FFEEE7] rounded-xl px-3 py-2 border border-[#E3422C]/40">
+            <p className="text-xs text-black/60 mb-1">Role</p>
             <span className="badge-info text-xs">{selectedUser.role}</span>
           </div>
-          <div className="bg-slate-800/60 rounded-xl px-3 py-2 border border-slate-700/40">
-            <p className="text-xs text-slate-500 mb-1">Status</p>
+          <div className="bg-[#FFEEE7] rounded-xl px-3 py-2 border border-[#E3422C]/40">
+            <p className="text-xs text-black/60 mb-1">Status</p>
             <StatusBadge status={selectedUser.status || 'ACTIVE'} />
           </div>
           <div className="bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 rounded-xl px-3 py-2 text-center">
-            <ShoppingBag className="w-3.5 h-3.5 text-sky-400 mx-auto mb-0.5" />
-            <p className="text-lg font-bold text-white">{posOrders.length}</p>
-            <p className="text-xs text-slate-500">Total Bills</p>
+            <ShoppingBag className="w-3.5 h-3.5 text-sky-500 mx-auto mb-0.5" />
+            <p className="text-lg font-bold text-black">{posOrders.length}</p>
+            <p className="text-xs text-black/60">Total Bills</p>
           </div>
           <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl px-3 py-2 text-center">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-400 mx-auto mb-0.5" />
-            <p className="text-lg font-bold text-white truncate">{fmt(totalRevenue)}</p>
-            <p className="text-xs text-slate-500">Total Revenue</p>
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-500 mx-auto mb-0.5" />
+            <p className="text-lg font-bold text-black truncate">{fmt(totalRevenue)}</p>
+            <p className="text-xs text-black/60">Total Revenue</p>
           </div>
         </div>
       </div>
@@ -370,7 +370,7 @@ const AdminUserDetailPage: React.FC = () => {
       {/* ── Tabs Card ── */}
       <div className="card overflow-hidden">
         {/* Tab Bar */}
-        <div className="flex border-b border-slate-800">
+        <div className="flex border-b border-[#E3422C] overflow-x-auto">
           {tabs.map(tab => (
             <button key={tab.key} onClick={async () => {
               setActiveTab(tab.key);
@@ -385,24 +385,24 @@ const AdminUserDetailPage: React.FC = () => {
                 finally { setStockLoading(false); setStockLoaded(true); }
               }
             }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors ${activeTab === tab.key ? tabActive[tab.key] : 'text-slate-500 hover:text-slate-300'
+              className={`flex-1 min-w-[80px] flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors ${activeTab === tab.key ? tabActive[tab.key] : 'text-black/50 hover:text-black/80'
                 }`}
             >
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{tab.key === 'daily' ? 'Daily' : tab.label}</span>
               {tab.key === 'orders' && (
-                <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-slate-800 text-slate-500'}`}>
+                <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-[#FFEEE7] text-black/50'}`}>
                   {userOrders.length}
                 </span>
               )}
               {tab.key === 'daily' && (
-                <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-slate-800 text-slate-500'}`}>
+                <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-[#FFEEE7] text-black/50'}`}>
                   {dailyRevenue.length}
                 </span>
               )}
               {tab.key === 'stock' && stockLoaded && (
-                <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-slate-800 text-slate-500'}`}>
+                <span className={`px-1.5 py-0.5 rounded-full text-xs ${activeTab === tab.key ? badgeActive[tab.key] : 'bg-[#FFEEE7] text-black/50'}`}>
                   {stockProducts.length}
                 </span>
               )}
@@ -420,17 +420,17 @@ const AdminUserDetailPage: React.FC = () => {
 
               {/* Last month vs This month */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/40">
-                  <p className="text-xs text-slate-500 mb-1">Last Month</p>
-                  <p className="text-xl font-bold text-white">{fmt(lastMonthRevenue)}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                <div className="bg-[#FFEEE7] rounded-xl p-4 border border-[#E3422C]/40">
+                  <p className="text-xs text-black/60 mb-1">Last Month</p>
+                  <p className="text-xl font-bold text-black">{fmt(lastMonthRevenue)}</p>
+                  <p className="text-xs text-black/60 mt-0.5">
                     {new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
                   </p>
                 </div>
                 <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4">
-                  <p className="text-xs text-slate-500 mb-1">This Month</p>
-                  <p className="text-xl font-bold text-violet-400">{fmt(thisMonthRevenue)}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-black/60 mb-1">This Month</p>
+                  <p className="text-xl font-bold text-violet-500">{fmt(thisMonthRevenue)}</p>
+                  <p className="text-xs text-black/60 mt-0.5">
                     {now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
                   </p>
                 </div>
@@ -439,7 +439,7 @@ const AdminUserDetailPage: React.FC = () => {
               {/* Bar Chart */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Revenue Trend</p>
+                  <p className="text-xs font-semibold text-black/60 uppercase tracking-wider">Revenue Trend</p>
                   <div className="flex gap-1">
                     <button
                       onClick={() => setChartRange('monthly')}
@@ -453,11 +453,11 @@ const AdminUserDetailPage: React.FC = () => {
                 </div>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={barData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false}
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffe3d6" />
+                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#7d746e' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#7d746e' }} axisLine={false} tickLine={false}
                       tickFormatter={v => v >= 1000 ? `₹${(v / 1000).toFixed(0)}k` : `₹${v}`} />
-                    <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                    <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(227,66,44,0.06)' }} />
                     <Bar dataKey="revenue" fill="#34d399" radius={[4, 4, 0, 0]} name="Revenue" />
                     <Bar dataKey="orders" fill="#38bdf8" radius={[4, 4, 0, 0]} name="Orders" />
                   </BarChart>
@@ -467,7 +467,7 @@ const AdminUserDetailPage: React.FC = () => {
               {/* Pie Chart — top products */}
               {pieData.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Top Products by Revenue</p>
+                  <p className="text-xs font-semibold text-black/60 uppercase tracking-wider mb-3">Top Products by Revenue</p>
                   <div className="flex flex-col sm:flex-row items-center gap-4">
                     <ResponsiveContainer width="100%" height={200}>
                       <PieChart>
@@ -486,9 +486,9 @@ const AdminUserDetailPage: React.FC = () => {
                         <div key={i} className="flex items-center justify-between gap-3 min-w-0">
                           <div className="flex items-center gap-2 min-w-0">
                             <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                            <span className="text-xs text-slate-300 truncate max-w-[120px]">{entry.name}</span>
+                            <span className="text-xs text-black/70 truncate max-w-[120px]">{entry.name}</span>
                           </div>
-                          <span className="text-xs text-slate-400 shrink-0">{fmt(entry.value)}</span>
+                          <span className="text-xs text-black/60 shrink-0">{fmt(entry.value)}</span>
                         </div>
                       ))}
                     </div>
@@ -497,7 +497,7 @@ const AdminUserDetailPage: React.FC = () => {
               )}
 
               {pieData.length === 0 && (
-                <div className="text-center py-8 text-slate-500 text-sm">No sales data available</div>
+                <div className="text-center py-8 text-black/60 text-sm">No sales data available</div>
               )}
             </div>
           )}
@@ -514,13 +514,13 @@ const AdminUserDetailPage: React.FC = () => {
                   onTo={v => { setOrderTo(v); setOrderPage(1); }}
                   onClear={() => { setOrderFrom(''); setOrderTo(''); setOrderPage(1); }}
                 />
-                <span className="text-xs text-slate-500">{filteredOrders.length} of {userOrders.length}</span>
+                <span className="text-xs text-black/60">{filteredOrders.length} of {userOrders.length}</span>
               </div>
 
               {userOrders.length === 0 ? (
-                <div className="text-center py-10 text-slate-500 text-sm">No orders placed yet</div>
+                <div className="text-center py-10 text-black/60 text-sm">No orders placed yet</div>
               ) : filteredOrders.length === 0 ? (
-                <div className="text-center py-10 text-slate-500 text-sm">No orders in this date range</div>
+                <div className="text-center py-10 text-black/60 text-sm">No orders in this date range</div>
               ) : (
                 <div className="rounded-xl border border-slate-700/40 overflow-hidden">
                   <div className="divide-y divide-slate-800/60">
@@ -530,37 +530,37 @@ const AdminUserDetailPage: React.FC = () => {
                         <div key={order.id}>
                           <button
                             onClick={() => setExpandedOrderId(isOpen ? null : String(order.id))}
-                            className="w-full flex items-center justify-between bg-slate-800/60 hover:bg-slate-800/80 px-4 py-3 transition-colors text-left gap-2"
+                            className="w-full flex items-center justify-between bg-[#FFEEE7] hover:bg-[#FFEEE7]/70 px-4 py-3 transition-colors text-left gap-2"
                           >
                             <div className="flex flex-col min-w-0">
                               <span className="font-mono text-xs text-sky-400">#{String(order.id).slice(-6).toUpperCase()}</span>
-                              <span className="text-xs text-slate-400">
+                              <span className="text-xs text-black/60">
                                 {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <span className="text-xs font-semibold text-white">{fmt(order.totalAmount || 0)}</span>
-                              <StatusBadge status={order.status} />
+                              <span className="text-xs font-semibold text-black">{fmt(order.totalAmount || 0)}</span>
+                              {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-black/50" /> : <ChevronDown className="w-3.5 h-3.5 text-black/50" />}
                               {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
                             </div>
                           </button>
 
                           {isOpen && (
-                            <div className="bg-slate-900/60 px-4 py-3">
+                            <div className="bg-[#FFEEE7]/40 px-4 py-3">
                               {order.items && order.items.length > 0 ? (
                                 <>
-                                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">
+                                  <p className="text-xs text-black/60 font-semibold uppercase tracking-wider mb-2">
                                     Items ({order.items.length})
                                   </p>
                                   <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
                                     {order.items.map((item: any, i: number) => (
-                                      <div key={i} className="flex items-center justify-between bg-slate-800/50 rounded-lg px-3 py-2">
+                                      <div key={i} className="flex items-center justify-between bg-[#fff] rounded-lg px-3 py-2 border border-[#E3422C]/30">
                                         <div className="flex-1 min-w-0">
-                                          <p className="text-xs text-white font-medium truncate">{item.materialName || `Item ${i + 1}`}</p>
-                                          {item.category && <p className="text-xs text-slate-500">{item.category}</p>}
+                                          <p className="text-xs text-black font-medium truncate">{item.materialName || `Item ${i + 1}`}</p>
+                                          {item.category && <p className="text-xs text-black/50">{item.category}</p>}
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0 ml-2">
-                                          <span className="text-xs text-slate-500">×{item.quantity || 1}</span>
+                                          <span className="text-xs text-black/50">×{item.quantity || 1}</span>
                                           <span className="text-xs text-emerald-400 font-semibold">
                                             {fmt(item.lineTotal ?? (item.priceAtOrder ?? item.price ?? 0) * item.quantity)}
                                           </span>
@@ -570,10 +570,10 @@ const AdminUserDetailPage: React.FC = () => {
                                   </div>
                                 </>
                               ) : (
-                                <p className="text-xs text-slate-500 text-center py-2">No item details available</p>
+                                <p className="text-xs text-black/60 text-center py-2">No item details available</p>
                               )}
                               {order.orderNotes && (
-                                <p className="text-xs text-slate-500 mt-2 italic">Note: {order.orderNotes}</p>
+                                <p className="text-xs text-black/60 mt-2 italic">Note: {order.orderNotes}</p>
                               )}
                             </div>
                           )}
@@ -606,22 +606,22 @@ const AdminUserDetailPage: React.FC = () => {
               </div>
 
               {filteredDaily.length === 0 ? (
-                <div className="text-center py-10 text-slate-500 text-sm">No POS sales in this date range</div>
+                <div className="text-center py-10 text-black/60 text-sm">No POS sales in this date range</div>
               ) : (
-                <div className="rounded-xl border border-slate-700/40 overflow-hidden">
-                  <div className="divide-y divide-slate-800/60">
+                <div className="rounded-xl border border-[#E3422C]/40 overflow-hidden">
+                  <div className="divide-y divide-[#E3422C]/40">
                     {paginatedDaily.map(row => (
-                      <div key={row.date} className="flex items-center justify-between bg-slate-800/60 hover:bg-slate-800/80 px-4 py-3 transition-colors">
+                      <div key={row.date} className="flex items-center justify-between bg-[#FFEEE7] hover:bg-[#FFEEE7]/70 px-4 py-3 transition-colors">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
-                          <p className="text-xs text-slate-300">
+                          <Calendar className="w-3 h-3 text-black/50 shrink-0" />
+                          <p className="text-xs text-black/70">
                             {new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="text-right">
                             <p className="text-sm font-bold text-emerald-400">{fmt(row.revenue)}</p>
-                            <p className="text-xs text-slate-500">{row.orderCount} order{row.orderCount > 1 ? 's' : ''}</p>
+                            <p className="text-xs text-black/60">{row.orderCount} order{row.orderCount > 1 ? 's' : ''}</p>
                           </div>
                           <button
                             onClick={() => setDetailDate(row.date)}
@@ -649,31 +649,31 @@ const AdminUserDetailPage: React.FC = () => {
                       className="card w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col"
                       onClick={e => e.stopPropagation()}
                     >
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E3422C]">
                         <div>
-                          <p className="text-sm font-bold text-white">
+                          <p className="text-sm font-bold text-black">
                             {new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </p>
-                          <p className="text-xs text-slate-500">{row.orderCount} orders · {fmt(row.revenue)}</p>
+                          <p className="text-xs text-black/60">{row.orderCount} orders · {fmt(row.revenue)}</p>
                         </div>
-                        <button onClick={() => setDetailDate(null)} className="text-slate-500 hover:text-white text-sm">✕</button>
+                        <button onClick={() => setDetailDate(null)} className="text-black/50 hover:text-black text-sm">✕</button>
                       </div>
 
                       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-1.5">
                         {summary.length === 0 ? (
-                          <p className="text-xs text-slate-500 text-center py-6">No item data for this day</p>
+                          <p className="text-xs text-black/60 text-center py-6">No item data for this day</p>
                         ) : summary.map((item, i) => (
-                          <div key={i} className="flex items-center justify-between bg-slate-800/50 rounded-lg px-3 py-2">
-                            <p className="text-xs text-white font-medium truncate flex-1">{item.name}</p>
+                          <div key={i} className="flex items-center justify-between bg-[#FFEEE7] rounded-lg px-3 py-2">
+                            <p className="text-xs text-black font-medium truncate flex-1">{item.name}</p>
                             <div className="flex items-center gap-3 shrink-0">
-                              <span className="text-xs text-slate-400">×{item.qty}</span>
+                              <span className="text-xs text-black/60">×{item.qty}</span>
                               <span className="text-xs text-emerald-400 font-semibold">{fmt(item.revenue)}</span>
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      <div className="px-4 py-3 border-t border-slate-800">
+                      <div className="px-4 py-3 border-t border-[#E3422C]">
                         <button
                           onClick={() => downloadDayExcel(row)}
                           className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
@@ -728,10 +728,10 @@ const AdminUserDetailPage: React.FC = () => {
             });
 
             return stockList.length === 0 ? (
-              <div className="text-center py-10 text-slate-500 text-sm">No products found for this franchise</div>
+              <div className="text-center py-10 text-black/60 text-sm">No products found for this franchise</div>
             ) : (
               <div className="space-y-3">
-                <p className="text-xs text-slate-500">{stockList.length} products · live stock from POS inventory</p>
+                <p className="text-xs text-black/60">{stockList.length} products · live stock from POS inventory</p>
                 <div className="space-y-2">
                   {stockList.map((item: any) => {
                     const isOpen = expandedStockId === String(item.id);
@@ -746,49 +746,49 @@ const AdminUserDetailPage: React.FC = () => {
                     const pct = Math.min(100, Math.max(2, (item.stockPieces / Math.max(item.threshold * 3, 1)) * 100));
 
                     return (
-                      <div key={item.id} className="rounded-xl border border-slate-700/40 overflow-hidden">
+                      <div key={item.id} className="rounded-xl border border-[#E3422C]/40 overflow-hidden">
                         <button
                           onClick={() => setExpandedStockId(isOpen ? null : String(item.id))}
-                          className="w-full bg-slate-800/60 hover:bg-slate-800/80 px-4 py-3 transition-colors text-left"
+                          className="w-full bg-[#FFEEE7] hover:bg-[#FFEEE7]/70 px-4 py-3 transition-colors text-left"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <p className="text-xs font-bold text-white uppercase tracking-wide">{item.name}</p>
+                              <p className="text-xs font-bold text-black uppercase tracking-wide">{item.name}</p>
                               {badge}
                             </div>
                             <div className="flex items-center gap-3">
                               <div className="text-right">
-                                <span className="text-sm font-bold text-white">{packets} Packets</span>
-                                <span className="text-xs text-slate-500"> + {loose} pcs</span>
+                                <span className="text-sm font-bold text-black">{packets} Packets</span>
+                                <span className="text-xs text-black/60"> + {loose} pcs</span>
                               </div>
-                              {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                              {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-black/50" /> : <ChevronDown className="w-3.5 h-3.5 text-black/50" />}
                             </div>
                           </div>
-                          <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div className="w-full h-1.5 bg-[#ffe3d6] rounded-full overflow-hidden">
                             <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
                           </div>
                           <div className="flex items-center justify-between mt-1">
-                            <p className="text-xs text-slate-500">Sold: {item.sold.qty} units</p>
-                            <p className="text-xs text-slate-500">Alert below: {item.threshold}</p>
+                            <p className="text-xs text-black/60">Sold: {item.sold.qty} units</p>
+                            <p className="text-xs text-black/60">Alert below: {item.threshold}</p>
                           </div>
                         </button>
 
                         {isOpen && (
-                          <div className="bg-slate-900/60 px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div className="bg-slate-800/50 rounded-lg px-3 py-2">
-                              <p className="text-xs text-slate-500 mb-0.5">Category</p>
-                              <p className="text-xs text-white font-medium">{item.category || '—'}</p>
+                          <div className="bg-[#FFEEE7]/60 px-4 py-3 grid grid-cols-2 gap-3">
+                            <div className="bg-[#fff] rounded-lg px-3 py-2 border border-[#E3422C]/30">
+                              <p className="text-xs text-black/60 mb-0.5">Category</p>
+                              <p className="text-xs text-black font-medium">{item.category || '—'}</p>
                             </div>
-                            <div className="bg-slate-800/50 rounded-lg px-3 py-2">
-                              <p className="text-xs text-slate-500 mb-0.5">Current Stock</p>
-                              <p className="text-xs text-amber-400 font-bold">{item.stockPieces} pieces</p>
+                            <div className="bg-[#fff] rounded-lg px-3 py-2 border border-[#E3422C]/30">
+                              <p className="text-xs text-black/60 mb-0.5">Current Stock</p>
+                              <p className="text-xs text-amber-500 font-bold">{item.stockPieces} pieces</p>
                             </div>
-                            <div className="bg-slate-800/50 rounded-lg px-3 py-2">
-                              <p className="text-xs text-slate-500 mb-0.5">Revenue (all-time)</p>
-                              <p className="text-xs text-emerald-400 font-bold">{fmt(item.sold.revenue)}</p>
+                            <div className="bg-[#fff] rounded-lg px-3 py-2 border border-[#E3422C]/30">
+                              <p className="text-xs text-black/60 mb-0.5">Revenue (all-time)</p>
+                              <p className="text-xs text-emerald-500 font-bold">{fmt(item.sold.revenue)}</p>
                             </div>
-                            <div className="bg-slate-800/50 rounded-lg px-3 py-2">
-                              <p className="text-xs text-slate-500 mb-0.5">Profit (all-time)</p>
+                            <div className="bg-[#fff] rounded-lg px-3 py-2 border border-[#E3422C]/30">
+                              <p className="text-xs text-black/60 mb-0.5">Profit (all-time)</p>
                               <p className={`text-xs font-bold ${item.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                                 {fmt(item.profit)}
                               </p>

@@ -20,10 +20,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, maxWidt
 
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={`bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full ${maxWidth} animate-[fadeIn_0.2s_ease-out]`}>
-        <div className="flex items-center justify-between p-5 border-b border-slate-800">
+      <div className={`bg-[#FFEEE7] border border-[#E3422C] rounded-2xl shadow-2xl w-full ${maxWidth} animate-[fadeIn_0.2s_ease-out]`}>
+        <div className="flex items-center justify-between p-5 border-b border-[#E3422C]">
           <h2 className="text-base font-semibold text-black">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-black hover:bg-slate-800 transition-all">
+          <button onClick={onClose} className="p-1.5 rounded-lg text-black/60 hover:text-black hover:bg-[#E3422C]/10 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>

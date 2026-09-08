@@ -53,10 +53,10 @@ const AdminDispatchedOrdersPage: React.FC = () => {
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-xl font-bold text-black flex items-center gap-2">
             <Truck className="w-5 h-5 text-sky-400" /> Dispatched Orders
           </h1>
-          <p className="text-slate-400 text-sm mt-0.5">{orders.length} orders out for delivery</p>
+          <p className="text-black/60 text-sm mt-0.5">{orders.length} orders out for delivery</p>
         </div>
         <button onClick={fetchData} className="btn-secondary">
           <RefreshCw className="w-4 h-4" /> Refresh
@@ -64,7 +64,7 @@ const AdminDispatchedOrdersPage: React.FC = () => {
       </div>
 
       <div className="card overflow-hidden">
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-[#E3422C]">
           <SearchBar value={search} onChange={setSearch} placeholder="Search by order ID or franchise name..." className="w-full sm:w-80" />
         </div>
 
@@ -79,7 +79,7 @@ const AdminDispatchedOrdersPage: React.FC = () => {
             />
           ) : (
             <table className="w-full">
-              <thead className="border-b border-slate-800 bg-slate-900/50">
+              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95 backdrop-blur">
                 <tr>
                   <th className="table-th">Order ID</th>
                   <th className="table-th">Franchise / User</th>
@@ -89,21 +89,21 @@ const AdminDispatchedOrdersPage: React.FC = () => {
                   <th className="table-th">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#E3422C]/40">
                 {paginated.map(order => (
-                  <tr key={order.id} className="hover:bg-white/2 transition-colors">
+                  <tr key={order.id} className="hover:bg-[#E3422C]/5 transition-colors">
                     <td className="table-td font-mono text-sky-400 text-xs font-bold">
                       #{String(order.id).slice(-8).toUpperCase()}
                     </td>
-                    <td className="table-td text-slate-300 text-sm">{order.userName || '—'}</td>
-                    <td className="table-td text-slate-300 text-sm">{order.kitchenName || '—'}</td>
-                    <td className="table-td font-semibold text-white">₹{order.totalAmount}</td>
-                    <td className="table-td text-slate-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="table-td text-black text-sm">{order.userName || '—'}</td>
+                    <td className="table-td text-black text-sm">{order.kitchenName || '—'}</td>
+                    <td className="table-td font-semibold text-black">₹{order.totalAmount}</td>
+                    <td className="table-td text-black text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
                     <td className="table-td">
                       <div className="flex items-center gap-2 flex-wrap">
                         <button
                           onClick={() => navigate(`/admin/orders/${order.id}`)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-700/60 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-all"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#FFEEE7] text-black border border-[#E3422C] hover:bg-[#FFEEE7]/70 transition-all"
                         >
                           <Eye className="w-3 h-3" /> Details
                         </button>

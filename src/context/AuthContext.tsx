@@ -48,9 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(u);
       toast.success(`Welcome back, ${u.name}!`);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
-      throw err;
-    } finally {
+  console.error('LOGIN ERROR:', err);
+  console.error('LOGIN STATUS:', err?.response?.status);
+  console.error('LOGIN DATA:', err?.response?.data);
+  console.error('LOGIN MESSAGE:', err?.message);
+
+  toast.error(err?.response?.data?.message || 'Login failed');
+  throw err;
+}
+ finally {
       setIsLoading(false);
     }
   }, []);

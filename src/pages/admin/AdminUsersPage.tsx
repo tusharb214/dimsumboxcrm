@@ -133,10 +133,10 @@ setUsers(allUsers.filter((u: any) => u.role !== 'KITCHEN'));
 
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white">Users</h1>
-          <p className="text-slate-400 text-sm mt-0.5">{users.length} registered users</p>
+           <h1 className="text-xl font-bold text-black">Users</h1>
+<p className="text-black/60 text-sm mt-0.5">{users.length} registered users</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={fetchUsers} className="btn-secondary"><RefreshCw className="w-4 h-4" />Refresh</button>
@@ -145,15 +145,15 @@ setUsers(allUsers.filter((u: any) => u.role !== 'KITCHEN'));
       </div>
 
       <div className="card overflow-hidden">
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-[#E3422C]">
           <SearchBar value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Search users..." />
         </div>
         <div className="overflow-x-auto">
           {loading ? <TableSkeleton rows={6} cols={5} /> : paginated.length === 0 ? (
             <EmptyState icon={Users} title="No users found" description="Create your first user" action={<button onClick={() => setModalOpen(true)} className="btn-primary"><Plus className="w-4 h-4" />Create User</button>} />
           ) : (
-            <table className="w-full">
-              <thead className="border-b border-slate-800 bg-slate-900/50">
+            <table className="w-full min-w-[640px]">
+              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95">
                 <tr>
                   <th className="table-th">Name</th>
                   <th className="table-th">Email</th>
@@ -165,21 +165,21 @@ setUsers(allUsers.filter((u: any) => u.role !== 'KITCHEN'));
                 </tr>
 
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#E3422C]/40">
                 {paginated.map(user => (
-                  <tr key={user.id} className="hover:bg-white/2 transition-colors">
+                  <tr key={user.id} className="hover:bg-[#E3422C]/5 transition-colors">
                     <td className="table-td">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center text-[#fff] text-xs font-bold flex-shrink-0">
                           {user.name.charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-medium text-white">{user.name}</span>
+                        <span className="font-medium text-black">{user.name}</span>
                       </div>
                     </td>
-                    <td className="table-td text-slate-400">{user.email}</td>
+                    <td className="table-td text-black/60">{user.email}</td>
                     <td className="table-td"><span className="badge-info">{user.role}</span></td>
                     <td className="table-td"><StatusBadge status={user.status || 'ACTIVE'} /></td>
-                    <td className="table-td text-slate-500 text-xs">{new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="table-td text-black/60 text-xs">{new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
                     <td className="table-td">
                       <button
                         onClick={() => navigate(`/admin/users/${user.id}`)}

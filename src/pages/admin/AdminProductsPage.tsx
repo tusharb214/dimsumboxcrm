@@ -131,8 +131,8 @@ const AdminProductsPage: React.FC = () => {
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Materials / Products</h1>
-          <p className="text-slate-400 text-sm mt-0.5">{materials.length} materials in catalog</p>
+           <h1 className="text-xl font-bold text-black">Materials / Products</h1>
+<p className="text-black/60 text-sm mt-0.5">{materials.length} materials in catalog</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={fetchMaterials} className="btn-secondary">
@@ -145,7 +145,7 @@ const AdminProductsPage: React.FC = () => {
       </div>
 
       <div className="card overflow-hidden">
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-[#E3422C]">
           <SearchBar value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Search by name, category, brand..." />
         </div>
         <div className="overflow-x-auto">
@@ -153,12 +153,12 @@ const AdminProductsPage: React.FC = () => {
             <TableSkeleton rows={6} cols={5} />
           ) : paginated.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Package className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-400 text-sm">No materials found</p>
+               <Package className="w-10 h-10 text-black/30 mb-3" />
+<p className="text-black/60 text-sm">No materials found</p>
             </div>
           ) : (
             <table className="w-full">
-              <thead className="border-b border-slate-800 bg-slate-900/50">
+              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95">
                 <tr>
                   <th className="table-th">Material</th>
                   <th className="table-th">Category</th>
@@ -168,24 +168,24 @@ const AdminProductsPage: React.FC = () => {
                   <th className="table-th">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#E3422C]/40">
                 {paginated.map(product => (
-                  <tr key={product.id} className="hover:bg-white/2 transition-colors">
+                  <tr key={product.id} className="hover:bg-[#E3422C]/5 transition-colors">
                     <td className="table-td">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                           <Package className="w-4 h-4 text-sky-400" />
                         </div>
-                        <span className="font-medium text-white">{product.name}</span>
+                        <span className="font-medium text-black">{product.name}</span>
                       </div>
                     </td>
                     <td className="table-td"><span className="badge-neutral">{product.category}</span></td>
-                    <td className="table-td text-slate-400">{product.brand || '—'}</td>
+                    <td className="table-td text-black/60">{product.brand || '—'}</td>
                     {/* <td className="table-td font-semibold text-white">₹{product.costPerItem}</td> */}
-                    <td className="table-td font-semibold text-white">
-                      ₹{product.costPerItem}
-                      {product.unitsPerPacket ? <span className="block text-xs text-slate-500 font-normal">{product.unitsPerPacket} pcs/packet</span> : null}
-                    </td>
+                    <td className="table-td font-semibold text-black">
+  ₹{product.costPerItem}
+  {product.unitsPerPacket ? <span className="block text-xs text-black/50 font-normal">{product.unitsPerPacket} pcs/packet</span> : null}
+</td>
                     <td className="table-td">
                       <StatusBadge status={product.isActive ? 'ACTIVE' : 'INACTIVE'} />
                     </td>
@@ -193,7 +193,7 @@ const AdminProductsPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => openEdit(product)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all"
+                          className="p-1.5 rounded-lg text-black/50 hover:text-sky-500 hover:bg-sky-500/10 transition-all"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -290,7 +290,7 @@ const AdminProductsPage: React.FC = () => {
       {/* Delete Confirm */}
       <Modal isOpen={!!deleteId} onClose={() => setDeleteId(null)} title="Deactivate Material">
         <div className="space-y-4">
-          <p className="text-slate-400 text-sm">Are you sure you want to deactivate this material? It won't appear for users.</p>
+          <p className="text-black/60 text-sm">Are you sure you want to deactivate this material? It won't appear for users.</p>
           <div className="flex gap-3">
             <button onClick={() => setDeleteId(null)} className="btn-secondary flex-1 justify-center">Cancel</button>
             <button onClick={handleDelete} className="btn-danger flex-1 justify-center">

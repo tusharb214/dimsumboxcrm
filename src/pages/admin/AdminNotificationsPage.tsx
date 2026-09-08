@@ -86,8 +86,8 @@ const AdminNotificationsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Notifications</h1>
-          <p className="text-slate-400 text-sm mt-0.5">System and activity alerts</p>
+           <h1 className="text-xl font-bold text-black">Notifications</h1>
+<p className="text-black/60 text-sm mt-0.5">System and activity alerts</p>
         </div>
          <div className="flex items-center gap-2">
           <button

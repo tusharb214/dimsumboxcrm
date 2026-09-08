@@ -40,15 +40,15 @@ const AdminKitchensPage: React.FC = () => {
       const r = await adminApi.getAllKitchens();
       const d = r.data as any;
       setKitchens(Array.isArray(d) ? d : d?.kitchens ?? d?.data ?? []);
-     const ordersRes = await adminApi.getAllOrders();
-    const allOrdersData = ordersRes.data as any;
-    const ordersList: Order[] = Array.isArray(allOrdersData)
-      ? allOrdersData
-      : allOrdersData?.orders ?? allOrdersData?.data ?? [];
-    setAllOrders(ordersList);
-  } catch { toast.error('Failed to load kitchens'); }
-  finally { setLoading(false); }
-};
+      const ordersRes = await adminApi.getAllOrders();
+      const allOrdersData = ordersRes.data as any;
+      const ordersList: Order[] = Array.isArray(allOrdersData)
+        ? allOrdersData
+        : allOrdersData?.orders ?? allOrdersData?.data ?? [];
+      setAllOrders(ordersList);
+    } catch { toast.error('Failed to load kitchens'); }
+    finally { setLoading(false); }
+  };
   useEffect(() => { fetchKitchens(); }, []);
 
   const filtered = kitchens.filter(k =>
@@ -119,8 +119,8 @@ const AdminKitchensPage: React.FC = () => {
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Kitchens</h1>
-          <p className="text-slate-400 text-sm mt-0.5">{kitchens.length} kitchens registered</p>
+          <h1 className="text-xl font-bold text-black">Kitchens</h1>
+          <p className="text-black/60 text-sm mt-0.5">{kitchens.length} kitchens registered</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={fetchKitchens} className="btn-secondary"><RefreshCw className="w-4 h-4" />Refresh</button>
@@ -128,7 +128,7 @@ const AdminKitchensPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="card p-4 border-b border-slate-800 rounded-b-none">
+      <div className="card p-4 border-b border-[#E3422C] rounded-b-none">
         <SearchBar value={search} onChange={setSearch} placeholder="Search kitchens..." />
       </div>
 
@@ -155,25 +155,25 @@ const AdminKitchensPage: React.FC = () => {
                   </div>
                   <StatusBadge status={kitchen.status} />
                 </div>
-                <h3 className="font-semibold text-white mb-1">{kitchen.name}</h3>
-                <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                <h3 className="font-semibold text-black mb-1">{kitchen.name}</h3>
+                <div className="flex items-center gap-1.5 text-black/60 text-sm">
                   <MapPin className="w-3.5 h-3.5" />
                   {kitchen.location}
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                <div className="mt-4 pt-4 border-t border-[#E3422C] flex items-center justify-between text-xs text-black/60">
                   {/* <span>Orders: <span className="text-white font-semibold">{kitchen.assignedOrders ?? 0}</span></span> */}
                   <span>Live Orders: <span className="text-emerald-400 font-semibold">
-  {allOrders.filter(o =>
-    (String(o.kitchenId) === String(kitchen.id) || o.kitchenName === kitchen.name) &&
-    ['PENDING', 'PREPARING', 'READY'].includes(o.status)
-  ).length}
-</span></span>
+                    {allOrders.filter(o =>
+                      (String(o.kitchenId) === String(kitchen.id) || o.kitchenName === kitchen.name) &&
+                      ['PENDING', 'PREPARING', 'READY'].includes(o.status)
+                    ).length}
+                  </span></span>
                   <span>Added: {new Date(kitchen.createdAt).toLocaleDateString('en-IN')}</span>
                 </div>
                 {/* FIX 4: View details button */}
                 <button
                   onClick={() => openKitchenDetail(kitchen)}
-                  className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:border-sky-500/40 hover:bg-sky-500/10 transition-all"
+                  className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs bg-[#FFEEE7] text-black/60 border border-[#E3422C] hover:text-black hover:border-sky-500/40 hover:bg-sky-500/10 transition-all"
                 >
                   <Eye className="w-3 h-3" /> View Details
                 </button>
@@ -188,20 +188,20 @@ const AdminKitchensPage: React.FC = () => {
       {selectedKitchen && (
         <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelectedKitchen(null)}>
           <div
-            className="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full overflow-y-auto shadow-2xl animate-[slideInRight_0.25s_ease-out]"
+            className="w-full max-w-md bg-[#fff] border-l border-[#E3422C] h-full overflow-y-auto shadow-2xl animate-[slideInRight_0.25s_ease-out]"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800/60 sticky top-0 z-10">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-[#E3422C] bg-[#E3422C] sticky top-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <ChefHat className="w-5 h-5 text-emerald-400" />
+                <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center">
+                  <ChefHat className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">{selectedKitchen.kitchen.name}</h2>
-                  <p className="text-xs text-slate-400 flex items-center gap-1"><MapPin className="w-3 h-3" />{selectedKitchen.kitchen.location}</p>
+                  <h2 className="text-base font-bold text-[#fff]">{selectedKitchen.kitchen.name}</h2>
+                  <p className="text-xs text-white/80 flex items-center gap-1"><MapPin className="w-3 h-3" />{selectedKitchen.kitchen.location}</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedKitchen(null)} className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-all">
+              <button onClick={() => setSelectedKitchen(null)} className="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/15 transition-all">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -212,8 +212,8 @@ const AdminKitchensPage: React.FC = () => {
               ) : (
                 <>
                   {/* Status */}
-                  <div className="flex items-center justify-between bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40">
-                    <span className="text-sm text-slate-400">Status</span>
+                  <div className="flex items-center justify-between bg-[#FFEEE7] rounded-xl px-4 py-3 border border-[#E3422C]/40">
+                    <span className="text-sm text-black/60">Status</span>
                     <StatusBadge status={selectedKitchen.kitchen.status} />
                   </div>
 
@@ -222,32 +222,32 @@ const AdminKitchensPage: React.FC = () => {
                     const stats = getKitchenStats(selectedKitchen.orders);
                     return (
                       <div>
-                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Performance</h3>
+                        <h3 className="text-xs font-semibold text-black/60 uppercase tracking-wider mb-3">Performance</h3>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 rounded-xl p-4 text-center">
                             <ShoppingBag className="w-4 h-4 text-sky-400 mx-auto mb-1" />
-                            <p className="text-2xl font-bold text-white">{stats.total}</p>
-                            <p className="text-xs text-slate-500">Total Orders</p>
+                            <p className="text-2xl font-bold text-black">{stats.total}</p>
+                            <p className="text-xs text-black">Total Orders</p>
                           </div>
                           <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 text-center">
                             <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                            <p className="text-2xl font-bold text-white">₹{stats.totalRevenue.toLocaleString()}</p>
-                            <p className="text-xs text-slate-500">Revenue</p>
+                            <p className="text-2xl font-bold text-black">₹{stats.totalRevenue.toLocaleString()}</p>
+                            <p className="text-xs text-black">Revenue</p>
                           </div>
                           <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-xl p-4 text-center">
                             <Clock className="w-4 h-4 text-amber-400 mx-auto mb-1" />
-                            <p className="text-2xl font-bold text-white">{stats.preparing}</p>
-                            <p className="text-xs text-slate-500">Preparing</p>
+                            <p className="text-2xl font-bold text-black">{stats.preparing}</p>
+                            <p className="text-xs text-black">Preparing</p>
                           </div>
                           <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-xl p-4 text-center">
                             <CheckCircle2 className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-                            <p className="text-2xl font-bold text-white">{stats.delivered}</p>
-                            <p className="text-xs text-slate-500">Delivered</p>
+                            <p className="text-2xl font-bold text-black">{stats.delivered}</p>
+                            <p className="text-xs text-black">Delivered</p>
                           </div>
                           <div className="bg-gradient-to-br from-sky-500/10 to-sky-500/5 border border-sky-500/20 rounded-xl p-4 text-center col-span-2">
                             <Calendar className="w-4 h-4 text-sky-400 mx-auto mb-1" />
-                            <p className="text-2xl font-bold text-white">{stats.todayOrders}</p>
-                            <p className="text-xs text-slate-500">Today's Orders</p>
+                            <p className="text-2xl font-bold text-black">{stats.todayOrders}</p>
+                            <p className="text-xs text-black">Today's Orders</p>
                           </div>
                         </div>
                       </div>
@@ -256,20 +256,20 @@ const AdminKitchensPage: React.FC = () => {
 
                   {/* Recent Orders */}
                   <div>
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Orders</h3>
+                    <h3 className="text-xs font-semibold text-black/60 uppercase tracking-wider mb-3">Recent Orders</h3>
                     {selectedKitchen.orders.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500 text-sm">No orders assigned yet</div>
+                      <div className="text-center py-8 text-black/60 text-sm">No orders assigned yet</div>
                     ) : (
                       <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                         {selectedKitchen.orders.slice(0, 10).map(order => (
-                          <div key={order.id} className="flex items-center justify-between bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40">
+                          <div key={order.id} className="flex items-center justify-between bg-[#FFEEE7] rounded-xl px-4 py-3 border border-[#E3422C]/40">
                             <div>
                               <p className="text-xs font-mono text-sky-400">#{String(order.id).slice(-6).toUpperCase()}</p>
-                              <p className="text-xs text-slate-500">{order.userName || 'Unknown user'}</p>
-                              <p className="text-xs text-slate-600">{new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+                              <p className="text-xs text-black/60">{order.userName || 'Unknown user'}</p>
+                              <p className="text-xs text-black/50">{new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-bold text-white mb-1">₹{order.totalAmount}</p>
+                              <p className="text-sm font-bold text-black mb-1">₹{order.totalAmount}</p>
                               <StatusBadge status={order.status} />
                             </div>
                           </div>
@@ -303,7 +303,7 @@ const AdminKitchensPage: React.FC = () => {
             <label className="label">Kitchen Login Password *</label>
             <input type="password" value={form.password} onChange={set('password')} placeholder="Min 6 characters" className="input-field" required />
           </div>
-          <p className="text-xs text-slate-500">Kitchen staff will use this email & password to login.</p>
+          <p className="text-xs text-black/60">Kitchen staff will use this email & password to login.</p>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={handleCloseModal} className="btn-secondary flex-1 justify-center">Cancel</button>
             <button type="submit" className="btn-primary flex-1 justify-center" disabled={submitting}>

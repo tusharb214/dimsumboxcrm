@@ -71,14 +71,14 @@ const AdminOrdersPage: React.FC = () => {
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Orders Management</h1>
-          <p className="text-slate-400 text-sm mt-0.5">{orders.length} total orders</p>
+          <h1 className="text-xl font-bold text-black">Orders Management</h1>
+          <p className="text-black/60 text-sm mt-0.5">{orders.length} total orders</p>
         </div>
         <button onClick={fetchData} className="btn-secondary"><RefreshCw className="w-4 h-4" />Refresh</button>
       </div>
 
       <div className="card overflow-hidden">
-        <div className="flex flex-col sm:flex-row gap-3 p-4 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row gap-3 p-4 border-b border-[#E3422C]">
           <SearchBar value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Search by ID or user..." className="flex-1" />
           <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }} className="input-field w-full sm:w-44 py-2.5">
             <option value="ALL">All Statuses</option>
@@ -91,7 +91,7 @@ const AdminOrdersPage: React.FC = () => {
             <EmptyState icon={Settings2} title="No orders found" description="Try adjusting filters" />
           ) : (
             <table className="w-full">
-              <thead className="border-b border-slate-800 bg-slate-900/50">
+              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]">
                 <tr>
                   <th className="table-th">Order ID</th>
                   <th className="table-th">User</th>
@@ -102,10 +102,10 @@ const AdminOrdersPage: React.FC = () => {
                   <th className="table-th">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#E3422C]/40">
                 {paginated.map(order => (
                   <tr key={order.id} className={`hover:bg-white/2 transition-colors ${updating === String(order.id) ? 'opacity-60' : ''}`}>
-                    <td className="table-td font-mono text-sky-400 text-xs">#{String(order.id).slice(-8).toUpperCase()}</td>
+                    <td className="table-td font-mono text-black text-xs">#{String(order.id).slice(-8).toUpperCase()}</td>
                     <td className="table-td">{order.userName || '—'}</td>
                     <td className="table-td"><StatusBadge status={order.status} /></td>
                     <td className="table-td">
@@ -114,11 +114,11 @@ const AdminOrdersPage: React.FC = () => {
                           <ChefHat className="w-3.5 h-3.5" />{order.kitchenName}
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-500">Not Assigned</span>
+                        <span className="text-xs text-black/60">Not Assigned</span>
                       )}
                     </td>
-                    <td className="table-td font-semibold text-white">₹{order.totalAmount}</td>
-                    <td className="table-td text-slate-500 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="table-td font-semibold text-black">₹{order.totalAmount}</td>
+                    <td className="table-td text-black/60 text-xs">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
                     <td className="table-td">
                       <div className="flex items-center gap-2 flex-wrap">
                         <button
@@ -160,8 +160,8 @@ const AdminOrdersPage: React.FC = () => {
       {addressModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="card w-full max-w-sm p-6 space-y-4">
-            <h3 className="text-sm font-semibold text-white">Approve for Delivery</h3>
-            <p className="text-xs text-slate-400">Enter the delivery address. Kitchen will see this on their Dispatch page.</p>
+            <h3 className="text-sm font-semibold text-black">Approve for Delivery</h3>
+            <p className="text-xs text-black/60">Enter the delivery address. Kitchen will see this on their Dispatch page.</p>
             <textarea
               value={addressModal.address}
               onChange={e => setAddressModal(prev => prev ? { ...prev, address: e.target.value } : null)}
@@ -171,7 +171,7 @@ const AdminOrdersPage: React.FC = () => {
               autoFocus
             />
             <div className="flex gap-2">
-              <button onClick={() => setAddressModal(null)} className="flex-1 py-2 rounded-xl text-xs text-slate-400 border border-slate-700 hover:bg-slate-800 transition-all">Cancel</button>
+              <button onClick={() => setAddressModal(null)} className="flex-1 py-2 rounded-xl text-xs text-black border border-[#E3422C] hover:bg-[#E3422C]/10 transition-all">Cancel</button>
               <button
                 onClick={confirmApproveDelivery}
                 disabled={!addressModal.address.trim() || !!updating}

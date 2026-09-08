@@ -119,7 +119,7 @@ const AdminDashboard: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-slate-500 border-b  border-[#ffeee7]">
+                  <tr className="text-left text-xs text-slate-500 border-b border-[#E3422C]">
                     {/* <th className="px-5 py-3 font-medium">Order ID</th> */}
                     <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">order ID</th>
                     <th className="px-4 py-2.5 font-medium">Outlet</th>
@@ -137,14 +137,14 @@ const AdminDashboard: React.FC = () => {
                     const isPaid = ['DELIVERED', 'COMPLETED', 'DISPATCHED'].includes(order.status);
                     return (
                       <tr key={order.id} className="hover:bg-white/[0.03] transition-colors">
-                        <td className="px-5 py-3 font-mono text-xs text-sky-400 whitespace-nowrap">
+                        <td className="px-5 py-3 font-mono text-xs text-black                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            whitespace-nowrap">
                           #{String(order.id).slice(-6).toUpperCase()}
                         </td>
-                        <td className="px-4 py-2.5 text-slate-300 whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-black whitespace-nowrap">
                           {order.kitchenName || 'Unassigned'}
                         </td>
-                        <td className="px-4 py-2.5 text-slate-400 whitespace-nowrap">{formatDate(order.createdAt)}</td>
-                        <td className="px-4 py-2.5 text-slate-200 whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-black whitespace-nowrap">{formatDate(order.createdAt)}</td>
+                        <td className="px-4 py-2.5 text-black whitespace-nowrap">
                           ₹{(order.totalAmount || 0).toLocaleString('en-IN')}
                         </td>
                         <td className="px-4 py-2.5 whitespace-nowrap">
@@ -158,7 +158,7 @@ const AdminDashboard: React.FC = () => {
                         <td className="px-5 py-3 text-right">
                           <Link
                             to={`/admin/orders/${order.id}`}
-                            className="inline-flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white/5 text-slate-400 hover:text-sky-400 transition-colors"
+                            className="inline-flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white/5 text-black hover:text-sky-400 transition-colors"
                           >
                             <Eye className="w-4 h-4" />
                           </Link>
@@ -181,7 +181,7 @@ const AdminDashboard: React.FC = () => {
           <div className="px-5 py-4 border-t  border-[#ffeee7]">
             <Link
               to="/admin/orders"
-              className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-[#ffeee7] text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+              className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-[#ffeee7] text-sm text-black hover:bg-white/5 hover:text-white transition-colors"
             >
               View All Orders
             </Link>
@@ -202,7 +202,7 @@ const AdminDashboard: React.FC = () => {
             ) : (
               <>
                  <div>
-                  <p className="text-xs text-slate-400">Total Outstanding</p>
+                  <p className="text-xs text-black">Total Outstanding</p>
                   <p className="text-xl font-bold text-white mt-1">
                     ₹{(dashStats?.paymentOverview?.totalOutstanding ?? 0).toLocaleString('en-IN')}
                   </p>
@@ -233,11 +233,11 @@ const AdminDashboard: React.FC = () => {
               <ol className="space-y-2.5">
                 {topOutlets.map((outlet, idx) => (
                   <li key={outlet.name} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-300 truncate pr-2">
+                    <span className="text-black truncate pr-2">
                       <span className="text-slate-500 mr-1.5">{idx + 1}.</span>
                       {outlet.name}
                     </span>
-                    <span className="text-slate-200 font-medium whitespace-nowrap">
+                    <span className="text-black font-medium whitespace-nowrap">
                       ₹{outlet.sales.toLocaleString('en-IN')}
                     </span>
                   </li>
