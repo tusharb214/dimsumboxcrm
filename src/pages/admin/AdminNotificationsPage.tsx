@@ -112,10 +112,10 @@ const AdminNotificationsPage: React.FC = () => {
 
       <div className="card overflow-hidden">
         {/* Top bar */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E3422C]">
           <div className="flex items-center gap-2">
-            <Bell className="w-4 h-4 text-slate-400" />
-            <span className="text-sm font-semibold text-white">All Notifications</span>
+             <Bell className="w-4 h-4 text-black/50" />
+<span className="text-sm font-semibold text-black">All Notifications</span>
             {unreadCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">
                 {unreadCount} new
@@ -143,18 +143,18 @@ const AdminNotificationsPage: React.FC = () => {
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <Bell className="w-10 h-10 text-slate-700 mb-3" />
-            <p className="text-slate-400 text-sm">No notifications yet</p>
+             <Bell className="w-10 h-10 text-black/30 mb-3" />
+            <p className="text-black/60 text-sm">No notifications yet</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-800/60">
+          <div className="divide-y divide-[#E3422C]/40">
             {notifications.map(n => {
               const isLowStock = n.type === 'LOW_STOCK';
               return (
                 <div
                   key={n.id}
-                  className={`flex items-start gap-4 px-5 py-4 hover:bg-white/2 transition-colors ${
-                    !n.read ? 'bg-sky-500/5' : ''
+                   className={`flex items-start gap-4 px-5 py-4 hover:bg-[#E3422C]/5 transition-colors ${
+  !n.read ? 'bg-sky-500/5' : ''
                   }`}
                 >
                   {/* Icon */}
@@ -178,7 +178,7 @@ const AdminNotificationsPage: React.FC = () => {
                           <button
                             onClick={() => handleMarkAsRead(n.id)}
                             title="Mark as read"
-                            className="p-1 rounded-lg text-slate-500 hover:text-sky-400 transition-colors"
+                             className="p-1 rounded-lg text-black/50 hover:text-sky-500 transition-colors"
                           >
                             <Check className="w-3.5 h-3.5" />
                           </button>
@@ -188,8 +188,8 @@ const AdminNotificationsPage: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <p className="text-sm text-slate-400 mt-0.5">{n.message}</p>
-                    <p className="text-xs text-slate-600 mt-1.5">{timeAgo(n.createdAt)}</p>
+                     <p className="text-sm text-black/70 mt-0.5">{n.message}</p>
+<p className="text-xs text-black/50 mt-1.5">{timeAgo(n.createdAt)}</p>
                   </div>
                 </div>
               );
