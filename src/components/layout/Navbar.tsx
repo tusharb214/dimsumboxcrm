@@ -129,7 +129,8 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
 
   return (
     // <header className="h-14 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/60 flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
-    <header className="h-14 bg-[#FFEEE7] border-b border-[#E3422C] flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
+    // <header className="h-14 bg-[#E3422C] border-b border-[#E3422C] flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
+    <header className="navbar-custom h-14 bg-[#E3422C] border-b border-[#E3422C] flex items-center justify-between px-4 lg:px-5 sticky top-0 z-30">
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
@@ -143,7 +144,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, pageTitle }) => {
       </div>
 
       {/* <div className="hidden md:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 w-64"> */}
-      <div className="hidden md:flex items-center gap-2 bg-white/70 border border-[#E3422C] rounded-xl px-3 py-2 w-64">
+      <div className="hidden md:flex items-center gap-2 bg-white/20 border border-white/30 rounded-xl px-3 py-2 w-64">
         <Search className="w-4 h-4 text-slate-500" />
            <input
           type="text"
