@@ -158,7 +158,7 @@ const AdminProductsPage: React.FC = () => {
             </div>
           ) : (
             <table className="w-full">
-              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95">
+              <thead className="border-b border-[#E3422C] bg-[#E3422C]/95">
                 <tr>
                   <th className="table-th">Material</th>
                   <th className="table-th">Category</th>

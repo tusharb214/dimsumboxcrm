@@ -116,7 +116,7 @@
      BUTTONS
   ========================= */
  .btn-primary {
-  @apply bg-[#e3422c]
+  @apply bg-[#E3422C]
   hover:bg-[#c22f1b]
   text-black
   font-semibold
@@ -135,7 +135,7 @@
 
   .btn-secondary {
     @apply bg-white
-    hover:bg-[#FFEEE7]
+    hover:bg-[#E3422C]
     text-black
     font-medium
     px-5

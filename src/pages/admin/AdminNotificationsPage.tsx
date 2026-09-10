@@ -172,7 +172,7 @@ const AdminNotificationsPage: React.FC = () => {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
-                      <p className="text-sm font-semibold text-white">{n.title}</p>
+                      <p className="text-sm font-semibold text-black">{n.title}</p>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {!n.read && (
                           <button

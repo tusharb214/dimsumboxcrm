@@ -79,7 +79,7 @@ const AdminDispatchedOrdersPage: React.FC = () => {
             />
           ) : (
             <table className="w-full">
-              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95 backdrop-blur">
+              <thead className="border-b border-[#E3422C] bg-[#E3422C]/95 backdrop-blur">
                 <tr>
                   <th className="table-th">Order ID</th>
                   <th className="table-th">Franchise / User</th>

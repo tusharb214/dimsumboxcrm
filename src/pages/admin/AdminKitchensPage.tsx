@@ -151,7 +151,7 @@ const AdminKitchensPage: React.FC = () => {
               <div key={kitchen.id} className="card-hover p-5 group">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                    <ChefHat className="w-5 h-5 text-emerald-400" />
+                    <ChefHat className="w-5 h-5 text-[#E3422C]" />
                   </div>
                   <StatusBadge status={kitchen.status} />
                 </div>

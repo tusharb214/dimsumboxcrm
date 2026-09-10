@@ -79,7 +79,7 @@ const AdminPendingPaymentsPage: React.FC = () => {
             />
           ) : (
             <table className="w-full">
-              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95">
+              <thead className="border-b border-[#E3422C] bg-[#E3422C]/95">
                 <tr>
                   <th className="table-th">Order ID</th>
                   <th className="table-th">Franchise / User</th>

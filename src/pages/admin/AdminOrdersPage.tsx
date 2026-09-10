@@ -91,7 +91,7 @@ const AdminOrdersPage: React.FC = () => {
             <EmptyState icon={Settings2} title="No orders found" description="Try adjusting filters" />
           ) : (
             <table className="w-full">
-              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]">
+              <thead className="border-b border-[#E3422C] bg-[#E3422C]">
                 <tr>
                   <th className="table-th">Order ID</th>
                   <th className="table-th">User</th>

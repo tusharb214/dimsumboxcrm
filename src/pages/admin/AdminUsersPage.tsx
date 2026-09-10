@@ -153,13 +153,14 @@ setUsers(allUsers.filter((u: any) => u.role !== 'KITCHEN'));
             <EmptyState icon={Users} title="No users found" description="Create your first user" action={<button onClick={() => setModalOpen(true)} className="btn-primary"><Plus className="w-4 h-4" />Create User</button>} />
           ) : (
             <table className="w-full min-w-[640px]">
-              <thead className="border-b border-[#E3422C] bg-[#FFEEE7]/95">
+              <thead className="border-b border-[#E3422C] bg-[#E3422C]/95">
                 <tr>
                   <th className="table-th">Name</th>
                   <th className="table-th">Email</th>
                   <th className="table-th">Role</th>
                   <th className="table-th">Status</th>
                   <th className="table-th">Joined</th>
+                  <th className="table-th">Actions</th>
 
 
                 </tr>
@@ -170,7 +171,7 @@ setUsers(allUsers.filter((u: any) => u.role !== 'KITCHEN'));
                   <tr key={user.id} className="hover:bg-[#E3422C]/5 transition-colors">
                     <td className="table-td">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center text-[#fff] text-xs font-bold flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#E3422C] to-[#B92E1F] flex items-center justify-center text-[#fff] text-xs font-bold flex-shrink-0">
                           {user.name.charAt(0).toUpperCase()}
                         </div>
                         <span className="font-medium text-black">{user.name}</span>
