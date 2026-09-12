@@ -94,7 +94,7 @@ const UserAnalyticsPage: React.FC = () => {
       </div>
 
       {/* ── Sales summary cards ── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Today's Sales",   value: fmt(todaySales)   },
           { label: 'Weekly Sales',    value: fmt(weeklySales)  },
@@ -150,8 +150,8 @@ const UserAnalyticsPage: React.FC = () => {
           {statusData.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-12">No orders yet</p>
           ) : (
-            <div className="flex items-center gap-6">
-              <ResponsiveContainer width="50%" height={180}>
+             <div className="flex flex-col sm:flex-row items-center gap-6">
+              <ResponsiveContainer width="100%" height={180} className="sm:!w-1/2">
                 <PieChart>
                   <Pie data={statusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
                     {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
@@ -159,7 +159,7 @@ const UserAnalyticsPage: React.FC = () => {
                   <Tooltip contentStyle={chartTooltipStyle} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-3 flex-1">
+              <div className="space-y-3 flex-1 w-full">
                 {statusData.map((s, i) => (
                   <div key={i} className="flex items-center gap-2.5">
                     <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
@@ -178,6 +178,7 @@ const UserAnalyticsPage: React.FC = () => {
           {revenueData.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-12">No data yet</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-800">
@@ -198,6 +199,7 @@ const UserAnalyticsPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

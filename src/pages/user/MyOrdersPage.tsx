@@ -43,13 +43,13 @@ const OrderTimeline: React.FC<{ status: string }> = ({ status }) => {
 
   return (
     <div className="relative">
-      <div className="flex items-start gap-0">
+      <div className="flex items-start gap-0 overflow-x-auto pb-1 -mx-1 px-1">
         {steps.map((step, i) => {
           const done = i < currentIdx;
           const active = i === currentIdx;
           const Icon = step.icon;
           return (
-            <div key={step.key} className="flex-1 flex flex-col items-center relative">
+            <div key={step.key} className="flex-shrink-0 w-16 sm:flex-1 sm:w-auto flex flex-col items-center relative">
               {/* Connector line */}
               {i < steps.length - 1 && (
                 <div className={`absolute top-3.5 left-1/2 w-full h-0.5 z-0 transition-all ${
@@ -104,7 +104,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
           <div>
             <h2 className="text-sm font-bold text-white">
               Order #{String(order.id).slice(-8).toUpperCase()}
@@ -126,7 +126,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           </div>
         </div>
 
-        <div className="px-6 py-5 space-y-5">
+        <div className="px-4 sm:px-6 py-5 space-y-5">
 
           {/* Order Timeline */}
           <div>
@@ -219,9 +219,9 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 <p className="text-xs text-slate-500 text-center py-4">No items</p>
               ) : (
                 order.items?.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-sm text-white font-medium">{item.materialName}</p>
+                  <div key={i} className="flex items-start justify-between gap-2 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm text-white font-medium break-words">{item.materialName}</p>
                       {(item.category || item.brand) && (
                         <p className="text-xs text-slate-500 mt-0.5">
                           {item.category}{item.brand ? ` · ${item.brand}` : ''}
@@ -380,7 +380,7 @@ const MyOrdersPage: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-white">My Orders</h1>
           <p className="text-slate-400 text-sm mt-0.5">{orders.length} total orders</p>

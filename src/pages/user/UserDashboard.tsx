@@ -62,8 +62,8 @@ const UserDashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Good morning, {user?.name?.split(' ')[0]} 👋</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Here's what's happening with your franchise today.</p>
+          <h1 className="text-xl font-bold text-black">Good morning, {user?.name?.split(' ')[0]} 👋</h1>
+          <p className="text-black text-sm mt-0.5">Here's what's happening with your franchise today.</p>
         </div>
         <Link to="/dashboard/order" className="btn-primary">
           <ShoppingBag className="w-4 h-4" /> New Order
@@ -91,8 +91,8 @@ const UserDashboard: React.FC = () => {
         {/* Recent Orders */}
         <div className="lg:col-span-2 card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-            <h2 className="font-semibold text-white text-sm">Recent Orders</h2>
-            <Link to="/dashboard/orders" className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1">
+            <h2 className="font-semibold text-blaccl text-sm">Recent Orders</h2>
+            <Link to="/dashboard/orders" className="text-xs text- hover:text-sky-300 flex items-center gap-1">
               View all <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -102,9 +102,9 @@ const UserDashboard: React.FC = () => {
             </div>
           ) : orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Package className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-400 text-sm font-medium">No orders yet</p>
-              <p className="text-slate-600 text-xs mt-1">Place your first order to get started</p>
+              <Package className="w-10 h-10 text-black mb-3" />
+              <p className="text-black text-sm font-medium">No orders yet</p>
+              <p className="text-black text-xs mt-1">Place your first order to get started</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-800/60">
@@ -112,12 +112,12 @@ const UserDashboard: React.FC = () => {
                 <div key={order.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-white/2 transition-colors">
                   <div>
                     {/* <p className="text-sm font-medium text-white font-mono">#{order.id.slice(-8).toUpperCase()}</p> */}
-                    <p className="text-sm font-medium text-white font-mono">#{String(order.id).slice(-8).toUpperCase()}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{new Date(order.createdAt).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-black font-mono">#{String(order.id).slice(-8).toUpperCase()}</p>
+                    <p className="text-xs text-black mt-0.5">{new Date(order.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={order.status} />
-                    <span className="text-sm text-slate-300 font-semibold">₹{order.totalAmount}</span>
+                    <span className="text-sm text-black font-semibold">₹{order.totalAmount}</span>
                   </div>
                 </div>
               ))}
@@ -129,12 +129,12 @@ const UserDashboard: React.FC = () => {
          {/* Stock Alerts */}
         <div className="card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-            <h2 className="font-semibold text-white text-sm">Stock Alerts</h2>
+            <h2 className="font-semibold text-black text-sm">Stock Alerts</h2>
           </div>
           {stockAlerts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center px-5">
-              <Package className="w-8 h-8 text-slate-700 mb-2" />
-              <p className="text-slate-400 text-sm">No low-stock items right now</p>
+              <Package className="w-8 h-8 text-black mb-2" />
+              <p className="text-black text-sm">No low-stock items right now</p>
             </div>
           ) : (
             <>
@@ -143,8 +143,8 @@ const UserDashboard: React.FC = () => {
                   <div key={i} className="px-5 py-3.5">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <p className="text-sm font-medium text-white">{item.name}</p>
-                        <p className="text-xs text-slate-500">{item.stockPieces} pcs remaining</p>
+                        <p className="text-sm font-medium text-black">{item.name}</p>
+                        <p className="text-xs text-black">{item.stockPieces} pcs remaining</p>
                       </div>
                       <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                     </div>

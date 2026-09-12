@@ -25,7 +25,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, co
     <div className="stat-card relative overflow-hidden group hover:border-slate-700 transition-all duration-200 p-4 rounded-xl">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">{title}</p>
+          <p className="text-[11px] font-semibold text-black uppercase tracking-wider mb-1">{title}</p>
           {pending ? (
             <div className="skeleton h-7 w-24 rounded-lg mt-2" />
           ) : (
@@ -47,11 +47,11 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, co
           <span className={`text-xs font-medium ${trend.value >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
             {Math.abs(trend.value)}%
           </span>
-          <span className="text-xs text-slate-500">{trend.label}</span>
+          <span className="text-xs text-black">{trend.label}</span>
         </div>
       )}
       {pending && (
-        <span className="absolute top-2 right-2 text-xs text-slate-600 font-mono">API pending</span>
+        <span className="absolute top-2 right-2 text-xs text-black font-mono">API pending</span>
       )}
     </div>
   );

@@ -72,9 +72,9 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">Notifications</h1>
+        <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-slate-400" />
           <p className="text-slate-400 text-sm mt-0.5">Stay updated on what admin shares</p>
         </div>
         <button onClick={fetchNotifications} className="btn-secondary">

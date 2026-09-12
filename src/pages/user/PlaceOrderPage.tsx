@@ -1,11 +1,11 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Plus, Minus, Trash2, ShoppingBag, Loader2, RefreshCw, Eye, X, QrCode, Copy, UploadCloud, CheckCircle2 } from 'lucide-react';
 import { userApi, materialApi } from '../../api/services';
 import { getFileUrl } from '../../api/client';
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 
- 
+
 interface Material {
   id: number;
   name: string;
@@ -89,7 +89,7 @@ const PlaceOrderPage: React.FC = () => {
         setIfscCode(data?.ifscCode ?? null);
         setUpiQrImagePath(data?.upiQrImagePath ?? null);
       })
-      .catch(() => {});
+      .catch(() => { });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -129,7 +129,7 @@ const PlaceOrderPage: React.FC = () => {
     setCategoryFilter('All');
   };
 
-   // Step 1: cart validate करून payment modal उघडतो. Order अजून create होत नाही.
+  // Step 1: cart validate करून payment modal उघडतो. Order अजून create होत नाही.
   const placeOrder = () => {
     if (cart.length === 0) return toast.error('Cart is empty');
     if (minOrderAmount > 0 && total < minOrderAmount)
@@ -167,13 +167,13 @@ const PlaceOrderPage: React.FC = () => {
       if (!orderId) {
         const res = isResubmit
           ? await userApi.resubmitOrder({
-              orderNotes: '',
-              items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
-            })
+            orderNotes: '',
+            items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
+          })
           : await userApi.createOrder({
-              orderNotes: '',
-              items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
-            });
+            orderNotes: '',
+            items: cart.map(c => ({ materialId: c.id, quantity: c.quantity })),
+          });
         const orderData = (res.data as any)?.data ?? res.data;
         orderId = String(orderData?.id);
         setPendingOrderId(orderId);
@@ -195,12 +195,12 @@ const PlaceOrderPage: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white">
+          <h1 className="text-xl font-bold text-black">
             {isResubmit ? `Resubmit Order #${String(resubmitOrder.id).slice(-6).toUpperCase()}` : 'Place Order'}
           </h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <p className="text-black text-sm mt-0.5">
             {isResubmit ? 'Edit your items and resubmit' : 'Select materials and quantities'}
           </p>
         </div>
@@ -225,8 +225,8 @@ const PlaceOrderPage: React.FC = () => {
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${categoryFilter === cat
-                    ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
-                    : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700'
+                  ? 'bg-[#E3422C] text-white shadow-lg shadow-sky-500/20'
+                  : 'bg-[#E3422C] text-white hover:bg-[#C23520] border border-[#E3422C]'
                   }`}
               >
                 {cat}
@@ -249,17 +249,17 @@ const PlaceOrderPage: React.FC = () => {
                 const qty = cartQty(material.id);
                 return (
 
-                  <div key={material.id} className="card-hover p-4 flex items-start gap-4 relative">
-                     
+                  <div key={material.id} className="card-hover p-4 flex items-start gap-4 relative min-w-0">
 
-                    <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-lg font-bold text-sky-400 flex-shrink-0">
+
+                    <div className="w-12 h-12 rounded-xl bg-[#E3422C] flex items-center justify-center text-lg font-bold text-white flex-shrink-0">
                       {material.name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{material.name}</p>
-                      <p className="text-xs text-slate-500">{material.category} · {material.brand}</p>
+                      <p className="text-sm font-semibold text-black truncate">{material.name}</p>
+                      <p className="text-xs text-black">{material.category} · {material.brand}</p>
                       {material.unitsPerPacket ? (
-                        <p className="text-xs text-amber-400 mt-0.5">{material.unitsPerPacket} momos / packet</p>
+                        <p className="text-xs font-semibold text-teal-800 mt-0.5">{material.unitsPerPacket} momos / packet</p>
                       ) : null}
                       <p className="text-sm font-bold text-sky-400 mt-1">₹{material.costPerItem} <span className="text-xs text-slate-500 font-normal">/ packet</span></p>
                       <button
@@ -269,7 +269,7 @@ const PlaceOrderPage: React.FC = () => {
                         <Eye className="w-3 h-3" /> Details
                       </button>
                     </div>
-                     
+
 
                     <div className="flex-shrink-0">
                       {qty === 0 ? (
@@ -278,29 +278,29 @@ const PlaceOrderPage: React.FC = () => {
                             type="number"
                             min="0"
                             placeholder="0"
-                            className="w-16 h-8 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm text-center focus:outline-none focus:border-sky-500"
+                            className="w-16 h-8 rounded-lg bg-[#E3422C] border border-slate-700 text-black text-sm text-center focus:outline-none focus:border-sky-500"
                             onChange={e => {
                               const val = parseInt(e.target.value) || 0;
                               if (val > 0) setQty(material.id, val);
                             }}
                           />
-                          <button onClick={() => addToCart(material)} className="p-2 rounded-xl bg-sky-500/15 border border-sky-500/20 text-sky-400 hover:bg-sky-500/25 transition-all">
+                          <button onClick={() => addToCart(material)} className="p-2 rounded-xl bg-[#E3422C] border border-[#E3422C] text-white hover:bg-[#C23520] transition-all">
                             <Plus className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1">
-                          <button onClick={() => updateQty(material.id, -1)} className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all">
+                          <button onClick={() => updateQty(material.id, -1)} className="w-7 h-7 rounded-lg bg-[#E3422C] border border-slate-700 text-white hover:bg-[#C23520] flex items-center justify-center transition-all">
                             <Minus className="w-3 h-3" />
                           </button>
                           <input
                             type="number"
                             min="0"
                             value={qty}
-                            className="w-12 h-7 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm text-center focus:outline-none focus:border-sky-500"
+                            className="w-12 h-7 rounded-lg bg-[#C23520] border border-slate-700 text-white text-sm text-center focus:outline-none focus:border-sky-500"
                             onChange={e => setQty(material.id, parseInt(e.target.value) || 0)}
                           />
-                          <button onClick={() => updateQty(material.id, 1)} className="w-7 h-7 rounded-lg bg-sky-500/15 border border-sky-500/20 text-sky-400 hover:bg-sky-500/25 flex items-center justify-center transition-all">
+                          <button onClick={() => updateQty(material.id, 1)} className="w-7 h-7 rounded-lg bg-[#E3422C] border border-slate-700 text-white hover:bg-[#C23520] flex items-center justify-center transition-all">
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
@@ -394,33 +394,33 @@ const PlaceOrderPage: React.FC = () => {
                     <p className="text-sm font-semibold text-white truncate">{accountNumber}</p>
                   </div>
                   {(accountHolderName || bankName) && (
-                <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 space-y-2">
-                  {accountHolderName && (
-                    <div>
-                      <p className="text-xs text-slate-500 mb-0.5">Account Holder Name</p>
-                      <p className="text-sm font-semibold text-white truncate">{accountHolderName}</p>
+                    <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 space-y-2">
+                      {accountHolderName && (
+                        <div>
+                          <p className="text-xs text-slate-500 mb-0.5">Account Holder Name</p>
+                          <p className="text-sm font-semibold text-white truncate">{accountHolderName}</p>
+                        </div>
+                      )}
+                      {bankName && (
+                        <div>
+                          <p className="text-xs text-slate-500 mb-0.5">Bank Name</p>
+                          <p className="text-sm font-semibold text-white truncate">{bankName}</p>
+                        </div>
+                      )}
                     </div>
                   )}
-                  {bankName && (
-                    <div>
-                      <p className="text-xs text-slate-500 mb-0.5">Bank Name</p>
-                      <p className="text-sm font-semibold text-white truncate">{bankName}</p>
-                    </div>
-                  )}
-                </div>
-              )}
 
-              {ifscCode && (
-                <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-xs text-slate-500 mb-0.5">IFSC Code</p>
-                    <p className="text-sm font-semibold text-white truncate">{ifscCode}</p>
-                  </div>
-                  <button onClick={handleCopyIfsc} className="p-2 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all flex-shrink-0">
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
+                  {ifscCode && (
+                    <div className="bg-slate-800/60 rounded-xl px-4 py-3 border border-slate-700/40 flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs text-slate-500 mb-0.5">IFSC Code</p>
+                        <p className="text-sm font-semibold text-white truncate">{ifscCode}</p>
+                      </div>
+                      <button onClick={handleCopyIfsc} className="p-2 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all flex-shrink-0">
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                   <button onClick={handleCopyAccountNumber} className="p-2 rounded-lg text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 transition-all flex-shrink-0">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
@@ -458,21 +458,21 @@ const PlaceOrderPage: React.FC = () => {
           </div>
         )}
 
-        
 
-        <div className="card overflow-hidden h-fit sticky top-24">
+
+        <div className="card overflow-hidden h-fit lg:sticky lg:top-24">
           <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-800">
-            <ShoppingCart className="w-4 h-4 text-sky-400" />
-            <h2 className="font-semibold text-white text-sm">Cart</h2>
+            <ShoppingCart className="w-4 h-4 text-[#C23520]" />
+            <h2 className="font-semibold text-black text-sm">Cart</h2>
             {cart.length > 0 && (
-              <span className="ml-auto text-xs bg-sky-500 text-white px-2 py-0.5 rounded-full font-semibold">{cart.length}</span>
+              <span className="ml-auto text-xs bg-[#C23520] text-white px-2 py-0.5 rounded-full font-semibold">{cart.length}</span>
             )}
           </div>
 
           {cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center px-4">
               <ShoppingBag className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-500 text-sm">Your cart is empty</p>
+              <p className="text-black text-sm">Your cart is empty</p>
             </div>
           ) : (
             <>
@@ -480,11 +480,11 @@ const PlaceOrderPage: React.FC = () => {
                 {cart.map(item => (
                   <div key={item.id} className="flex items-center justify-between px-5 py-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-white truncate">{item.name}</p>
-                      <p className="text-xs text-slate-500">₹{item.price} × {item.quantity}</p>
+                      <p className="text-sm font-medium text-black truncate">{item.name}</p>
+                      <p className="text-xs text-black">₹{item.price} × {item.quantity}</p>
                     </div>
                     <div className="flex items-center gap-2 ml-3">
-                      <span className="text-sm font-semibold text-white">₹{item.price * item.quantity}</span>
+                      <span className="text-sm font-semibold text-black">₹{item.price * item.quantity}</span>
                       <button onClick={() => updateQty(item.id, -item.quantity)} className="p-1 rounded-lg text-slate-500 hover:text-rose-400 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -494,11 +494,11 @@ const PlaceOrderPage: React.FC = () => {
               </div>
               <div className="px-5 py-4 border-t border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">Total</span>
+                  <span className="text-sm text-black">Total</span>
                   <span className="text-lg font-bold text-white">₹{total}</span>
                 </div>
                 {minOrderAmount > 0 && total < minOrderAmount && (
-                  <p className="text-xs text-amber-400">
+                  <p className="text-xs text-amber-900">
                     Minimum order amount is ₹{minOrderAmount}. Add ₹{minOrderAmount - total} more to place this order.
                   </p>
                 )}

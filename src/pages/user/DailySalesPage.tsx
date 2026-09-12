@@ -169,7 +169,7 @@ const InvoiceModal: React.FC<{
           <p className="text-center text-xs text-slate-400 mt-3">Thank you for dining with us!</p>
         </div>
 
-        <div className="no-print flex items-center gap-2 p-4 border-t border-slate-200">
+        <div className="no-print flex flex-wrap items-center gap-2 p-4 border-t border-slate-200">
           <button onClick={handlePrint}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-all">
             <Printer className="w-4 h-4" /> Print
@@ -463,7 +463,7 @@ const [loadingStock, setLoadingStock] = useState(true);
   return (
     <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
 
-      <div className="flex items-center justify-between">
+             <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-white">Daily Sales</h1>
           <p className="text-slate-400 text-sm mt-0.5">Sales log & stock track</p>
@@ -474,7 +474,7 @@ const [loadingStock, setLoadingStock] = useState(true);
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Today's Sales", value: summary.today,   color: 'text-emerald-400' },
           { label: 'Weekly Sales',  value: summary.weekly,  color: 'text-sky-400'     },
@@ -489,14 +489,14 @@ const [loadingStock, setLoadingStock] = useState(true);
         ))}
       </div>
 
-      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 w-full sm:w-fit overflow-x-auto">
         {([
           { key: 'log',     label: 'Log Sales', icon: TrendingUp   },
           { key: 'history', label: 'History',    icon: History      },
           { key: 'stock',   label: `Stock${alertCount > 0 ? ` (${alertCount})` : ''}`, icon: AlertTriangle },
         ] as const).map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
               activeTab === tab.key ? 'bg-sky-500 text-white shadow'
               : tab.key === 'stock' && alertCount > 0
               ? 'text-amber-400 hover:text-white'
@@ -514,7 +514,7 @@ const [loadingStock, setLoadingStock] = useState(true);
           {/* Day-wise sales list — filter, export, pagination, breakdown action */}
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-white">Day-wise Sales</h2>
                 <button onClick={downloadDailyExcel}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
@@ -525,7 +525,7 @@ const [loadingStock, setLoadingStock] = useState(true);
                 {/* <input value={dailySearch} placeholder="Search items or amount..."
                   onChange={e => { setDailySearch(e.target.value); setDailyPage(1); }}
                   className="input-field flex-1 py-2" /> */}
-                <div className="flex gap-2">
+                              <div className="flex flex-wrap gap-2">
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">From</label>
                     <input type="date" value={dailyFrom} max={today}
@@ -605,7 +605,7 @@ const [loadingStock, setLoadingStock] = useState(true);
       {activeTab === 'history' && (
         <div className="card overflow-hidden">
           <div className="p-4 border-b border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-white">Sales History</h2>
               <button onClick={downloadHistoryExcel}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
@@ -616,7 +616,7 @@ const [loadingStock, setLoadingStock] = useState(true);
               <input value={historySearch} placeholder="Search items or amount..."
                 onChange={e => { setHistorySearch(e.target.value); setHistoryPage(1); }}
                 className="input-field flex-1 py-2" />
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <div>
                   <label className="block text-xs text-slate-500 mb-1">From</label>
                   <input type="date" value={historyFrom} max={today}
@@ -717,7 +717,7 @@ const [loadingStock, setLoadingStock] = useState(true);
       {activeTab === 'stock' && (
         <div className="card overflow-hidden">
           <div className="p-4 border-b border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-white">Stock Remaining</h2>
               <button onClick={downloadStockExcel}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
@@ -728,7 +728,7 @@ const [loadingStock, setLoadingStock] = useState(true);
               <input value={stockSearch} placeholder="Search item name..."
                 onChange={e => { setStockSearch(e.target.value); setStockPage(1); }}
                 className="input-field flex-1 py-2" />
-              <div className="flex gap-1">
+              <div className="flex flex-wrap gap-1">
                 {(['all', 'critical', 'low', 'ok'] as const).map(f => (
                   <button key={f} onClick={() => { setStockFilter(f); setStockPage(1); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${
@@ -773,7 +773,7 @@ const [loadingStock, setLoadingStock] = useState(true);
 
                   return (
                     <div key={item.id} className="px-5 py-4">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-white">{item.name}</p>
                           {badge}
