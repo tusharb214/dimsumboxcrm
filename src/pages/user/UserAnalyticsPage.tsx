@@ -1,4 +1,4 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell
@@ -15,22 +15,22 @@ const chartTooltipStyle = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  COMPLETED:  '#10b981',
-  REQUESTED:  '#f59e0b',
-  ACCEPTED:   '#3b82f6',
-  ASSIGNED:   '#8b5cf6',
-  PREPARING:  '#a855f7',
-  READY:      '#06b6d4',
-  DELIVERED:  '#0ea5e9',
-  REJECTED:   '#ef4444',
+  COMPLETED: '#10b981',
+  REQUESTED: '#f59e0b',
+  ACCEPTED: '#3b82f6',
+  ASSIGNED: '#8b5cf6',
+  PREPARING: '#a855f7',
+  READY: '#06b6d4',
+  DELIVERED: '#0ea5e9',
+  REJECTED: '#ef4444',
 };
 
 const UserAnalyticsPage: React.FC = () => {
-  const [orders, setOrders]       = useState<Order[]>([]);
-  const [todaySales, setToday]    = useState<number>(0);
-  const [weeklySales, setWeekly]  = useState<number>(0);
-  const [monthlySales, setMonthly]= useState<number>(0);
-  const [loading, setLoading]     = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [todaySales, setToday] = useState<number>(0);
+  const [weeklySales, setWeekly] = useState<number>(0);
+  const [monthlySales, setMonthly] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
@@ -59,7 +59,7 @@ const UserAnalyticsPage: React.FC = () => {
   }));
 
   // ── Monthly revenue from completed orders ────────────────────
-  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthlyMap = orders.reduce<Record<string, { revenue: number; orders: number }>>((acc, o) => {
     const d = new Date(o.createdAt);
     const key = monthNames[d.getMonth()];
@@ -78,7 +78,7 @@ const UserAnalyticsPage: React.FC = () => {
     return (
       <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
         <div className="grid lg:grid-cols-2 gap-5">
-          {[1,2,3,4].map(i => <div key={i} className="skeleton h-64 rounded-2xl" />)}
+          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-64 rounded-2xl" />)}
         </div>
       </div>
     );
@@ -88,83 +88,97 @@ const UserAnalyticsPage: React.FC = () => {
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Revenue Analytics</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Your franchise performance overview</p>
+          <h1 className="text-xl font-bold text-black">Revenue Analytics</h1>
+          <p className="text-black text-sm mt-0.5">Your franchise performance overview</p>
         </div>
       </div>
 
       {/* ── Sales summary cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Today's Sales",   value: fmt(todaySales)   },
-          { label: 'Weekly Sales',    value: fmt(weeklySales)  },
-          { label: 'Monthly Sales',   value: fmt(monthlySales) },
+          { label: "Today's Sales", value: fmt(todaySales), color: 'text-emerald-600' },
+          { label: 'Weekly Sales', value: fmt(weeklySales), color: 'text-sky-600' },
+          { label: 'Monthly Sales', value: fmt(monthlySales), color: 'text-[#E3422C]' },
         ].map(c => (
           <div key={c.label} className="card p-4">
-            <p className="text-xs text-slate-400">{c.label}</p>
-            <p className="text-xl font-bold text-white mt-1">{c.value}</p>
+            <p className="text-xs text-black">{c.label}</p>
+            <p className={`text-xl font-bold mt-1 ${c.color}`}>{c.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-5">
         {/* Revenue chart */}
-        <div className="card p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">Monthly Revenue</h2>
+        <div className="card p-5 min-w-0">
+          <h2 className="text-sm font-semibold text-black mb-4">Monthly Revenue</h2>
           {revenueData.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-16">No completed orders yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={chartTooltipStyle} formatter={(v: any) => [`₹${Number(v).toLocaleString('en-IN')}`, 'Revenue']} />
-                <Bar dataKey="revenue" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" tick={{ fill: '#475569', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#475569', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', color: '#0f172a' }}
+                  labelStyle={{ color: '#0f172a', fontWeight: 600 }}
+                  itemStyle={{ color: '#E3422C' }}
+                  formatter={(v: any) => [`₹${Number(v).toLocaleString('en-IN')}`, 'Revenue']}
+                />
+                <Bar dataKey="revenue" fill="#E3422C" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
 
         {/* Order volume chart */}
-        <div className="card p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">Order Volume</h2>
+          <div className="card p-5 min-w-0">
+          <h2 className="text-sm font-semibold text-black mb-4">Order Volume</h2>
           {revenueData.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-16">No orders yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={chartTooltipStyle} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" tick={{ fill: '#475569', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#475569', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', color: '#0f172a' }}
+                  labelStyle={{ color: '#0f172a', fontWeight: 600 }}
+                  itemStyle={{ color: '#a855f7' }}
+                  formatter={(v: any) => [v, 'Orders']}
+                />
                 <Line type="monotone" dataKey="orders" stroke="#a855f7" strokeWidth={2} dot={{ fill: '#a855f7', r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        {/* Status breakdown */}
-        <div className="card p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">Order Status Breakdown</h2>
+                 {/* Status breakdown */}
+         <div className="card p-5 min-w-0">
+          <h2 className="text-sm font-semibold text-black mb-4">Order Status Breakdown</h2>
           {statusData.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-12">No orders yet</p>
           ) : (
-             <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
               <ResponsiveContainer width="100%" height={180} className="sm:!w-1/2">
                 <PieChart>
                   <Pie data={statusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
                     {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
-                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', color: '#0f172a' }}
+                    labelStyle={{ color: '#0f172a', fontWeight: 600 }}
+                    itemStyle={{ color: '#0f172a' }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-3 flex-1 w-full">
                 {statusData.map((s, i) => (
                   <div key={i} className="flex items-center gap-2.5">
                     <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
-                    <span className="text-sm text-slate-400">{s.name}</span>
-                    <span className="text-sm font-semibold text-white ml-auto">{s.value}</span>
+                    <span className="text-sm text-slate-600">{s.name}</span>
+                    <span className="text-sm font-semibold text-black ml-auto">{s.value}</span>
                   </div>
                 ))}
               </div>
@@ -172,33 +186,33 @@ const UserAnalyticsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Monthly summary table */}
-        <div className="card p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">Monthly Summary</h2>
+                 {/* Monthly summary table */}
+         <div className="card p-5 min-w-0">
+          <h2 className="text-sm font-semibold text-black mb-4">Monthly Summary</h2>
           {revenueData.length === 0 ? (
-            <p className="text-slate-500 text-sm text-center py-12">No data yet</p>
+            <p className="text-black text-sm text-center py-12">No data yet</p>
           ) : (
             <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-800">
-                  <th className="table-th pl-0">Month</th>
-                  <th className="table-th">Orders</th>
-                  <th className="table-th">Revenue</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {revenueData.map(row => (
-                  <tr key={row.month}>
-                    <td className="table-td pl-0 font-medium text-white">{row.month}</td>
-                    <td className="table-td">{row.orders}</td>
-                    <td className="table-td font-semibold text-sky-400">
-                      ₹{row.revenue.toLocaleString('en-IN')}
-                    </td>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#E3422C]">
+                    <th className="table-th pl-0">Month</th>
+                    <th className="table-th">Orders</th>
+                    <th className="table-th">Revenue</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {revenueData.map(row => (
+                    <tr key={row.month}>
+                      <td className="table-td pl-0 font-medium text-black">{row.month}</td>
+                      <td className="table-td">{row.orders}</td>
+                      <td className="table-td font-semibold text-[#E3422C]">
+                        ₹{row.revenue.toLocaleString('en-IN')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

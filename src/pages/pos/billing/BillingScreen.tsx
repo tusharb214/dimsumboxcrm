@@ -217,52 +217,11 @@ const handleNewOrder = () => {
 
   const grandTotal = taxableAmount + taxAmount;
 
-//   return (
-
-
-//     <div className="min-h-screen bg-slate-950 p-6">
-//       <h1 className="text-xl font-semibold text-white mb-4">Billing</h1>
-
-//       <CustomerSelector customer={customer} onChange={setCustomer} />
-
-//       <div className="flex flex-col lg:flex-row gap-6">
-//         <div className="flex-1 min-w-0">
-//           <CategoryTabs
-//             categories={categories}
-//             activeCategory={activeCategory}
-//             onSelect={setActiveCategory}
-//           />
-
-//           <ProductGrid
-//             products={visibleProducts}
-//             loading={loading}
-//             onSelectProduct={handleAddToCart}
-//           />
-//         </div>
-
-//         <div className="w-full lg:w-96 shrink-0">
-//           <CartPanel
-//             items={cartItems}
-//             discountPercent={discountPercent}
-//             gstEnabled={gstEnabled}
-//             gstPercentage={gstPercentage}
-//             subtotal={subtotal}
-//             discountAmount={discountAmount}
-//             taxAmount={taxAmount}
-//             grandTotal={grandTotal}
-//             onIncrement={handleIncrement}
-//             onDecrement={handleDecrement}
-//             onRemove={handleRemoveFromCart}
-//             onDiscountChange={setDiscountPercent}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };  
-return (
-    <div className="min-h-screen bg-slate-950 p-6">
-      <h1 className="text-xl font-semibold text-white mb-4">Billing</h1>
+ 
+ 
+     return (
+    <div className="min-h-screen bg-[#fff5f0] p-4 sm:p-6">
+      <h1 className="text-xl font-semibold text-black mb-4">Billing</h1>
 
       {stage === 'CART' && (
         <>
@@ -316,12 +275,12 @@ return (
       paymentMethod={paymentMethod}
       onSelect={handleSelectPaymentMethod}
     />
- <button
+   <button
       onClick={handleCompletePayment}
       disabled={cartItems.length === 0 || !orderType || !paymentMethod || processingPayment}
       className={`w-full mt-6 py-4 rounded-lg font-semibold text-base transition-colors ${
         cartItems.length === 0 || !orderType || !paymentMethod || processingPayment
-          ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+          ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
           : 'bg-emerald-500 text-white hover:bg-emerald-600'
       }`}
     >
@@ -331,21 +290,21 @@ return (
 )}
 
 {stage === 'RECEIPT' && completedOrder && (
-  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-md mx-auto text-center">
-    <h2 className="text-emerald-400 text-lg font-semibold mb-2">Payment Successful</h2>
-    <p className="text-slate-400 text-sm mb-4">Invoice Generated</p>
+  <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 max-w-md mx-auto text-center shadow-sm">
+    <h2 className="text-emerald-600 text-lg font-semibold mb-2">Payment Successful</h2>
+    <p className="text-slate-500 text-sm mb-4">Invoice Generated</p>
 
-    <div className="bg-slate-950 rounded-lg p-4 text-left text-sm text-slate-300 space-y-1 mb-4">
-      <div className="flex justify-between"><span>Invoice No.</span><span className="text-white">{completedOrder.invoiceNumber}</span></div>
-      <div className="flex justify-between"><span>Order Type</span><span className="text-white">{completedOrder.orderType}</span></div>
-      <div className="flex justify-between"><span>Payment Method</span><span className="text-white">{completedOrder.paymentMethod}</span></div>
-      <div className="flex justify-between"><span>Date & Time</span><span className="text-white">{new Date(completedOrder.billDateTime).toLocaleString()}</span></div>
-      <div className="flex justify-between font-semibold pt-2 border-t border-slate-800"><span>Grand Total</span><span className="text-emerald-400">₹{completedOrder.totalAmount.toFixed(2)}</span></div>
+    <div className="bg-slate-50 rounded-lg p-4 text-left text-sm text-slate-600 space-y-1 mb-4">
+      <div className="flex justify-between"><span>Invoice No.</span><span className="text-black">{completedOrder.invoiceNumber}</span></div>
+      <div className="flex justify-between"><span>Order Type</span><span className="text-black">{completedOrder.orderType}</span></div>
+      <div className="flex justify-between"><span>Payment Method</span><span className="text-black">{completedOrder.paymentMethod}</span></div>
+      <div className="flex justify-between"><span>Date & Time</span><span className="text-black">{new Date(completedOrder.billDateTime).toLocaleString()}</span></div>
+      <div className="flex justify-between font-semibold pt-2 border-t border-slate-200"><span>Grand Total</span><span className="text-emerald-600">₹{completedOrder.totalAmount.toFixed(2)}</span></div>
     </div>
 
     <button
       onClick={handleNewOrder}
-      className="w-full py-3 rounded-lg font-semibold bg-sky-500 text-white hover:bg-sky-600 transition-colors"
+      className="w-full py-3 rounded-lg font-semibold bg-[#E3422C] text-white hover:bg-[#c93a24] transition-colors"
     >
       New Order
     </button>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import { posSetupApi } from '../../../../api/posServices';
 
 export const RestaurantDetailsStep: React.FC<{ onNext: () => void }> = ({ onNext }) => {
@@ -26,34 +26,34 @@ export const RestaurantDetailsStep: React.FC<{ onNext: () => void }> = ({ onNext
   return (
     <div className="space-y-4">
       <input
-        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white"
+        className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-black placeholder-slate-400 focus:border-[#E3422C] focus:outline-none transition-colors"
         placeholder="Outlet Name"
         value={form.outletName}
         onChange={(e) => setForm({ ...form, outletName: e.target.value })}
       />
       <textarea
-        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white"
+        className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-black placeholder-slate-400 focus:border-[#E3422C] focus:outline-none transition-colors"
         placeholder="Address"
         value={form.address}
         onChange={(e) => setForm({ ...form, address: e.target.value })}
       />
       <input
-        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white"
+        className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-black placeholder-slate-400 focus:border-[#E3422C] focus:outline-none transition-colors"
         placeholder="GST Number (optional)"
         value={form.gstNumber}
         onChange={(e) => setForm({ ...form, gstNumber: e.target.value })}
       />
       <input
-        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-white"
+        className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-black placeholder-slate-400 focus:border-[#E3422C] focus:outline-none transition-colors"
         placeholder="Contact Number"
         value={form.contactNumber}
         onChange={(e) => setForm({ ...form, contactNumber: e.target.value })}
       />
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={saving}
-        className="w-full bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition-colors"
+        className="w-full bg-[#E3422C] hover:bg-[#c93a24] disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition-colors"
       >
         {saving ? 'Saving...' : 'Next'}
       </button>

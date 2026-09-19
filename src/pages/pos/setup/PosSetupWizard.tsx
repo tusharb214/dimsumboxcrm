@@ -29,26 +29,26 @@ export const PosSetupWizard: React.FC = () => {
     navigate('/dashboard/pos');
   };
 
-  return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl bg-slate-900 rounded-2xl border border-slate-800 p-8">
+
+       return (
+    <div className="min-h-screen bg-[#fff5f0] flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 p-5 sm:p-8">
         {/* Progress bar */}
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-6 sm:mb-8 overflow-x-auto">
           {STEPS.map((label, i) => (
-            <div key={label} className="flex-1">
+            <div key={label} className="flex-1 min-w-[20px]">
               <div
                 className={`h-1.5 rounded-full transition-colors ${
-                  i <= step ? 'bg-sky-500' : 'bg-slate-800'
+                  i <= step ? 'bg-[#E3422C]' : 'bg-slate-200'
                 }`}
               />
             </div>
           ))}
         </div>
-        <p className="text-slate-400 text-sm mb-1">
+        <p className="text-slate-500 text-sm mb-1">
           Step {step + 1} of {STEPS.length}
         </p>
-        <h2 className="text-xl font-semibold text-white mb-6">{STEPS[step]}</h2>
-
+        <h2 className="text-lg sm:text-xl font-semibold text-black mb-6">{STEPS[step]}</h2>
         {step === 0 && <RestaurantDetailsStep onNext={goNext} />}
         {step === 1 && <BillingSettingsStep onNext={goNext} onBack={goBack} />}
         {step === 2 && <PaymentMethodsStep onNext={goNext} onBack={goBack} />}

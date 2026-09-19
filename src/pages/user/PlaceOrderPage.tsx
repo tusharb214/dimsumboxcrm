@@ -261,7 +261,7 @@ const PlaceOrderPage: React.FC = () => {
                       {material.unitsPerPacket ? (
                         <p className="text-xs font-semibold text-teal-800 mt-0.5">{material.unitsPerPacket} momos / packet</p>
                       ) : null}
-                      <p className="text-sm font-bold text-sky-400 mt-1">₹{material.costPerItem} <span className="text-xs text-slate-500 font-normal">/ packet</span></p>
+                      <p className="text-sm font-bold text-[#E3422C] mt-1">₹{material.costPerItem} <span className="text-xs text-[#E3422C] font-normal">/ packet</span></p>
                       <button
                         onClick={() => setViewMaterial(material)}
                         className="flex items-center gap-1 text-xs text-slate-500 hover:text-sky-400 mt-1 transition-all"

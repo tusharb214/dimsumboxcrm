@@ -27,11 +27,11 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products, loading, onS
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') onSelectProduct(product);
           }}
-          className="bg-slate-900 border border-slate-800 rounded-xl p-4 cursor-pointer hover:border-sky-500 active:scale-[0.97] transition-all select-none"
+          className="bg-[#E3422C] border border-[#fff5f0] rounded-xl p-4 cursor-pointer hover:[#E3422C] active:scale-[0.97] transition-all select-none"
         >
           <p className="text-white font-medium truncate">{product.name}</p>
-          <p className="text-slate-500 text-xs mt-1">{product.category}</p>
-          <p className="text-sky-400 font-semibold mt-2">₹{product.sellingPrice.toFixed(2)}</p>
+          <p className="text-white text-xs mt-1">{product.category}</p>
+          <p className="text-white font-semibold mt-2">₹{product.sellingPrice.toFixed(2)}</p>
         </div>
       ))}
     </div>

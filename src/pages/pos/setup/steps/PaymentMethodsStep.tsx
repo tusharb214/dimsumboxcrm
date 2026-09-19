@@ -31,7 +31,7 @@ export const PaymentMethodsStep: React.FC<{ onNext: () => void; onBack: () => vo
     }
   };
 
-  return (
+     return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         {ALL_METHODS.map((method) => (
@@ -41,8 +41,8 @@ export const PaymentMethodsStep: React.FC<{ onNext: () => void; onBack: () => vo
             onClick={() => toggle(method)}
             className={`py-3 rounded-lg border font-medium transition-colors ${
               selected.includes(method)
-                ? 'bg-sky-500 border-sky-500 text-white'
-                : 'bg-slate-800 border-slate-700 text-slate-300'
+                ? 'bg-[#E3422C] border-[#E3422C] text-white'
+                : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
             }`}
           >
             {method}
@@ -50,19 +50,19 @@ export const PaymentMethodsStep: React.FC<{ onNext: () => void; onBack: () => vo
         ))}
       </div>
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={onBack}
-          className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-lg transition-colors"
+          className="flex-1 bg-white border border-slate-300 hover:bg-slate-50 text-black font-medium py-2.5 rounded-lg transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="flex-1 bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition-colors"
+          className="flex-1 bg-[#E3422C] hover:bg-[#c93a24] disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition-colors"
         >
           {saving ? 'Saving...' : 'Next'}
         </button>

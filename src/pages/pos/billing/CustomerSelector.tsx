@@ -55,17 +55,17 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
     setShowSuggestions(false);
   };
 
-  return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-4">
-      <div className="flex items-center gap-2 mb-3">
+     return (
+    <div className="bg-white border border-slate-200 rounded-xl p-4 mb-4 shadow-sm">
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
         {TYPE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
             onClick={() => handleTypeChange(opt.value)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               customer.customerType === opt.value
-                ? 'bg-sky-500 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-[#E3422C] text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             {opt.icon}
@@ -77,7 +77,7 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
       {customer.customerType !== 'WALK_IN' && (
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="tel"
               placeholder="Phone number"
@@ -88,16 +88,16 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
               }}
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500"
+              className="w-full bg-white border border-slate-300 rounded-lg pl-8 pr-3 py-2 text-sm text-black placeholder-slate-400 focus:outline-none focus:border-[#E3422C]"
             />
 
             {customer.customerType === 'EXISTING' && showSuggestions && suggestions.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full bg-slate-900 border border-slate-800 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+              <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                 {suggestions.map((s) => (
                   <button
                     key={s.customerPhone}
                     onMouseDown={() => handleSelectSuggestion(s)}
-                    className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 transition-colors"
+                    className="w-full text-left px-3 py-2 text-sm text-black hover:bg-slate-50 transition-colors"
                   >
                     <span className="font-medium">{s.customerName || 'Unnamed'}</span>
                     <span className="text-slate-500 ml-2">{s.customerPhone}</span>
@@ -112,7 +112,7 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
             placeholder="Customer name"
             value={customer.customerName}
             onChange={(e) => onChange({ ...customer, customerName: e.target.value })}
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500"
+            className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-black placeholder-slate-400 focus:outline-none focus:border-[#E3422C]"
           />
         </div>
       )}

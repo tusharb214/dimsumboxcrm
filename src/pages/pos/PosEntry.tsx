@@ -17,10 +17,10 @@ export const PosEntry: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
+     if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <p className="text-slate-400">Loading POS...</p>
+      <div className="min-h-screen bg-[#fff5f0] flex items-center justify-center">
+        <p className="text-slate-500">Loading POS...</p>
       </div>
     );
   }

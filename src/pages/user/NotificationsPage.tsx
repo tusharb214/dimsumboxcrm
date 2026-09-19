@@ -1,4 +1,4 @@
- import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Bell, AlertTriangle, RefreshCw, CheckCheck, Check, Megaphone } from 'lucide-react';
 import { franchiseNotificationApi } from '../../api/services';
 import toast from 'react-hot-toast';
@@ -72,10 +72,10 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
-        <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <Bell className="w-4 h-4 text-slate-400" />
-          <p className="text-slate-400 text-sm mt-0.5">Stay updated on what admin shares</p>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 border-b border-slate-800">
+        <div className="flex items-center gap-2">
+          <Bell className="w-4 h-4 text-black" />
+          <p className="text-black text-sm mt-0.5">Stay updated on what admin shares</p>
         </div>
         <button onClick={fetchNotifications} className="btn-secondary">
           <RefreshCw className="w-4 h-4" /> Refresh
@@ -83,14 +83,15 @@ const NotificationsPage: React.FC = () => {
       </div>
 
       <div className="card overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <Bell className="w-4 h-4 text-slate-400" />
-            <span className="text-sm font-semibold text-white">All Notifications</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 border-b border-slate-800">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Bell className="w-4 h-4 text-black" />
+            <span className="text-sm font-semibold text-black">All Notifications</span>
             {unreadCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#E3422C] text-white">
                 {unreadCount} new
               </span>
+
             )}
           </div>
           {unreadCount > 0 && (

@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.sitegenius.dimsumcrm',
-  appName: 'Dimsum CRM',
+  appName: 'Fold & Steam',
   webDir: 'build' ,
   server: {
     cleartext: true,

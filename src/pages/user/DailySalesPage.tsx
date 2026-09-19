@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { TrendingUp, RefreshCw, AlertTriangle, History, Download, ChevronLeft, ChevronRight, Receipt, Printer, X, FileDown, Eye } from 'lucide-react';
- import { salesApi } from '../../api/services';
+import { salesApi } from '../../api/services';
 import { posBillingApi, posSetupApi } from '../../api/posServices';
 import { FranchiseProduct } from '../../types/pos';
 import { PosOrderResponse } from '../../types/pos';
@@ -21,7 +21,7 @@ interface SalesReport {
   notes?: string;
   createdAt: string;
 }
- interface StockItem {
+interface StockItem {
   id: number;
   name: string;
   category?: string;
@@ -32,10 +32,10 @@ interface SalesReport {
 }
 
 const today = new Date().toISOString().split('T')[0];
- 
-const HISTORY_LIMIT      = 10;
-const STOCK_LIMIT        = 10;
-const DAILY_LIMIT        = 10;
+
+const HISTORY_LIMIT = 10;
+const STOCK_LIMIT = 10;
+const DAILY_LIMIT = 10;
 
 const parseItemsSold = (str: string): Record<string, number> => {
   if (!str) return {};
@@ -65,9 +65,8 @@ const Pager: React.FC<{ page: number; total: number; limit: number; onChange: (p
         </button>
         {Array.from({ length: pages }, (_, i) => i + 1).map(p => (
           <button key={p} onClick={() => onChange(p)}
-            className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
-              p === page ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}>
+            className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${p === page ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}>
             {p}
           </button>
         ))}
@@ -241,25 +240,25 @@ const DailySalesPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'stock' ? 'stock' : 'log';
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'stock'>(initialTab);
-const [salesHistory, setSalesHistory] = useState<SalesReport[]>([]);
-   const [franchiseProducts, setFranchiseProducts] = useState<FranchiseProduct[]>([]);
-const [loadingStock, setLoadingStock] = useState(true);
-  const [summary, setSummary]             = useState({ today: 0, weekly: 0, monthly: 0 });
+  const [salesHistory, setSalesHistory] = useState<SalesReport[]>([]);
+  const [franchiseProducts, setFranchiseProducts] = useState<FranchiseProduct[]>([]);
+  const [loadingStock, setLoadingStock] = useState(true);
+  const [summary, setSummary] = useState({ today: 0, weekly: 0, monthly: 0 });
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
   // Day-wise sales list (Log Sales tab) — filters, pagination, breakdown modal
-  const [dailySearch, setDailySearch]   = useState('');
-  const [dailyFrom, setDailyFrom]       = useState('');
-  const [dailyTo, setDailyTo]           = useState('');
-  const [dailyPage, setDailyPage]       = useState(1);
+  const [dailySearch, setDailySearch] = useState('');
+  const [dailyFrom, setDailyFrom] = useState('');
+  const [dailyTo, setDailyTo] = useState('');
+  const [dailyPage, setDailyPage] = useState(1);
   const [selectedDailyLog, setSelectedDailyLog] = useState<SalesReport | null>(null);
 
   // POS bill history (History tab)
   const [historySearch, setHistorySearch] = useState('');
-  const [historyFrom, setHistoryFrom]     = useState('');
-  const [historyTo, setHistoryTo]         = useState('');
-  const [historyPage, setHistoryPage]     = useState(1);
+  const [historyFrom, setHistoryFrom] = useState('');
+  const [historyTo, setHistoryTo] = useState('');
+  const [historyPage, setHistoryPage] = useState(1);
 
   const [posOrders, setPosOrders] = useState<PosOrderResponse[]>([]);
   const [loadingPosOrders, setLoadingPosOrders] = useState(true);
@@ -268,9 +267,9 @@ const [loadingStock, setLoadingStock] = useState(true);
 
   const [stockFilter, setStockFilter] = useState<'all' | 'critical' | 'low' | 'ok'>('all');
   const [stockSearch, setStockSearch] = useState('');
-  const [stockPage, setStockPage]     = useState(1);
+  const [stockPage, setStockPage] = useState(1);
 
- useEffect(() => {
+  useEffect(() => {
     fetchHistory(); fetchSummary(); fetchPosOrders(); fetchOutletName(); fetchStock();
   }, []);
 
@@ -294,7 +293,7 @@ const [loadingStock, setLoadingStock] = useState(true);
       .finally(() => setLoadingHistory(false));
   };
 
- const fetchStock = () => {
+  const fetchStock = () => {
     setLoadingStock(true);
     posSetupApi.getAllProducts()
       .then(r => setFranchiseProducts((r.data as any)?.data ?? []))
@@ -315,7 +314,7 @@ const [loadingStock, setLoadingStock] = useState(true);
         const settings = r.data?.data ?? r.data ?? {};
         setOutletName(settings.outletName || 'Restaurant');
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   // ── Day-wise sales (Log Sales tab list) ──
@@ -325,7 +324,7 @@ const [loadingStock, setLoadingStock] = useState(true);
         log.itemsSold?.toLowerCase().includes(dailySearch.toLowerCase()) ||
         String(log.totalSales).includes(dailySearch);
       const matchFrom = !dailyFrom || log.reportDate >= dailyFrom;
-      const matchTo   = !dailyTo   || log.reportDate <= dailyTo;
+      const matchTo = !dailyTo || log.reportDate <= dailyTo;
       return matchSearch && matchFrom && matchTo;
     }).sort((a, b) => b.reportDate.localeCompare(a.reportDate));
   }, [salesHistory, dailySearch, dailyFrom, dailyTo]);
@@ -365,7 +364,7 @@ const [loadingStock, setLoadingStock] = useState(true);
         o.customerName?.toLowerCase().includes(historySearch.toLowerCase()) ||
         String(o.totalAmount).includes(historySearch);
       const matchFrom = !historyFrom || billDate >= historyFrom;
-      const matchTo   = !historyTo   || billDate <= historyTo;
+      const matchTo = !historyTo || billDate <= historyTo;
       return matchSearch && matchFrom && matchTo;
     });
   }, [posOrders, historySearch, historyFrom, historyTo]);
@@ -380,8 +379,8 @@ const [loadingStock, setLoadingStock] = useState(true);
       const threshold = p.lowStockThreshold ?? 20;
       const alertLevel: 'ok' | 'low' | 'critical' =
         stockPieces <= 0 ? 'critical'
-        : stockPieces <= threshold ? 'low'
-        : 'ok';
+          : stockPieces <= threshold ? 'low'
+            : 'ok';
       return {
         id: p.id,
         name: p.name,
@@ -398,10 +397,10 @@ const [loadingStock, setLoadingStock] = useState(true);
   }, [franchiseProducts]);
 
 
-  
+
   const filteredStock = useMemo(() => {
     return stockItems.filter(s => {
-      const matchAlert  = stockFilter === 'all' || s.alertLevel === stockFilter;
+      const matchAlert = stockFilter === 'all' || s.alertLevel === stockFilter;
       const matchSearch = !stockSearch || s.name.toLowerCase().includes(stockSearch.toLowerCase());
       return matchAlert && matchSearch;
     });
@@ -443,11 +442,11 @@ const [loadingStock, setLoadingStock] = useState(true);
       const packets = Math.floor(s.stockPieces / s.unitsPerPacket);
       const loose = s.stockPieces % s.unitsPerPacket;
       return {
-        'Item':                   s.name,
+        'Item': s.name,
         'Current Stock (pieces)': s.stockPieces,
-        'Packets + Pieces':       `${packets} Packets + ${loose} Pieces`,
-        'Low Stock Alert Below':  s.lowStockThreshold,
-        'Status':                 s.alertLevel.toUpperCase(),
+        'Packets + Pieces': `${packets} Packets + ${loose} Pieces`,
+        'Low Stock Alert Below': s.lowStockThreshold,
+        'Status': s.alertLevel.toUpperCase(),
       };
     });
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -463,10 +462,10 @@ const [loadingStock, setLoadingStock] = useState(true);
   return (
     <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
 
-             <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white">Daily Sales</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Sales log & stock track</p>
+          <h1 className="text-xl font-bold text-black">Daily Sales</h1>
+          <p className="text-black text-sm mt-0.5">Sales log & stock track</p>
         </div>
         {/* <button onClick={() => { fetchSummary(); fetchHistory(); fetchOrders(); fetchPosOrders(); }} className="btn-secondary"> */}
         <button onClick={() => { fetchSummary(); fetchHistory(); fetchStock(); fetchPosOrders(); }} className="btn-secondary">
@@ -476,12 +475,12 @@ const [loadingStock, setLoadingStock] = useState(true);
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Today's Sales", value: summary.today,   color: 'text-emerald-400' },
-          { label: 'Weekly Sales',  value: summary.weekly,  color: 'text-sky-400'     },
-          { label: 'Monthly Sales', value: summary.monthly, color: 'text-purple-400'  },
+          { label: "Today's Sales", value: summary.today, color: 'text-emerald-400' },
+          { label: 'Weekly Sales', value: summary.weekly, color: 'text-sky-400' },
+          { label: 'Monthly Sales', value: summary.monthly, color: 'text-purple-400' },
         ].map(c => (
           <div key={c.label} className="card p-4">
-            <p className="text-xs text-slate-400">{c.label}</p>
+            <p className="text-xs text-black">{c.label}</p>
             {loadingSummary
               ? <div className="skeleton h-7 w-24 rounded-lg mt-2" />
               : <p className={`text-xl font-bold mt-1 ${c.color}`}>{fmt(c.value)}</p>}
@@ -491,17 +490,16 @@ const [loadingStock, setLoadingStock] = useState(true);
 
       <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 w-full sm:w-fit overflow-x-auto">
         {([
-          { key: 'log',     label: 'Log Sales', icon: TrendingUp   },
-          { key: 'history', label: 'History',    icon: History      },
-          { key: 'stock',   label: `Stock${alertCount > 0 ? ` (${alertCount})` : ''}`, icon: AlertTriangle },
+          { key: 'log', label: 'Log Sales', icon: TrendingUp },
+          { key: 'history', label: 'History', icon: History },
+          { key: 'stock', label: `Stock${alertCount > 0 ? ` (${alertCount})` : ''}`, icon: AlertTriangle },
         ] as const).map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-              activeTab === tab.key ? 'bg-sky-500 text-white shadow'
-              : tab.key === 'stock' && alertCount > 0
-              ? 'text-amber-400 hover:text-white'
-              : 'text-slate-400 hover:text-white'
-            }`}>
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${activeTab === tab.key ? 'bg-[#E3422C] text-white shadow'
+                : tab.key === 'stock' && alertCount > 0
+                  ? 'text-amber-400 hover:text-white'
+                  : 'text-slate-400 hover:text-white'
+              }`}>
             <tab.icon className="w-3.5 h-3.5" />{tab.label}
           </button>
         ))}
@@ -514,10 +512,10 @@ const [loadingStock, setLoadingStock] = useState(true);
           {/* Day-wise sales list — filter, export, pagination, breakdown action */}
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-slate-800 space-y-3">
-                            <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold text-white">Day-wise Sales</h2>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-black">Day-wise Sales</h2>
                 <button onClick={downloadDailyExcel}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-800 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
                   <Download className="w-3.5 h-3.5" /> Export Excel
                 </button>
               </div>
@@ -525,7 +523,7 @@ const [loadingStock, setLoadingStock] = useState(true);
                 {/* <input value={dailySearch} placeholder="Search items or amount..."
                   onChange={e => { setDailySearch(e.target.value); setDailyPage(1); }}
                   className="input-field flex-1 py-2" /> */}
-                              <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">From</label>
                     <input type="date" value={dailyFrom} max={today}
@@ -557,7 +555,7 @@ const [loadingStock, setLoadingStock] = useState(true);
             </div>
 
             {loadingHistory ? (
-              <div className="p-4 space-y-2">{[1,2,3,4,5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
+              <div className="p-4 space-y-2">{[1, 2, 3, 4, 5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
             ) : paginatedDailyHistory.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <History className="w-10 h-10 text-slate-700 mb-3" />
@@ -565,7 +563,29 @@ const [loadingStock, setLoadingStock] = useState(true);
               </div>
             ) : (
               <>
-                <div className="overflow-x-auto">
+                {/* Mobile card view */}
+                <div className="md:hidden divide-y divide-slate-800/60">
+                  {paginatedDailyHistory.map(log => (
+                    <div key={log.id} className="p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-300">
+                          {new Date(log.reportDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </span>
+                        <span className="font-semibold text-emerald-400 text-sm">{fmt(log.totalSales || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-500">{log.totalOrders || 0} orders</span>
+                        <button onClick={() => setSelectedDailyLog(log)}
+                          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all">
+                          <Eye className="w-3.5 h-3.5" /> View Items
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop table view */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="border-b border-slate-800 bg-slate-900/50">
                       <tr>
@@ -605,8 +625,8 @@ const [loadingStock, setLoadingStock] = useState(true);
       {activeTab === 'history' && (
         <div className="card overflow-hidden">
           <div className="p-4 border-b border-slate-800 space-y-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-white">Sales History</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-black">Sales History</h2>
               <button onClick={downloadHistoryExcel}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
                 <Download className="w-3.5 h-3.5" /> Export Excel
@@ -647,7 +667,7 @@ const [loadingStock, setLoadingStock] = useState(true);
             )}
           </div>
 
-          {loadingPosOrders ? (
+                     {loadingPosOrders ? (
             <div className="p-4 space-y-2">{[1,2,3,4,5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
           ) : paginatedOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
@@ -656,7 +676,45 @@ const [loadingStock, setLoadingStock] = useState(true);
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              {/* Mobile card view */}
+              <div className="md:hidden divide-y divide-slate-800/60">
+                {paginatedOrders.map(order => (
+                  <div key={order.id} className="p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-white text-sm">{order.invoiceNumber}</span>
+                      <span className="font-semibold text-emerald-400 text-sm">{fmt(order.totalAmount || 0)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <span>{order.customerName || 'Walk-in'}</span>
+                      <span>
+                        {order.billDateTime
+                          ? new Date(order.billDateTime).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                          : '—'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                        {order.orderType?.replace('_', ' ')}
+                      </span>
+                      <span className="text-xs text-slate-400">{order.paymentMethod}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-lg border ${
+                        order.status === 'PAID'
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                          : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                    <button onClick={() => setSelectedInvoice(order)}
+                      className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all">
+                      <Receipt className="w-3.5 h-3.5" /> View Invoice
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop table view */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b border-slate-800 bg-slate-900/50">
                     <tr>
@@ -717,8 +775,8 @@ const [loadingStock, setLoadingStock] = useState(true);
       {activeTab === 'stock' && (
         <div className="card overflow-hidden">
           <div className="p-4 border-b border-slate-800 space-y-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-white">Stock Remaining</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-black">Stock Remaining</h2>
               <button onClick={downloadStockExcel}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
                 <Download className="w-3.5 h-3.5" /> Export Excel
@@ -731,14 +789,13 @@ const [loadingStock, setLoadingStock] = useState(true);
               <div className="flex flex-wrap gap-1">
                 {(['all', 'critical', 'low', 'ok'] as const).map(f => (
                   <button key={f} onClick={() => { setStockFilter(f); setStockPage(1); }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${
-                      stockFilter === f
-                        ? f === 'critical' ? 'bg-rose-500/30 text-rose-300 border border-rose-500/40'
-                        : f === 'low'      ? 'bg-amber-500/30 text-amber-300 border border-amber-500/40'
-                        : f === 'ok'       ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/40'
-                        : 'bg-sky-500/30 text-sky-300 border border-sky-500/40'
-                        : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
-                    }`}>
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize border ${stockFilter === f
+                        ? f === 'critical' ? 'bg-rose-100 text-rose-700 border-rose-300'
+                          : f === 'low' ? 'bg-amber-100 text-amber-700 border-amber-300'
+                            : f === 'ok' ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                              : 'bg-[#E3422C] text-white border-[#E3422C]'
+                        : 'bg-white text-slate-500 border-slate-300 hover:text-black hover:bg-slate-50'
+                      }`}>
                     {f === 'all' ? 'All' : f}
                     {f !== 'all' && (
                       <span className="ml-1 opacity-70">
@@ -759,17 +816,17 @@ const [loadingStock, setLoadingStock] = useState(true);
           ) : (
             <>
               <div className="divide-y divide-slate-800/60">
-                 {paginatedStock.map(item => {
+                {paginatedStock.map(item => {
                   const packets = Math.floor(item.stockPieces / item.unitsPerPacket);
                   const loose = item.stockPieces % item.unitsPerPacket;
                   const barColor = item.alertLevel === 'critical' ? 'bg-rose-500'
-                                 : item.alertLevel === 'low'      ? 'bg-amber-500'
-                                 : 'bg-emerald-500';
+                    : item.alertLevel === 'low' ? 'bg-amber-500'
+                      : 'bg-emerald-500';
                   const badge = item.alertLevel === 'critical'
                     ? <span className="text-xs px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Critical</span>
                     : item.alertLevel === 'low'
-                    ? <span className="text-xs px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Low</span>
-                    : <span className="text-xs px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OK</span>;
+                      ? <span className="text-xs px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Low</span>
+                      : <span className="text-xs px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OK</span>;
 
                   return (
                     <div key={item.id} className="px-5 py-4">

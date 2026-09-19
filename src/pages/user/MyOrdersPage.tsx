@@ -1,4 +1,4 @@
- import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ClipboardList, RefreshCw, Download, CheckCircle, Edit2, Upload,
   X, Package, MapPin, Truck, Clock, CheckCircle2, ChefHat, Eye
@@ -17,20 +17,20 @@ const LIMIT = 10;
 
 // ── Order Status Timeline ─────────────────────────────────────────
 const STATUS_STEPS = [
-  { key: 'REQUESTED',        label: 'Order Placed',     icon: ClipboardList },
-  { key: 'ACCEPTED',         label: 'Accepted',         icon: CheckCircle2 },
-  { key: 'ASSIGNED',         label: 'Kitchen Assigned', icon: ChefHat },
-  { key: 'PREPARING',        label: 'Preparing',        icon: Clock },
-  { key: 'READY',            label: 'Ready',            icon: Package },
-  { key: 'APPROVAL_PENDING', label: 'Admin Approved',   icon: CheckCircle2 },
-  { key: 'DISPATCHED',       label: 'Dispatched',       icon: Truck },
-  { key: 'DELIVERED',        label: 'Delivered',        icon: MapPin },
-  { key: 'COMPLETED',        label: 'Completed',        icon: CheckCircle },
+  { key: 'REQUESTED', label: 'Order Placed', icon: ClipboardList },
+  { key: 'ACCEPTED', label: 'Accepted', icon: CheckCircle2 },
+  { key: 'ASSIGNED', label: 'Kitchen Assigned', icon: ChefHat },
+  { key: 'PREPARING', label: 'Preparing', icon: Clock },
+  { key: 'READY', label: 'Ready', icon: Package },
+  { key: 'APPROVAL_PENDING', label: 'Admin Approved', icon: CheckCircle2 },
+  { key: 'DISPATCHED', label: 'Dispatched', icon: Truck },
+  { key: 'DELIVERED', label: 'Delivered', icon: MapPin },
+  { key: 'COMPLETED', label: 'Completed', icon: CheckCircle },
 ];
 
 const REJECTED_STEPS = [
   { key: 'REQUESTED', label: 'Order Placed', icon: ClipboardList },
-  { key: 'REJECTED',  label: 'Rejected',     icon: X },
+  { key: 'REJECTED', label: 'Rejected', icon: X },
 ];
 
 const getStepIndex = (status: string) =>
@@ -52,28 +52,27 @@ const OrderTimeline: React.FC<{ status: string }> = ({ status }) => {
             <div key={step.key} className="flex-shrink-0 w-16 sm:flex-1 sm:w-auto flex flex-col items-center relative">
               {/* Connector line */}
               {i < steps.length - 1 && (
-                <div className={`absolute top-3.5 left-1/2 w-full h-0.5 z-0 transition-all ${
-                  done ? 'bg-emerald-500/60' : 'bg-slate-700'
-                }`} />
+                <div className={`absolute top-3.5 left-1/2 w-full h-0.5 z-0 transition-all ${done ? 'bg-[#E3422C]' : 'bg-[#E3422C]/30'
+                  }`} />
               )}
               {/* Circle */}
-              <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all ${
-                active
-                  ? isRejected && i === 1
-                    ? 'bg-red-500/20 border-red-500 text-red-400'
-                    : 'bg-sky-500/20 border-sky-500 text-sky-400'
-                  : done
-                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                    : 'bg-slate-800 border-slate-700 text-slate-600'
-              }`}>
+              <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all ${active
+                ? isRejected && i === 1
+                  ? 'bg-red-500/20 border-[#E3422C] text-[#E3422C]'
+                  : 'bg-[#E3422C]/20 border-[#E3422C] text-[#E3422C]'
+                : done
+                  ? 'bg-[#E3422C]/20 border-[#E3422C] text-[#E3422C]'
+                  : 'bg-[#1e293b] border-[#334155] text-[#64748b]'
+                }`}>
                 <Icon className="w-3 h-3" />
               </div>
               {/* Label */}
-              <p className={`mt-1.5 text-center text-xs leading-tight px-0.5 ${
-                active
-                  ? isRejected && i === 1 ? 'text-red-400 font-semibold' : 'text-sky-400 font-semibold'
-                  : done ? 'text-emerald-400' : 'text-slate-600'
-              }`}>
+              <p className={`mt-1.5 text-center text-xs leading-tight px-0.5 ${active
+                  ? 'text-[#E3422C] font-semibold'
+                  : done
+                    ? 'text-[#E3422C]'
+                    : 'text-slate-600'
+                }`}>
                 {step.label}
               </p>
             </div>
@@ -100,16 +99,16 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg max-h-[88vh] overflow-y-auto"
+        className="bg-[#fff5f0] border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg max-h-[88vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-6 py-4 border-b border-slate-800 sticky top-0 bg-[#E3422C] z-10">
           <div>
             <h2 className="text-sm font-bold text-white">
               Order #{String(order.id).slice(-8).toUpperCase()}
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-white mt-0.5">
               {new Date(order.createdAt).toLocaleDateString('en-IN', {
                 day: '2-digit', month: 'long', year: 'numeric'
               })}
@@ -119,7 +118,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             <StatusBadge status={order.status} />
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+              className="p-1.5 rounded-lg text-Black hover:text-white hover:bg-slate-800 transition-all"
             >
               <X className="w-4 h-4" />
             </button>
@@ -130,7 +129,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
           {/* Order Timeline */}
           <div>
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-3">
+            <p className="text-xs text-black font-semibold uppercase tracking-wider mb-3">
               Order Progress
             </p>
             <OrderTimeline status={order.status} />
@@ -138,15 +137,15 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
           {/* Tracking Info — show when dispatched */}
           {(order.status === 'DISPATCHED' || order.status === 'DELIVERED') && (
-            <div className="rounded-xl border border-slate-800 overflow-hidden">
-              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800 flex items-center gap-2">
-                <Truck className="w-3.5 h-3.5 text-sky-400" />
+            <div className="rounded-xl border border-[#E3422C] overflow-hidden">
+              <div className="px-4 py-2.5 bg-[#E3422C] border-b border-slate-800 flex items-center gap-2">
+                <Truck className="w-3.5 h-3.5 text-Black" />
                 <p className="text-xs font-semibold text-white">Delivery Tracking</p>
               </div>
               <div className="px-4 py-3 space-y-2.5">
                 {order.deliveryAddress && (
                   <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-sky-400 mt-0.5 flex-shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-[#E3422C] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-slate-500">Delivery Address</p>
                       <p className="text-xs text-slate-300 mt-0.5">{order.deliveryAddress}</p>
@@ -208,42 +207,42 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
           {/* Items */}
           <div className="rounded-xl border border-slate-800 overflow-hidden">
-            <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800 flex items-center gap-2">
-              <Package className="w-3.5 h-3.5 text-slate-400" />
+            <div className="px-4 py-2.5 bg-[#E3422C] border-b border-slate-800 flex items-center gap-2">
+              <Package className="w-3.5 h-3.5 text-white" />
               <p className="text-xs font-semibold text-white">
                 Items ({order.items?.length || 0})
               </p>
             </div>
             <div className="divide-y divide-slate-800/60">
               {order.items?.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4">No items</p>
+                <p className="text-xs text-black text-center py-4">No items</p>
               ) : (
                 order.items?.map((item, i) => (
                   <div key={i} className="flex items-start justify-between gap-2 px-4 py-3">
                     <div className="min-w-0">
-                      <p className="text-sm text-white font-medium break-words">{item.materialName}</p>
+                      <p className="text-sm text-black font-medium break-words">{item.materialName}</p>
                       {(item.category || item.brand) && (
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs text-black mt-0.5">
                           {item.category}{item.brand ? ` · ${item.brand}` : ''}
                         </p>
                       )}
                     </div>
                     <div className="text-right ml-4 flex-shrink-0">
-                      <p className="text-sm font-bold text-white">×{item.quantity}</p>
+                      <p className="text-sm font-bold text-black">×{item.quantity}</p>
                       {item.priceAtOrder && (
-                        <p className="text-xs text-slate-500">₹{item.priceAtOrder} each</p>
+                        <p className="text-xs text-black">₹{item.priceAtOrder} each</p>
                       )}
                       {item.lineTotal && (
-                        <p className="text-xs text-sky-400 font-semibold">₹{item.lineTotal}</p>
+                        <p className="text-xs text-[#E3422C] font-semibold">₹{item.lineTotal}</p>
                       )}
                     </div>
                   </div>
                 ))
               )}
             </div>
-            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800 bg-slate-900/50">
-              <span className="text-xs font-semibold text-slate-400">Total Amount</span>
-              <span className="text-base font-bold text-white">₹{order.totalAmount}</span>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800 bg-[#E3422C]">
+              <span className="text-xs font-semibold text-black">Total Amount</span>
+              <span className="text-base font-bold text-black">₹{order.totalAmount}</span>
             </div>
           </div>
 
@@ -380,10 +379,10 @@ const MyOrdersPage: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white">My Orders</h1>
-          <p className="text-slate-400 text-sm mt-0.5">{orders.length} total orders</p>
+          <h1 className="text-lg sm:text-xl font-bold text-black">My Orders</h1>
+          <p className="text-black text-sm mt-0.5">{orders.length} total orders</p>
         </div>
         <button onClick={fetchOrders} className="btn-secondary">
           <RefreshCw className="w-4 h-4" /> Refresh
@@ -404,7 +403,7 @@ const MyOrdersPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* <div className="overflow-x-auto">
           {loading ? (
             <TableSkeleton rows={6} cols={6} />
           ) : paginated.length === 0 ? (
@@ -414,8 +413,79 @@ const MyOrdersPage: React.FC = () => {
               description={search ? 'Try adjusting your search or filters' : "You haven't placed any orders yet"}
             />
           ) : (
+            <table className="w-full"> */}
+
+                    <div>
+          {loading ? (
+            <TableSkeleton rows={6} cols={6} />
+          ) : paginated.length === 0 ? (
+            <EmptyState
+              icon={ClipboardList}
+              title="No orders found"
+              description={search ? 'Try adjusting your search or filters' : "You haven't placed any orders yet"}
+            />
+          ) : (
+            <>
+              {/* Mobile card view */}
+              <div className="md:hidden divide-y divide-slate-800/60">
+                {paginated.map(order => (
+                  <div key={order.id} className="p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[#E3422C] text-xs font-bold">
+                        #{String(order.id).slice(-8).toUpperCase()}
+                      </span>
+                      <StatusBadge status={order.status} />
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-black">
+                      <span>{order.kitchenName || '—'}</span>
+                      <span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-black">
+                        {order.items?.length > 0 ? `${order.items.length} item${order.items.length > 1 ? 's' : ''}` : '—'}
+                      </span>
+                      <span className="font-semibold text-black text-sm">₹{order.totalAmount}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap pt-1">
+                      <button
+                        onClick={() => setDetailOrder(order)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white border border-slate-700 hover:bg-slate-700 transition-all"
+                      >
+                        <Eye className="w-3 h-3" /> Details
+                      </button>
+                      {['REQUESTED', 'ACCEPTED', 'ASSIGNED', 'PREPARING'].includes(order.status) && (
+                        <>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            id={`ss-m-${order.id}`}
+                            onChange={e => {
+                              const file = e.target.files?.[0];
+                              if (file) handleUploadScreenshot(String(order.id), file);
+                              e.target.value = '';
+                            }}
+                          />
+                          <label
+                            htmlFor={`ss-m-${order.id}`}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-violet-500/20 text-violet-400 border border-violet-500/30 hover:bg-violet-500/30 cursor-pointer transition-all"
+                          >
+                            {uploadingFor === String(order.id)
+                              ? <RefreshCw className="w-3 h-3 animate-spin" />
+                              : <Upload className="w-3 h-3" />}
+                            SS
+                          </label>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop table view */}
+              <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-slate-800 bg-slate-900/50">
+              <thead className="border-b border-slate-800 bg-[#E3422C]">
                 <tr>
                   <th className="table-th">Order ID</th>
                   <th className="table-th">Status</th>
@@ -429,22 +499,22 @@ const MyOrdersPage: React.FC = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {paginated.map(order => (
                   <tr key={order.id} className="hover:bg-white/2 transition-colors">
-                    <td className="table-td font-mono text-sky-400 text-xs font-bold">
+                    <td className="table-td font-mono text-[#E3422C] text-xs font-bold">
                       #{String(order.id).slice(-8).toUpperCase()}
                     </td>
                     <td className="table-td">
                       <StatusBadge status={order.status} />
                     </td>
-                    <td className="table-td text-slate-400 text-sm">
+                    <td className="table-td text-black text-sm">
                       {order.kitchenName || '—'}
                     </td>
-                    <td className="table-td text-slate-400 text-xs">
+                    <td className="table-td text-black text-xs">
                       {order.items?.length > 0
                         ? `${order.items.length} item${order.items.length > 1 ? 's' : ''}`
                         : '—'}
                     </td>
-                    <td className="table-td font-semibold text-white">₹{order.totalAmount}</td>
-                    <td className="table-td text-slate-500 text-xs">
+                    <td className="table-td font-semibold text-black">₹{order.totalAmount}</td>
+                    <td className="table-td text-black text-xs">
                       {new Date(order.createdAt).toLocaleDateString('en-IN', {
                         day: '2-digit', month: 'short', year: 'numeric'
                       })}
@@ -454,7 +524,7 @@ const MyOrdersPage: React.FC = () => {
                         {/* See Details — always visible */}
                         <button
                           onClick={() => setDetailOrder(order)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-700/60 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-all"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white border border-slate-700 hover:bg-slate-700 transition-all"
                         >
                           <Eye className="w-3 h-3" /> Details
                         </button>
@@ -490,10 +560,12 @@ const MyOrdersPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </>
           )}
         </div>
         <Pagination page={page} total={filtered.length} limit={LIMIT} onChange={setPage} />
-      </div>
+           </div>
 
       {/* Order Detail Modal */}
       {detailOrder && (

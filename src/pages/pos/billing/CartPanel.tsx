@@ -35,19 +35,19 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   onProceed,
 }) => {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-full">
+    <div className="bg-[#fff5f0] border border-slate-800 rounded-xl p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-4">
-        <ShoppingCart className="w-5 h-5 text-sky-400" />
-        <h2 className="text-white font-semibold">Cart</h2>
+        <ShoppingCart className="w-5 h-5 text-[#E3422C]" />
+        <h2 className="text-black font-semibold">Cart</h2>
         {items.length > 0 && (
-          <span className="ml-auto text-xs text-slate-400">
+          <span className="ml-auto text-xs text-black">
             {items.reduce((sum, i) => sum + i.quantity, 0)} item(s)
           </span>
         )}
       </div>
 
       {items.length === 0 ? (
-        <p className="text-slate-500 text-sm flex-1">
+        <p className="text-[#E3422C] text-sm flex-1">
           No items yet. Tap a product to add it to the cart.
         </p>
       ) : (
@@ -99,12 +99,12 @@ export const CartPanel: React.FC<CartPanelProps> = ({
       )}
 
       <div className="border-t border-slate-800 mt-4 pt-4 space-y-2">
-        <div className="flex items-center justify-between text-sm text-slate-300">
+        <div className="flex items-center justify-between text-sm text-black">
           <span>Subtotal</span>
           <span>₹{subtotal.toFixed(2)}</span>
         </div>
 
-        <div className="flex items-center justify-between text-sm text-slate-300">
+        <div className="flex items-center justify-between text-sm text-black">
           <label htmlFor="cart-discount" className="flex items-center gap-2">
             Discount
             <input
@@ -124,18 +124,15 @@ export const CartPanel: React.FC<CartPanelProps> = ({
           <span>-₹{discountAmount.toFixed(2)}</span>
         </div>
 
-        <div className="flex items-center justify-between text-sm text-slate-300">
+        <div className="flex items-center justify-between text-sm text-`">
           <span>Tax{gstEnabled ? ` (GST ${gstPercentage}%)` : ''}</span>
           <span>₹{taxAmount.toFixed(2)}</span>
         </div>
 
-        {/* <div className="flex items-center justify-between text-white font-semibold text-base pt-2 border-t border-slate-800">
+         
+         <div className="flex items-center justify-between text-[#E3422C] font-semibold text-base pt-2 border-t border-[#E3422C]">
           <span>Grand Total</span>
-          <span className="text-sky-400">₹{grandTotal.toFixed(2)}</span>
-        </div> */}
-         <div className="flex items-center justify-between text-white font-semibold text-base pt-2 border-t border-slate-800">
-          <span>Grand Total</span>
-          <span className="text-sky-400">₹{grandTotal.toFixed(2)}</span>
+          <span className="text-[#E3422C]">₹{grandTotal.toFixed(2)}</span>
         </div>
 
         <button
@@ -143,8 +140,8 @@ export const CartPanel: React.FC<CartPanelProps> = ({
           disabled={items.length === 0}
           className={`w-full mt-3 py-3 rounded-lg font-semibold text-sm transition-colors ${
             items.length === 0
-              ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-              : 'bg-sky-500 text-white hover:bg-sky-600'
+              ? 'bg-[#fff5f0] text-slate-500 cursor-not-allowed'
+              : 'bg-[#E3422C] text-white hover:bg-sky-600'
           }`}
         >
           Proceed to Checkout
