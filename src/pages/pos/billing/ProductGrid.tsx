@@ -1,19 +1,23 @@
  import React from 'react';
 import { FranchiseProduct } from '../../../types/pos';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translateProductName, translateCategory } from '../i18n/productTranslations';
+
 
 interface ProductGridProps {
   products: FranchiseProduct[];
   loading: boolean;
   onSelectProduct: (product: FranchiseProduct) => void;
 }
+ export const ProductGrid: React.FC<ProductGridProps> = ({ products, loading, onSelectProduct }) => {
+  const { t, lang } = useLanguage();
 
-export const ProductGrid: React.FC<ProductGridProps> = ({ products, loading, onSelectProduct }) => {
   if (loading) {
-    return <p className="text-slate-400">Loading products...</p>;
+    return <p className="text-slate-400">{t('product.loading')}</p>;
   }
 
   if (products.length === 0) {
-    return <p className="text-slate-400">No products available. Import products from POS setup.</p>;
+    return <p className="text-slate-400">{t('product.empty')}</p>;
   }
 
   return (
@@ -29,8 +33,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products, loading, onS
           }}
           className="bg-[#E3422C] border border-[#fff5f0] rounded-xl p-4 cursor-pointer hover:[#E3422C] active:scale-[0.97] transition-all select-none"
         >
-          <p className="text-white font-medium truncate">{product.name}</p>
-          <p className="text-white text-xs mt-1">{product.category}</p>
+                     <p className="text-white font-medium truncate">{translateProductName(product.name, lang)}</p>
+          <p className="text-white text-xs mt-1">{translateCategory(product.category, lang)}</p>
           <p className="text-white font-semibold mt-2">₹{product.sellingPrice.toFixed(2)}</p>
         </div>
       ))}

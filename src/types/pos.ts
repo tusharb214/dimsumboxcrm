@@ -58,21 +58,36 @@ export interface RestaurantTable {
   lowStockThreshold?: number;
 }
 
-export interface UpdateFranchiseProductPayload {
+  export interface UpdateFranchiseProductPayload {
   sellingPrice?: number;
   isAvailable?: boolean;
   piecesPerPlate?: number;
   lowStockThreshold?: number;
- 
-
+  category?: string;
 }
- export interface CreateFranchiseProductPayload {
+
+export interface CreateFranchiseProductPayload {
   name: string;
   category?: string;
   sellingPrice: number;
   piecesPerPlate?: number;
   stockPieces?: number;
   lowStockThreshold?: number;
+}
+
+export interface AddStockPayload {
+  quantityPieces: number;
+  date: string;   // yyyy-MM-dd
+  note?: string;
+}
+
+export interface StockHistoryEntry {
+  id: number;
+  productId: number;
+  date: string;
+  quantityPieces: number;
+  note?: string;
+  createdAt?: string;
 }
  // Billing cart line item — built from a real FranchiseProduct, never mock data.
 // materialId is optional — franchise-created products (no admin Material link) won't have one.
@@ -108,7 +123,7 @@ export interface PosCheckoutItem {
   quantity: number;
 }
 
-export interface PosCheckoutPayload {
+ export interface PosCheckoutPayload {
   items: PosCheckoutItem[];
   customerType: CustomerType;
   customerName: string;
@@ -118,6 +133,7 @@ export interface PosCheckoutPayload {
   discountPercent: number;
   referenceNumber?: string;
   notes?: string;
+  deviceNumber: string;
 }
 
 export interface PosOrderItemResult {
@@ -128,7 +144,7 @@ export interface PosOrderItemResult {
   lineTotal: number;
 }
 
-export interface PosOrderResponse {
+ export interface PosOrderResponse {
   id: number;
   invoiceNumber: string;
   orderType: OrderType;
@@ -142,5 +158,6 @@ export interface PosOrderResponse {
   taxAmount: number;
   totalAmount: number;
   billDateTime: string;
+  deviceNumber: string;
   items: PosOrderItemResult[];
 }

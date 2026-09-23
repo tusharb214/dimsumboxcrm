@@ -1,4 +1,4 @@
- import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { posBillingApi, posSetupApi } from '../../../api/posServices';
 import { CartItem, FranchiseProduct } from '../../../types/pos';
@@ -11,10 +11,13 @@ import { CustomerSelector } from './CustomerSelector';
 import { BillingCustomer, OrderType, PaymentMethod, PosOrderResponse } from '../../../types/pos';
 import { OrderTypeSelector } from './OrderTypeSelector';
 import { PaymentMethodSelector } from './PaymentMethodSelector';
+import { useLanguage } from '../i18n/LanguageContext';
+import { LanguageToggle } from './LanguageToggle';
 
 // Billing Screen — Product Categories + Product Grid + Cart, all backed by real DB data.
 // Search, payment, and order placement land in later features.
 export const BillingScreen: React.FC = () => {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<FranchiseProduct[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
@@ -32,89 +35,89 @@ export const BillingScreen: React.FC = () => {
     customerPhone: '',
   });
   // Checkout stage state — controls Cart vs Order-Type screen
-//  const [stage, setStage] = useState<'CART' | 'CHECKOUT'>('CART');
-const [stage, setStage] =
-  useState<'CART' | 'CHECKOUT' | 'RECEIPT'>('CART');
-const [orderType, setOrderType] = useState<OrderType | null>(null);
-const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
-const [processingPayment, setProcessingPayment] = useState(false);
-const [completedOrder, setCompletedOrder] = useState<PosOrderResponse | null>(null);
+  //  const [stage, setStage] = useState<'CART' | 'CHECKOUT'>('CART');
+  const [stage, setStage] =
+    useState<'CART' | 'CHECKOUT' | 'RECEIPT'>('CART');
+  const [orderType, setOrderType] = useState<OrderType | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState<PosOrderResponse | null>(null);
 
-const handleProceedToCheckout = () => {
-  if (cartItems.length === 0) {
-    toast.error('Cart is empty');
-    return;
-  }
-  setStage('CHECKOUT');
-};
+  const handleProceedToCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error(t('cart.empty.toast'));
+      return;
+    }
+    setStage('CHECKOUT');
+  };
 
-const handleBackToCart = () => {
-  setStage('CART');
-};
+  const handleBackToCart = () => {
+    setStage('CART');
+  };
 
-const handleSelectOrderType = (type: OrderType) => {
-  setOrderType(type);
-};
+  const handleSelectOrderType = (type: OrderType) => {
+    setOrderType(type);
+  };
 
-const handleSelectPaymentMethod = (method: PaymentMethod) => {
-  setPaymentMethod(method);
-};
+  const handleSelectPaymentMethod = (method: PaymentMethod) => {
+    setPaymentMethod(method);
+  };
 
- // Validates payment, calls checkout API — saves order/items/payment, auto-updates
-// Daily Sales + Dashboard + Notifications on the backend.
-const handleCompletePayment = async () => {
-  if (cartItems.length === 0) {
-    toast.error('Cart is empty');
-    return;
-  }
-  if (!orderType) {
-    toast.error('Please select an order type');
-    return;
-  }
-  if (!paymentMethod) {
-    toast.error('Please select a payment method');
-    return;
-  }
-  if (customer.customerType !== 'WALK_IN' && !customer.customerPhone.trim()) {
-    toast.error('Please enter customer phone number');
-    return;
-  }
+  // Validates payment, calls checkout API — saves order/items/payment, auto-updates
+  // Daily Sales + Dashboard + Notifications on the backend.
+  const handleCompletePayment = async () => {
+    if (cartItems.length === 0) {
+      toast.error(t('cart.empty.toast'));
+      return;
+    }
+    if (!orderType) {
+      toast.error(t('orderType.select.toast'));
+      return;
+    }
+    if (!paymentMethod) {
+      toast.error(t('payment.select.toast'));
+      return;
+    }
+    if (customer.customerType !== 'WALK_IN' && !customer.customerPhone.trim()) {
+      toast.error(t('customer.enterPhone.toast'));
+      return;
+    }
 
-  try {
-    setProcessingPayment(true);
-    const payload = {
-      items: cartItems.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-      })),
-      customerType: customer.customerType,
-      customerName: customer.customerName,
-      customerPhone: customer.customerPhone,
-      orderType,
-      paymentMethod,
-      discountPercent,
-    };
-    const res = await posBillingApi.checkout(payload as any);
-    const order: PosOrderResponse = res.data?.data;
-    setCompletedOrder(order);
-    toast.success(`Payment received — Invoice ${order.invoiceNumber} generated`);
-    setStage('RECEIPT');
-  } catch (err: any) {
-    toast.error(err?.response?.data?.message || 'Payment failed. Please try again.');
-  } finally {
-    setProcessingPayment(false);
-  }
-};
+    try {
+      setProcessingPayment(true);
+      const payload = {
+        items: cartItems.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+        customerType: customer.customerType,
+        customerName: customer.customerName,
+        customerPhone: customer.customerPhone,
+        orderType,
+        paymentMethod,
+        discountPercent,
+      };
+      const res = await posBillingApi.checkout(payload as any);
+      const order: PosOrderResponse = res.data?.data;
+      setCompletedOrder(order);
+      toast.success(t('checkout.paymentReceived', { invoice: order.invoiceNumber }));
+      setStage('RECEIPT');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('checkout.paymentFailed'));
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
 
-const handleNewOrder = () => {
-  setCartItems([]);
-  setDiscountPercent(0);
-  setCustomer({ customerType: 'WALK_IN', customerName: '', customerPhone: '' });
-  setOrderType(null);
-  setPaymentMethod(null);
-  setCompletedOrder(null);
-  setStage('CART');
-};
+  const handleNewOrder = () => {
+    setCartItems([]);
+    setDiscountPercent(0);
+    setCustomer({ customerType: 'WALK_IN', customerName: '', customerPhone: '' });
+    setOrderType(null);
+    setPaymentMethod(null);
+    setCompletedOrder(null);
+    setStage('CART');
+  };
   useEffect(() => {
     loadBillingData();
   }, []);
@@ -133,7 +136,7 @@ const handleNewOrder = () => {
       setGstEnabled(!!settings?.gstEnabled);
       setGstPercentage(settings?.gstPercentage || 0);
     } catch (err) {
-      toast.error('Failed to load billing data');
+      toast.error(t('checkout.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -147,7 +150,7 @@ const handleNewOrder = () => {
   // ─── Cart handlers ────────────────────────────────────────────────
   const handleAddToCart = (product: FranchiseProduct) => {
     if (!product.isAvailable) {
-      toast.error(`${product.name} is currently unavailable`);
+      toast.error(`${product.name} ${t('product.unavailable')}`);
       return;
     }
 
@@ -172,7 +175,7 @@ const handleNewOrder = () => {
         },
       ];
     });
-    toast.success(`${product.name} added to cart`);
+    toast.success(`${product.name} ${t('product.addedToCart')}`);
   };
 
   const handleIncrement = (productId: number) => {
@@ -217,11 +220,14 @@ const handleNewOrder = () => {
 
   const grandTotal = taxableAmount + taxAmount;
 
- 
- 
-     return (
+
+
+  return (
     <div className="min-h-screen bg-[#fff5f0] p-4 sm:p-6">
-      <h1 className="text-xl font-semibold text-black mb-4">Billing</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-semibold text-black">{t('billing.title')}</h1>
+        <LanguageToggle />
+      </div>
 
       {stage === 'CART' && (
         <>
@@ -263,53 +269,52 @@ const handleNewOrder = () => {
         </>
       )}
 
-       {stage === 'CHECKOUT' && (
-  <>
-    <OrderTypeSelector
-      orderType={orderType}
-      onSelect={handleSelectOrderType}
-      onBack={handleBackToCart}
-    />
+      {stage === 'CHECKOUT' && (
+        <>
+          <OrderTypeSelector
+            orderType={orderType}
+            onSelect={handleSelectOrderType}
+            onBack={handleBackToCart}
+          />
 
-    <PaymentMethodSelector
-      paymentMethod={paymentMethod}
-      onSelect={handleSelectPaymentMethod}
-    />
-   <button
-      onClick={handleCompletePayment}
-      disabled={cartItems.length === 0 || !orderType || !paymentMethod || processingPayment}
-      className={`w-full mt-6 py-4 rounded-lg font-semibold text-base transition-colors ${
-        cartItems.length === 0 || !orderType || !paymentMethod || processingPayment
-          ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-          : 'bg-emerald-500 text-white hover:bg-emerald-600'
-      }`}
-    >
-      {processingPayment ? 'Processing...' : 'Complete Payment'}
-    </button>
-  </>
-)}
+          <PaymentMethodSelector
+            paymentMethod={paymentMethod}
+            onSelect={handleSelectPaymentMethod}
+          />
+          <button
+            onClick={handleCompletePayment}
+            disabled={cartItems.length === 0 || !orderType || !paymentMethod || processingPayment}
+            className={`w-full mt-6 py-4 rounded-lg font-semibold text-base transition-colors ${cartItems.length === 0 || !orderType || !paymentMethod || processingPayment
+                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                : 'bg-emerald-500 text-white hover:bg-emerald-600'
+              }`}
+          >
+                  {processingPayment ? t('checkout.processing') : t('checkout.completePayment')}
+          </button>
+        </>
+      )}
 
-{stage === 'RECEIPT' && completedOrder && (
-  <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 max-w-md mx-auto text-center shadow-sm">
-    <h2 className="text-emerald-600 text-lg font-semibold mb-2">Payment Successful</h2>
-    <p className="text-slate-500 text-sm mb-4">Invoice Generated</p>
+      {stage === 'RECEIPT' && completedOrder && (
+        <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 max-w-md mx-auto text-center shadow-sm">
+               <h2 className="text-emerald-600 text-lg font-semibold mb-2">{t('receipt.success')}</h2>
+    <p className="text-slate-500 text-sm mb-4">{t('receipt.invoiceGenerated')}</p>
 
     <div className="bg-slate-50 rounded-lg p-4 text-left text-sm text-slate-600 space-y-1 mb-4">
-      <div className="flex justify-between"><span>Invoice No.</span><span className="text-black">{completedOrder.invoiceNumber}</span></div>
-      <div className="flex justify-between"><span>Order Type</span><span className="text-black">{completedOrder.orderType}</span></div>
-      <div className="flex justify-between"><span>Payment Method</span><span className="text-black">{completedOrder.paymentMethod}</span></div>
-      <div className="flex justify-between"><span>Date & Time</span><span className="text-black">{new Date(completedOrder.billDateTime).toLocaleString()}</span></div>
-      <div className="flex justify-between font-semibold pt-2 border-t border-slate-200"><span>Grand Total</span><span className="text-emerald-600">₹{completedOrder.totalAmount.toFixed(2)}</span></div>
+      <div className="flex justify-between"><span>{t('receipt.invoiceNo')}</span><span className="text-black">{completedOrder.invoiceNumber}</span></div>
+      <div className="flex justify-between"><span>{t('receipt.orderType')}</span><span className="text-black">{completedOrder.orderType}</span></div>
+      <div className="flex justify-between"><span>{t('receipt.paymentMethod')}</span><span className="text-black">{completedOrder.paymentMethod}</span></div>
+      <div className="flex justify-between"><span>{t('receipt.dateTime')}</span><span className="text-black">{new Date(completedOrder.billDateTime).toLocaleString()}</span></div>
+      <div className="flex justify-between font-semibold pt-2 border-t border-slate-200"><span>{t('receipt.grandTotal')}</span><span className="text-emerald-600">₹{completedOrder.totalAmount.toFixed(2)}</span></div>
     </div>
 
     <button
       onClick={handleNewOrder}
       className="w-full py-3 rounded-lg font-semibold bg-[#E3422C] text-white hover:bg-[#c93a24] transition-colors"
     >
-      New Order
+      {t('receipt.newOrder')}
     </button>
-  </div>
-)}
+        </div>
+      )}
     </div>
   );
 };

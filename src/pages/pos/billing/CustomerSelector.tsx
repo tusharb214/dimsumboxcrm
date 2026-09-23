@@ -1,20 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+ import React, { useEffect, useRef, useState } from 'react';
 import { User, UserCheck, UserPlus, Search } from 'lucide-react';
 import { posBillingApi } from '../../../api/posServices';
 import { BillingCustomer, CustomerSuggestion, CustomerType } from '../../../types/pos';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface CustomerSelectorProps {
   customer: BillingCustomer;
   onChange: (customer: BillingCustomer) => void;
 }
 
-const TYPE_OPTIONS: { value: CustomerType; label: string; icon: React.ReactNode }[] = [
-  { value: 'WALK_IN', label: 'Walk-in', icon: <User className="w-3.5 h-3.5" /> },
-  { value: 'EXISTING', label: 'Existing', icon: <UserCheck className="w-3.5 h-3.5" /> },
-  { value: 'NEW', label: 'New', icon: <UserPlus className="w-3.5 h-3.5" /> },
-];
-
 export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, onChange }) => {
+  const { t } = useLanguage();
+  const TYPE_OPTIONS: { value: CustomerType; label: string; icon: React.ReactNode }[] = [
+    { value: 'WALK_IN', label: t('customer.walkIn'), icon: <User className="w-3.5 h-3.5" /> },
+    { value: 'EXISTING', label: t('customer.existing'), icon: <UserCheck className="w-3.5 h-3.5" /> },
+    { value: 'NEW', label: t('customer.new'), icon: <UserPlus className="w-3.5 h-3.5" /> },
+  ];
   const [suggestions, setSuggestions] = useState<CustomerSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -79,8 +80,8 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
           <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
-              type="tel"
-              placeholder="Phone number"
+                            type="tel"
+              placeholder={t('customer.phonePlaceholder')}
               value={customer.customerPhone}
               onChange={(e) => {
                 onChange({ ...customer, customerPhone: e.target.value });
@@ -99,7 +100,7 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
                     onMouseDown={() => handleSelectSuggestion(s)}
                     className="w-full text-left px-3 py-2 text-sm text-black hover:bg-slate-50 transition-colors"
                   >
-                    <span className="font-medium">{s.customerName || 'Unnamed'}</span>
+                                        <span className="font-medium">{s.customerName || t('customer.unnamed')}</span>
                     <span className="text-slate-500 ml-2">{s.customerPhone}</span>
                   </button>
                 ))}
@@ -109,7 +110,7 @@ export const CustomerSelector: React.FC<CustomerSelectorProps> = ({ customer, on
 
           <input
             type="text"
-            placeholder="Customer name"
+            placeholder={t('customer.namePlaceholder')}
             value={customer.customerName}
             onChange={(e) => onChange({ ...customer, customerName: e.target.value })}
             className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-black placeholder-slate-400 focus:outline-none focus:border-[#E3422C]"

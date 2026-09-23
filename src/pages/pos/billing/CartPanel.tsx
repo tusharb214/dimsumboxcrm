@@ -1,6 +1,8 @@
 import React from 'react';
 import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
 import { CartItem } from '../../../types/pos';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translateProductName } from '../i18n/productTranslations';
 
 interface CartPanelProps {
   items: CartItem[];
@@ -32,23 +34,24 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   onDecrement,
   onRemove,
   onDiscountChange,
-  onProceed,
+    onProceed,
 }) => {
+  const { t, lang } = useLanguage();
   return (
     <div className="bg-[#fff5f0] border border-slate-800 rounded-xl p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-4">
         <ShoppingCart className="w-5 h-5 text-[#E3422C]" />
-        <h2 className="text-black font-semibold">Cart</h2>
+                <h2 className="text-black font-semibold">{t('cart.title')}</h2>
         {items.length > 0 && (
           <span className="ml-auto text-xs text-black">
-            {items.reduce((sum, i) => sum + i.quantity, 0)} item(s)
+            {items.reduce((sum, i) => sum + i.quantity, 0)} {t('cart.itemsSuffix')}
           </span>
         )}
       </div>
 
       {items.length === 0 ? (
         <p className="text-[#E3422C] text-sm flex-1">
-          No items yet. Tap a product to add it to the cart.
+          {t('cart.empty')}
         </p>
       ) : (
         <div className="flex-1 overflow-y-auto space-y-3 pr-1">
@@ -59,8 +62,8 @@ export const CartPanel: React.FC<CartPanelProps> = ({
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-white text-sm font-medium truncate">{item.name}</p>
-                  <p className="text-slate-500 text-xs">₹{item.sellingPrice.toFixed(2)} each</p>
+                  <p className="text-white text-sm font-medium truncate">{translateProductName(item.name, lang)}</p>
+                                    <p className="text-slate-500 text-xs">₹{item.sellingPrice.toFixed(2)} {t('cart.each')}</p>
                 </div>
                 <button
                   onClick={() => onRemove(item.productId)}
@@ -99,14 +102,14 @@ export const CartPanel: React.FC<CartPanelProps> = ({
       )}
 
       <div className="border-t border-slate-800 mt-4 pt-4 space-y-2">
-        <div className="flex items-center justify-between text-sm text-black">
-          <span>Subtotal</span>
+                 <div className="flex items-center justify-between text-sm text-black">
+          <span>{t('cart.subtotal')}</span>
           <span>₹{subtotal.toFixed(2)}</span>
         </div>
 
         <div className="flex items-center justify-between text-sm text-black">
           <label htmlFor="cart-discount" className="flex items-center gap-2">
-            Discount
+            {t('cart.discount')}
             <input
               id="cart-discount"
               type="number"
@@ -124,14 +127,14 @@ export const CartPanel: React.FC<CartPanelProps> = ({
           <span>-₹{discountAmount.toFixed(2)}</span>
         </div>
 
-        <div className="flex items-center justify-between text-sm text-`">
-          <span>Tax{gstEnabled ? ` (GST ${gstPercentage}%)` : ''}</span>
+                 <div className="flex items-center justify-between text-sm text-black">
+          <span>{t('cart.tax')}{gstEnabled ? ` (GST ${gstPercentage}%)` : ''}</span>
           <span>₹{taxAmount.toFixed(2)}</span>
         </div>
 
          
-         <div className="flex items-center justify-between text-[#E3422C] font-semibold text-base pt-2 border-t border-[#E3422C]">
-          <span>Grand Total</span>
+                   <div className="flex items-center justify-between text-[#E3422C] font-semibold text-base pt-2 border-t border-[#E3422C]">
+          <span>{t('cart.grandTotal')}</span>
           <span className="text-[#E3422C]">₹{grandTotal.toFixed(2)}</span>
         </div>
 
@@ -144,7 +147,7 @@ export const CartPanel: React.FC<CartPanelProps> = ({
               : 'bg-[#E3422C] text-white hover:bg-sky-600'
           }`}
         >
-          Proceed to Checkout
+          {t('cart.proceed')}
         </button>
       </div>
     </div>

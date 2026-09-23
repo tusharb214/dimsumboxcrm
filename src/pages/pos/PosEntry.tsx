@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { posSetupApi } from '../../api/posServices';
 import { BillingScreen } from './billing/BillingScreen';
+import { LanguageProvider, useLanguage } from './i18n/LanguageContext';
 
-// Franchise lands here after login. Decides: unfinished wizard -> /dashboard/pos/setup,
-// completed setup -> Billing Screen directly. Single source of truth: PosSettings.setupCompleted.
-export const PosEntry: React.FC = () => {
+const PosEntryContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [setupCompleted, setSetupCompleted] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     posSetupApi
@@ -17,10 +17,10 @@ export const PosEntry: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-     if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#fff5f0] flex items-center justify-center">
-        <p className="text-slate-500">Loading POS...</p>
+        <p className="text-slate-500">{t('loading.pos')}</p>
       </div>
     );
   }
@@ -31,3 +31,9 @@ export const PosEntry: React.FC = () => {
 
   return <BillingScreen />;
 };
+
+export const PosEntry: React.FC = () => (
+  <LanguageProvider>
+    <PosEntryContent />
+  </LanguageProvider>
+);

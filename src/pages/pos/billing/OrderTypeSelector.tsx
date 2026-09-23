@@ -1,6 +1,7 @@
- import React from 'react';
+  import React from 'react';
 import { Utensils, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { OrderType } from '../../../types/pos';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface OrderTypeSelectorProps {
   orderType: OrderType | null;
@@ -8,19 +9,17 @@ interface OrderTypeSelectorProps {
   onBack: () => void;
 }
 
-const ORDER_TYPES: { value: OrderType; label: string; icon: React.ElementType }[] = [
-  { value: 'DINE_IN', label: 'Dine In', icon: Utensils },
-  { value: 'TAKE_AWAY', label: 'Take Away', icon: ShoppingBag },
-];
-
-// Checkout Stage — Step 1: Order Type selection.
-// Payment method selection follows in the same Checkout stage (see PaymentMethodSelector).
-// Invoice generation and save-bill are handled in a later phase (not implemented here).
-export const OrderTypeSelector: React.FC<OrderTypeSelectorProps> = ({
+ export const OrderTypeSelector: React.FC<OrderTypeSelectorProps> = ({
   orderType,
   onSelect,
   onBack,
 }) => {
+  const { t } = useLanguage();
+  const ORDER_TYPES: { value: OrderType; label: string; icon: React.ElementType }[] = [
+    { value: 'DINE_IN', label: t('orderType.dineIn'), icon: Utensils },
+    { value: 'TAKE_AWAY', label: t('orderType.takeAway'), icon: ShoppingBag },
+  ];
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
       <div className="flex items-center gap-3 mb-6">
@@ -29,10 +28,10 @@ export const OrderTypeSelector: React.FC<OrderTypeSelectorProps> = ({
           className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-sm"
           aria-label="Back to cart"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Cart
+                   <ArrowLeft className="w-4 h-4" />
+          {t('orderType.back')}
         </button>
-        <h2 className="text-white font-semibold text-lg ml-2">Order Type</h2>
+        <h2 className="text-white font-semibold text-lg ml-2">{t('orderType.title')}</h2>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

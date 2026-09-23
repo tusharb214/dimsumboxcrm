@@ -40,6 +40,11 @@ export const posSetupApi = {
 
   deleteProduct: (id: number) =>
     apiClient.delete(`/pos/products/${id}`),
+   addStock: (id: number, payload: import('../types/pos').AddStockPayload) =>
+    apiClient.post(`/pos/products/${id}/stock`, payload),
+
+  getStockHistory: (id: number) =>
+    apiClient.get(`/pos/products/${id}/stock-history`),
 };
 
  export const posBillingApi = {

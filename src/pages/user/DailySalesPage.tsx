@@ -53,25 +53,26 @@ const parseItemsSold = (str: string): Record<string, number> => {
 const Pager: React.FC<{ page: number; total: number; limit: number; onChange: (p: number) => void }> = ({ page, total, limit, onChange }) => {
   const pages = Math.ceil(total / limit);
   if (pages <= 1) return null;
+
   return (
-    <div className="flex items-center justify-between px-5 py-3 border-t border-slate-800">
+    <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200">
       <p className="text-xs text-slate-500">
         Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
       </p>
       <div className="flex items-center gap-1">
         <button onClick={() => onChange(page - 1)} disabled={page === 1}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+          className="p-1.5 rounded-lg text-slate-500 hover:text-black hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
           <ChevronLeft className="w-4 h-4" />
         </button>
         {Array.from({ length: pages }, (_, i) => i + 1).map(p => (
           <button key={p} onClick={() => onChange(p)}
-            className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${p === page ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${p === page ? 'bg-[#E3422C] text-white' : 'text-slate-500 hover:text-black hover:bg-slate-100'
               }`}>
             {p}
           </button>
         ))}
         <button onClick={() => onChange(page + 1)} disabled={page === pages}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+          className="p-1.5 rounded-lg text-slate-500 hover:text-black hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -193,27 +194,27 @@ const ItemsBreakdownModal: React.FC<{ log: SalesReport; onClose: () => void }> =
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-5 border-b border-slate-800">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-5 border-b border-slate-200">
           <div>
-            <h3 className="text-sm font-semibold text-white">Items Sold</h3>
+            <h3 className="text-sm font-semibold text-black">Items Sold</h3>
             <p className="text-xs text-slate-500 mt-0.5">{dateLabel}</p>
           </div>
           <button onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+            className="p-1.5 rounded-lg text-slate-400 hover:text-black hover:bg-slate-100 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="p-5">
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="px-3 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700">
+            <div className="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200">
               <p className="text-xs text-slate-500">Total Sales</p>
-              <p className="text-sm font-semibold text-emerald-400 mt-0.5">₹{(log.totalSales || 0).toLocaleString('en-IN')}</p>
+              <p className="text-sm font-semibold text-emerald-600 mt-0.5">₹{(log.totalSales || 0).toLocaleString('en-IN')}</p>
             </div>
-            <div className="px-3 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700">
+            <div className="px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200">
               <p className="text-xs text-slate-500">Total Orders</p>
-              <p className="text-sm font-semibold text-sky-400 mt-0.5">{log.totalOrders || 0}</p>
+              <p className="text-sm font-semibold text-[#E3422C] mt-0.5">{log.totalOrders || 0}</p>
             </div>
           </div>
 
@@ -222,9 +223,9 @@ const ItemsBreakdownModal: React.FC<{ log: SalesReport; onClose: () => void }> =
           ) : (
             <div className="space-y-2">
               {items.map(([name, qty]) => (
-                <div key={name} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700">
-                  <span className="text-sm text-slate-200">{name}</span>
-                  <span className="text-sm font-semibold text-sky-400">{qty} units</span>
+                <div key={name} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <span className="text-sm text-black">{name}</span>
+                  <span className="text-sm font-semibold text-[#E3422C]">{qty} units</span>
                 </div>
               ))}
             </div>
@@ -488,7 +489,7 @@ const DailySalesPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="flex gap-1 bg-slate-900 border border-slate-800 rounded-xl p-1 w-full sm:w-fit overflow-x-auto">
+      <div className="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 w-full sm:w-fit overflow-x-auto shadow-sm">
         {([
           { key: 'log', label: 'Log Sales', icon: TrendingUp },
           { key: 'history', label: 'History', icon: History },
@@ -496,9 +497,9 @@ const DailySalesPage: React.FC = () => {
         ] as const).map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${activeTab === tab.key ? 'bg-[#E3422C] text-white shadow'
-                : tab.key === 'stock' && alertCount > 0
-                  ? 'text-amber-400 hover:text-white'
-                  : 'text-slate-400 hover:text-white'
+              : tab.key === 'stock' && alertCount > 0
+                ? 'text-amber-600 hover:text-black'
+                : 'text-slate-500 hover:text-black'
               }`}>
             <tab.icon className="w-3.5 h-3.5" />{tab.label}
           </button>
@@ -511,11 +512,11 @@ const DailySalesPage: React.FC = () => {
 
           {/* Day-wise sales list — filter, export, pagination, breakdown action */}
           <div className="card overflow-hidden">
-            <div className="p-4 border-b border-slate-800 space-y-3">
+            <div className="p-4 border-b border-slate-200 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-black">Day-wise Sales</h2>
                 <button onClick={downloadDailyExcel}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-800 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all">
                   <Download className="w-3.5 h-3.5" /> Export Excel
                 </button>
               </div>
@@ -538,7 +539,7 @@ const DailySalesPage: React.FC = () => {
                   </div>
                   {(dailySearch || dailyFrom || dailyTo) && (
                     <button onClick={() => { setDailySearch(''); setDailyFrom(''); setDailyTo(''); setDailyPage(1); }}
-                      className="self-end px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                      className="self-end px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-black hover:bg-slate-100 transition-all">
                       Clear
                     </button>
                   )}
@@ -547,7 +548,7 @@ const DailySalesPage: React.FC = () => {
               {filteredDailyHistory.length > 0 && (
                 <div className="flex gap-4 text-xs text-slate-500">
                   <span>{filteredDailyHistory.length} entries</span>
-                  <span className="text-emerald-400 font-medium">
+                  <span className="text-emerald-600 font-medium">
                     Total: {fmt(filteredDailyHistory.reduce((s, l) => s + (l.totalSales || 0), 0))}
                   </span>
                 </div>
@@ -558,25 +559,25 @@ const DailySalesPage: React.FC = () => {
               <div className="p-4 space-y-2">{[1, 2, 3, 4, 5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
             ) : paginatedDailyHistory.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16">
-                <History className="w-10 h-10 text-slate-700 mb-3" />
-                <p className="text-slate-400 text-sm">No entries found</p>
+                <History className="w-10 h-10 text-slate-300 mb-3" />
+                <p className="text-slate-500 text-sm">No entries found</p>
               </div>
             ) : (
               <>
                 {/* Mobile card view */}
-                <div className="md:hidden divide-y divide-slate-800/60">
+                <div className="md:hidden divide-y divide-slate-200">
                   {paginatedDailyHistory.map(log => (
                     <div key={log.id} className="p-4 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-300">
+                        <span className="text-sm text-slate-700">
                           {new Date(log.reportDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </span>
-                        <span className="font-semibold text-emerald-400 text-sm">{fmt(log.totalSales || 0)}</span>
+                        <span className="font-semibold text-emerald-600 text-sm">{fmt(log.totalSales || 0)}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-slate-500">{log.totalOrders || 0} orders</span>
                         <button onClick={() => setSelectedDailyLog(log)}
-                          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all">
+                          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition-all">
                           <Eye className="w-3.5 h-3.5" /> View Items
                         </button>
                       </div>
@@ -587,7 +588,7 @@ const DailySalesPage: React.FC = () => {
                 {/* Desktop table view */}
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b border-slate-800 bg-slate-900/50">
+                    <thead className="border-b border-slate-200 bg-slate-50">
                       <tr>
                         <th className="table-th">Date</th>
                         <th className="table-th">Total Sales</th>
@@ -595,17 +596,17 @@ const DailySalesPage: React.FC = () => {
                         <th className="table-th">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y divide-slate-200">
                       {paginatedDailyHistory.map(log => (
-                        <tr key={log.id} className="hover:bg-white/2 transition-colors">
-                          <td className="table-td text-slate-300">
+                        <tr key={log.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="table-td text-slate-700">
                             {new Date(log.reportDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </td>
-                          <td className="table-td font-semibold text-emerald-400">{fmt(log.totalSales || 0)}</td>
-                          <td className="table-td text-slate-300">{log.totalOrders || 0}</td>
+                          <td className="table-td font-semibold text-emerald-600">{fmt(log.totalSales || 0)}</td>
+                          <td className="table-td text-slate-700">{log.totalOrders || 0}</td>
                           <td className="table-td">
                             <button onClick={() => setSelectedDailyLog(log)}
-                              className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all">
+                              className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition-all">
                               <Eye className="w-3.5 h-3.5" /> View Items
                             </button>
                           </td>
@@ -624,11 +625,11 @@ const DailySalesPage: React.FC = () => {
       {/* ── TAB: History ── */}
       {activeTab === 'history' && (
         <div className="card overflow-hidden">
-          <div className="p-4 border-b border-slate-800 space-y-3">
+          <div className="p-4 border-b border-slate-200 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-black">Sales History</h2>
               <button onClick={downloadHistoryExcel}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all">
                 <Download className="w-3.5 h-3.5" /> Export Excel
               </button>
             </div>
@@ -651,7 +652,7 @@ const DailySalesPage: React.FC = () => {
                 </div>
                 {(historySearch || historyFrom || historyTo) && (
                   <button onClick={() => { setHistorySearch(''); setHistoryFrom(''); setHistoryTo(''); setHistoryPage(1); }}
-                    className="self-end px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-all">
+                    className="self-end px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-black hover:bg-slate-100 transition-all">
                     Clear
                   </button>
                 )}
@@ -660,31 +661,31 @@ const DailySalesPage: React.FC = () => {
             {filteredOrders.length > 0 && (
               <div className="flex gap-4 text-xs text-slate-500">
                 <span>{filteredOrders.length} bills</span>
-                <span className="text-emerald-400 font-medium">
+                <span className="text-emerald-600 font-medium">
                   Total: {fmt(filteredOrders.reduce((s, o) => s + (o.totalAmount || 0), 0))}
                 </span>
               </div>
             )}
           </div>
 
-                     {loadingPosOrders ? (
-            <div className="p-4 space-y-2">{[1,2,3,4,5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
+          {loadingPosOrders ? (
+            <div className="p-4 space-y-2">{[1, 2, 3, 4, 5].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
           ) : paginatedOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <History className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-400 text-sm">No bills found</p>
+              <History className="w-10 h-10 text-slate-300 mb-3" />
+              <p className="text-slate-500 text-sm">No bills found</p>
             </div>
           ) : (
             <>
               {/* Mobile card view */}
-              <div className="md:hidden divide-y divide-slate-800/60">
+              <div className="md:hidden divide-y divide-slate-200">
                 {paginatedOrders.map(order => (
                   <div key={order.id} className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-white text-sm">{order.invoiceNumber}</span>
-                      <span className="font-semibold text-emerald-400 text-sm">{fmt(order.totalAmount || 0)}</span>
+                      <span className="font-medium text-black text-sm">{order.invoiceNumber}</span>
+                      <span className="font-semibold text-emerald-600 text-sm">{fmt(order.totalAmount || 0)}</span>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-slate-400">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
                       <span>{order.customerName || 'Walk-in'}</span>
                       <span>
                         {order.billDateTime
@@ -693,20 +694,19 @@ const DailySalesPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                      <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200">
                         {order.orderType?.replace('_', ' ')}
                       </span>
-                      <span className="text-xs text-slate-400">{order.paymentMethod}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-lg border ${
-                        order.status === 'PAID'
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                          : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                      }`}>
+                      <span className="text-xs text-slate-500">{order.paymentMethod}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-lg border ${order.status === 'PAID'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}>
                         {order.status}
                       </span>
                     </div>
                     <button onClick={() => setSelectedInvoice(order)}
-                      className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all">
+                      className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition-all">
                       <Receipt className="w-3.5 h-3.5" /> View Invoice
                     </button>
                   </div>
@@ -716,7 +716,7 @@ const DailySalesPage: React.FC = () => {
               {/* Desktop table view */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
-                  <thead className="border-b border-slate-800 bg-slate-900/50">
+                  <thead className="border-b border-slate-200 bg-slate-50">
                     <tr>
                       <th className="table-th">Invoice #</th>
                       <th className="table-th">Bill Date & Time</th>
@@ -728,35 +728,34 @@ const DailySalesPage: React.FC = () => {
                       <th className="table-th">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-200">
                     {paginatedOrders.map(order => (
-                      <tr key={order.id} className="hover:bg-white/2 transition-colors">
-                        <td className="table-td font-medium text-white">{order.invoiceNumber}</td>
-                        <td className="table-td text-slate-400 text-xs">
+                      <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="table-td font-medium text-black">{order.invoiceNumber}</td>
+                        <td className="table-td text-slate-500 text-xs">
                           {order.billDateTime
                             ? new Date(order.billDateTime).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
                             : '—'}
                         </td>
-                        <td className="table-td text-slate-300">{order.customerName || 'Walk-in'}</td>
+                        <td className="table-td text-slate-700">{order.customerName || 'Walk-in'}</td>
                         <td className="table-td">
-                          <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                          <span className="text-xs px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200">
                             {order.orderType?.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="table-td text-slate-300">{order.paymentMethod}</td>
-                        <td className="table-td font-semibold text-emerald-400">{fmt(order.totalAmount || 0)}</td>
+                        <td className="table-td text-slate-700">{order.paymentMethod}</td>
+                        <td className="table-td font-semibold text-emerald-600">{fmt(order.totalAmount || 0)}</td>
                         <td className="table-td">
-                          <span className={`text-xs px-2 py-0.5 rounded-lg border ${
-                            order.status === 'PAID'
-                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                              : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                          }`}>
+                          <span className={`text-xs px-2 py-0.5 rounded-lg border ${order.status === 'PAID'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                            }`}>
                             {order.status}
                           </span>
                         </td>
                         <td className="table-td">
                           <button onClick={() => setSelectedInvoice(order)}
-                            className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all">
+                            className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition-all">
                             <Receipt className="w-3.5 h-3.5" /> View Invoice
                           </button>
                         </td>
@@ -774,7 +773,7 @@ const DailySalesPage: React.FC = () => {
       {/* ── TAB: Stock Alerts ── */}
       {activeTab === 'stock' && (
         <div className="card overflow-hidden">
-          <div className="p-4 border-b border-slate-800 space-y-3">
+          <div className="p-4 border-b border-slate-200 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-black">Stock Remaining</h2>
               <button onClick={downloadStockExcel}
@@ -790,11 +789,11 @@ const DailySalesPage: React.FC = () => {
                 {(['all', 'critical', 'low', 'ok'] as const).map(f => (
                   <button key={f} onClick={() => { setStockFilter(f); setStockPage(1); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize border ${stockFilter === f
-                        ? f === 'critical' ? 'bg-rose-100 text-rose-700 border-rose-300'
-                          : f === 'low' ? 'bg-amber-100 text-amber-700 border-amber-300'
-                            : f === 'ok' ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
-                              : 'bg-[#E3422C] text-white border-[#E3422C]'
-                        : 'bg-white text-slate-500 border-slate-300 hover:text-black hover:bg-slate-50'
+                      ? f === 'critical' ? 'bg-rose-100 text-rose-700 border-rose-300'
+                        : f === 'low' ? 'bg-amber-100 text-amber-700 border-amber-300'
+                          : f === 'ok' ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                            : 'bg-[#E3422C] text-white border-[#E3422C]'
+                      : 'bg-white text-slate-500 border-slate-300 hover:text-black hover:bg-slate-50'
                       }`}>
                     {f === 'all' ? 'All' : f}
                     {f !== 'all' && (
@@ -810,12 +809,12 @@ const DailySalesPage: React.FC = () => {
 
           {filteredStock.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <AlertTriangle className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-slate-400 text-sm">No stock data available</p>
+              <AlertTriangle className="w-10 h-10 text-slate-300 mb-3" />
+              <p className="text-slate-500 text-sm">No stock data available</p>
             </div>
           ) : (
             <>
-              <div className="divide-y divide-slate-800/60">
+              <div className="divide-y divide-slate-200">
                 {paginatedStock.map(item => {
                   const packets = Math.floor(item.stockPieces / item.unitsPerPacket);
                   const loose = item.stockPieces % item.unitsPerPacket;
@@ -823,29 +822,29 @@ const DailySalesPage: React.FC = () => {
                     : item.alertLevel === 'low' ? 'bg-amber-500'
                       : 'bg-emerald-500';
                   const badge = item.alertLevel === 'critical'
-                    ? <span className="text-xs px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Critical</span>
+                    ? <span className="text-xs px-2 py-0.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Critical</span>
                     : item.alertLevel === 'low'
-                      ? <span className="text-xs px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Low</span>
-                      : <span className="text-xs px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OK</span>;
+                      ? <span className="text-xs px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Low</span>
+                      : <span className="text-xs px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">OK</span>;
 
                   return (
                     <div key={item.id} className="px-5 py-4">
                       <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-white">{item.name}</p>
+                          <p className="text-sm font-medium text-black">{item.name}</p>
                           {badge}
                         </div>
-                        <p className="text-xs text-slate-400">
-                          <span className="text-white font-semibold">{packets} Packets</span> + {loose} Pieces
+                        <p className="text-xs text-slate-500">
+                          <span className="text-black font-semibold">{packets} Packets</span> + {loose} Pieces
                         </p>
                       </div>
-                      <div className="w-full bg-slate-800 rounded-full h-1.5">
+                      <div className="w-full bg-slate-100 rounded-full h-1.5">
                         <div className={`${barColor} h-1.5 rounded-full transition-all`}
                           style={{ width: `${Math.min(100, Math.max(2, (item.stockPieces / Math.max(item.lowStockThreshold * 3, 1)) * 100))}%` }} />
                       </div>
                       <div className="flex justify-between mt-1">
-                        <p className="text-xs text-slate-600">Total: {item.stockPieces} pieces</p>
-                        <p className="text-xs text-slate-600">Alert below: {item.lowStockThreshold}</p>
+                        <p className="text-xs text-slate-500">Total: {item.stockPieces} pieces</p>
+                        <p className="text-xs text-slate-500">Alert below: {item.lowStockThreshold}</p>
                       </div>
                     </div>
                   );

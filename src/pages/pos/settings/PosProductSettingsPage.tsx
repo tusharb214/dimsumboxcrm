@@ -175,26 +175,26 @@ const PosProductSettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-start justify-between flex-wrap gap-2">
+             <div className="flex items-start justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Package className="w-5 h-5 text-sky-400" /> POS Settings — Products
+          <h2 className="text-lg font-bold text-black flex items-center gap-2">
+            <Package className="w-5 h-5 text-[#E3422C]" /> POS Settings — Products
           </h2>
           <p className="text-xs text-slate-500 mt-1">
             Enable/disable products for billing, set your own selling price, and set pieces per plate for accurate stock tracking.
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
           <button
             onClick={() => setShowAddForm(v => !v)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#fdece8] text-[#E3422C] border border-[#f3c9be] hover:bg-[#fbdcd4] transition-all"
           >
             <Plus className="w-3.5 h-3.5" /> Add Product
           </button>
           <button
             onClick={syncNewProducts}
             disabled={syncing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 disabled:opacity-50 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50 transition-all"
           >
             {syncing ? 'Syncing...' : 'Sync From Admin'}
           </button>
@@ -202,10 +202,10 @@ const PosProductSettingsPage: React.FC = () => {
       </div>
 
       {showAddForm && (
-        <div className="card p-4 border border-sky-500/30 space-y-3">
+        <div className="card p-4 border border-[#f3c9be] space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-bold text-white">New Custom Product</p>
-            <button onClick={() => setShowAddForm(false)} className="text-slate-500 hover:text-white">
+            <p className="text-sm font-bold text-black">New Custom Product</p>
+            <button onClick={() => setShowAddForm(false)} className="text-slate-500 hover:text-black">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -245,10 +245,10 @@ const PosProductSettingsPage: React.FC = () => {
           <p className="text-xs text-slate-500">
             This product is added directly into your product list — same as admin-dispatched products (stock, low-stock alerts, and pieces-per-plate all apply).
           </p>
-          <button
+                     <button
             onClick={addCustomProduct}
             disabled={adding}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 disabled:opacity-50 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white hover:bg-[#c93a24] disabled:opacity-50 transition-all"
           >
             {adding ? 'Adding...' : 'Add Product'}
           </button>
@@ -261,33 +261,33 @@ const PosProductSettingsPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {products.map(p => {
+                     {products.map(p => {
             const draft = drafts[p.id] || { sellingPrice: '', piecesPerPlate: '1', lowStockThreshold: '20' };
             const low = isLow(p);
             return (
-              <div key={p.id} className={`card p-4 border ${low ? 'border-red-500/30' : 'border-slate-700/40'}`}>
+              <div key={p.id} className={`card p-4 border ${low ? 'border-red-300' : 'border-slate-200'}`}>
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <div>
-                    <p className="text-sm font-bold text-white">{p.name}</p>
+                    <p className="text-sm font-bold text-black">{p.name}</p>
                     <p className="text-xs text-slate-500">{p.category}{p.brand ? ` · ${p.brand}` : ''}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                      {low && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30">
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200">
                         <AlertTriangle className="w-3 h-3" /> Low Stock
                       </span>
                     )}
                     <button
                       onClick={() => toggleAvailable(p)}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${p.isAvailable ? 'bg-emerald-500' : 'bg-slate-700'}`}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${p.isAvailable ? 'bg-emerald-500' : 'bg-slate-300'}`}
                     >
                       <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${p.isAvailable ? 'translate-x-5' : ''}`} />
                     </button>
-                    <span className="text-xs text-slate-400 w-16">{p.isAvailable ? 'Enabled' : 'Disabled'}</span>
+                    <span className="text-xs text-slate-500 w-16">{p.isAvailable ? 'Enabled' : 'Disabled'}</span>
                      <button
                       onClick={() => deleteProduct(p)}
                       disabled={deletingId === p.id}
-                      className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors"
+                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
                       title="Delete product"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -314,9 +314,9 @@ const PosProductSettingsPage: React.FC = () => {
                       onChange={e => updateDraft(p.id, 'lowStockThreshold', e.target.value)}
                       className="input-field w-full text-sm" />
                   </div>
-                  <div>
+                                     <div>
                     <label className="text-xs text-slate-500 mb-1 block">Current Stock</label>
-                    <p className={`text-sm font-semibold pt-2 ${low ? 'text-red-400' : 'text-emerald-400'}`}>
+                    <p className={`text-sm font-semibold pt-2 ${low ? 'text-red-600' : 'text-emerald-600'}`}>
                       {stockLabel(p)}
                     </p>
                   </div>
@@ -324,7 +324,7 @@ const PosProductSettingsPage: React.FC = () => {
                 <button
                   onClick={() => saveProduct(p)}
                   disabled={savingId === p.id}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30 hover:bg-sky-500/30 disabled:opacity-50 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white hover:bg-[#c93a24] disabled:opacity-50 transition-all"
                 >
                   <Save className="w-3.5 h-3.5" /> {savingId === p.id ? 'Saving...' : 'Save Changes'}
                 </button>

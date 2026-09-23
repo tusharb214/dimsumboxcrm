@@ -1,4 +1,6 @@
 import React from 'react';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translateCategory } from '../i18n/productTranslations';
 
 interface CategoryTabsProps {
   categories: string[];
@@ -10,7 +12,11 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
   categories,
   activeCategory,
   onSelect,
-}) => {
+
+
+
+ }) => {
+  const { t, lang } = useLanguage();
   const tabs = ['ALL', ...categories];
 
   return (
@@ -25,7 +31,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
               : 'bg-[#fff5f0] text-[#333] hover:bg-[#E3422C]'
           }`}
         >
-          {cat === 'ALL' ? 'All Items' : cat}
+                              {cat === 'ALL' ? t('category.allItems') : translateCategory(cat, lang)}
         </button>
       ))}
     </div>

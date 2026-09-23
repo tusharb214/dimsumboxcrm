@@ -1,30 +1,32 @@
- import React from 'react';
+  import React from 'react';
 import { Banknote, Smartphone, CreditCard } from 'lucide-react';
 import { PaymentMethod } from '../../../types/pos';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface PaymentMethodSelectorProps {
   paymentMethod: PaymentMethod | null;
   onSelect: (method: PaymentMethod) => void;
 }
 
-const PAYMENT_METHODS: {
-  value: PaymentMethod;
-  label: string;
-  icon: React.ElementType;
-}[] = [
-  { value: 'CASH', label: 'Cash', icon: Banknote },
-  { value: 'UPI', label: 'UPI', icon: Smartphone },
-  { value: 'CARD', label: 'Card', icon: CreditCard },
-];
-
 export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   paymentMethod,
   onSelect,
 }) => {
+  const { t } = useLanguage();
+  const PAYMENT_METHODS: {
+    value: PaymentMethod;
+    label: string;
+    icon: React.ElementType;
+  }[] = [
+    { value: 'CASH', label: t('payment.cash'), icon: Banknote },
+    { value: 'UPI', label: t('payment.upi'), icon: Smartphone },
+    { value: 'CARD', label: t('payment.card'), icon: CreditCard },
+  ];
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 lg:p-6 mt-4 sm:mt-6">
       <h2 className="text-white font-semibold text-base sm:text-lg mb-4 sm:mb-6">
-        Payment Method
+        {t('payment.title')}
       </h2>
 
       <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
