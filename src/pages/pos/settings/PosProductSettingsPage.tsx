@@ -1,10 +1,17 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Package, Save, AlertTriangle, Plus, Trash2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { posSetupApi } from '../../../api/posServices';
 import { FranchiseProduct } from '../../../types/pos';
 
-interface Draft { sellingPrice: string; piecesPerPlate: string; lowStockThreshold: string; }
+interface Draft {
+  sellingPrice: string;
+  piecesPerPlate: string;
+  unitsPerPacket: string;
+  lowStockThreshold: string;
+  stockProductId: string;
+  isRawStockProduct: boolean;
+}
 
 const PosProductSettingsPage: React.FC = () => {
   const [products, setProducts] = useState<FranchiseProduct[]>([]);
@@ -27,6 +34,10 @@ const PosProductSettingsPage: React.FC = () => {
 
   // Delete
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [stockPackets, setStockPackets] = useState<Record<number, string>>({});
+  const [stockUpdatingId, setStockUpdatingId] = useState<number | null>(null);
+  const [stockHistory, setStockHistory] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -39,7 +50,10 @@ const PosProductSettingsPage: React.FC = () => {
         d[p.id] = {
           sellingPrice: String(p.sellingPrice ?? ''),
           piecesPerPlate: String(p.piecesPerPlate ?? 1),
+          unitsPerPacket: String(p.unitsPerPacket ?? 1),
           lowStockThreshold: String(p.lowStockThreshold ?? 20),
+          stockProductId: p.stockProductId ? String(p.stockProductId) : '',
+          isRawStockProduct: Boolean(p.isRawStockProduct),
         };
       });
       setDrafts(d);
@@ -52,9 +66,17 @@ const PosProductSettingsPage: React.FC = () => {
 
   useEffect(() => { load(); }, []);
 
-  const updateDraft = (id: number, field: keyof Draft, value: string) => {
-    setDrafts(prev => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
-  };
+  const updateDraft = (
+  id: number,
+  field: keyof Draft,
+  value: string | boolean
+) => {
+  setDrafts(prev => ({
+    ...prev,
+    [id]: { ...prev[id], [field]: value },
+  }));
+};
+
 
   const toggleAvailable = async (p: FranchiseProduct) => {
     try {
@@ -72,19 +94,35 @@ const PosProductSettingsPage: React.FC = () => {
     const sellingPrice = parseFloat(draft.sellingPrice);
     const piecesPerPlate = parseInt(draft.piecesPerPlate, 10);
     const lowStockThreshold = parseInt(draft.lowStockThreshold, 10);
+    const unitsPerPacket = parseInt(draft.unitsPerPacket, 10);
+    const stockProductId = draft.stockProductId
+      ? parseInt(draft.stockProductId, 10)
+      : null;
 
-  if (isNaN(sellingPrice) || sellingPrice <= 0) return toast.error('Enter a valid selling price');
-    if (isNaN(piecesPerPlate) || piecesPerPlate <= 0) return toast.error('Enter valid pieces per plate');
+    if (isNaN(sellingPrice) || sellingPrice <= 0) {
+      return toast.error('Enter a valid selling price');
+    }
+
+    if (isNaN(piecesPerPlate) || piecesPerPlate <= 0) {
+      return toast.error('Enter valid pieces per plate');
+    }
+
+    if (isNaN(unitsPerPacket) || unitsPerPacket <= 0) {
+      return toast.error('Enter valid units per packet');
+    }
 
     setSavingId(p.id);
+
     try {
-      const res = await posSetupApi.updateProduct(p.id, {
+      await posSetupApi.updateProduct(p.id, {
         sellingPrice,
         piecesPerPlate,
         lowStockThreshold: isNaN(lowStockThreshold) ? undefined : lowStockThreshold,
+        unitsPerPacket,
+        stockProductId,
+        isRawStockProduct: draft.isRawStockProduct,
       });
-      const updated: FranchiseProduct = (res.data as any).data;
-      setProducts(prev => prev.map(x => x.id === p.id ? updated : x));
+      await load();
       toast.success(`${p.name} updated`);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Failed to update product');
@@ -109,7 +147,7 @@ const PosProductSettingsPage: React.FC = () => {
     }
   };
 
-   const addCustomProduct = async () => {
+  const addCustomProduct = async () => {
     if (!newName.trim()) return toast.error('Enter a product name');
     const price = parseFloat(newPrice);
     if (isNaN(price) || price <= 0) return toast.error('Enter a valid selling price');
@@ -154,6 +192,41 @@ const PosProductSettingsPage: React.FC = () => {
     }
   };
 
+  const addStock = async (p: FranchiseProduct) => {
+    const packets = parseInt(stockPackets[p.id] || '', 10);
+
+    if (isNaN(packets) || packets <= 0) {
+      return toast.error('Enter valid packets');
+    }
+
+    setStockUpdatingId(p.id);
+
+    try {
+      const res = await posSetupApi.addStock(p.id, { packets });
+
+      const updated: FranchiseProduct = (res.data as any).data;
+
+      setProducts(prev =>
+        prev.map(x =>
+          x.id === updated.id ? updated : x
+        )
+      );
+
+      setStockPackets(prev => ({
+        ...prev,
+        [p.id]: '',
+      }));
+
+      toast.success(`${packets} packet(s) stock added`);
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message || 'Failed to add stock'
+      );
+    } finally {
+      setStockUpdatingId(null);
+    }
+  };
+
   const stockLabel = (p: FranchiseProduct) => {
     const pieces = p.stockPieces ?? 0;
     const unitsPerPacket = p.unitsPerPacket && p.unitsPerPacket > 0 ? p.unitsPerPacket : 1;
@@ -162,7 +235,7 @@ const PosProductSettingsPage: React.FC = () => {
     return `${packets} Packets + ${loose} Pieces`;
   };
 
- const isLow = (p: FranchiseProduct) =>
+  const isLow = (p: FranchiseProduct) =>
     (p.stockPieces ?? 0) <= (p.lowStockThreshold ?? 20);
 
   if (loading) {
@@ -175,7 +248,7 @@ const PosProductSettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-             <div className="flex items-start justify-between flex-wrap gap-2">
+      <div className="flex items-start justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-lg font-bold text-black flex items-center gap-2">
             <Package className="w-5 h-5 text-[#E3422C]" /> POS Settings — Products
@@ -226,10 +299,20 @@ const PosProductSettingsPage: React.FC = () => {
                 placeholder="e.g. 20" className="input-field w-full text-sm" />
             </div>
             <div>
-              <label className="text-xs text-slate-500 mb-1 block">Pieces / Plate *</label>
-              <input type="number" value={newPieces} onChange={e => setNewPieces(e.target.value)}
-                placeholder="e.g. 1" className="input-field w-full text-sm" />
+              <label className="text-xs text-slate-500 mb-1 block">
+                Pieces / Plate *
+              </label>
+              <input
+                type="number"
+                value={newPieces}
+                onChange={e => setNewPieces(e.target.value)}
+                placeholder="e.g. 6"
+                className="input-field w-full text-sm"
+              />
             </div>
+          
+
+
             <div>
               <label className="text-xs text-slate-500 mb-1 block">Opening Stock (pieces)</label>
               <input type="number" value={newStock} onChange={e => setNewStock(e.target.value)}
@@ -241,11 +324,11 @@ const PosProductSettingsPage: React.FC = () => {
                 placeholder="e.g. 20" className="input-field w-full text-sm" />
             </div>
           </div>
-          
+
           <p className="text-xs text-slate-500">
             This product is added directly into your product list — same as admin-dispatched products (stock, low-stock alerts, and pieces-per-plate all apply).
           </p>
-                     <button
+          <button
             onClick={addCustomProduct}
             disabled={adding}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white hover:bg-[#c93a24] disabled:opacity-50 transition-all"
@@ -261,8 +344,14 @@ const PosProductSettingsPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-3">
-                     {products.map(p => {
-            const draft = drafts[p.id] || { sellingPrice: '', piecesPerPlate: '1', lowStockThreshold: '20' };
+          {products.map(p => {
+            const draft = drafts[p.id] || {
+              sellingPrice: '',
+              piecesPerPlate: '1',
+              unitsPerPacket: '1',
+              lowStockThreshold: '20',
+              stockProductId: ''
+            };
             const low = isLow(p);
             return (
               <div key={p.id} className={`card p-4 border ${low ? 'border-red-300' : 'border-slate-200'}`}>
@@ -272,7 +361,7 @@ const PosProductSettingsPage: React.FC = () => {
                     <p className="text-xs text-slate-500">{p.category}{p.brand ? ` · ${p.brand}` : ''}</p>
                   </div>
                   <div className="flex items-center gap-3 flex-wrap">
-                     {low && (
+                    {low && (
                       <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200">
                         <AlertTriangle className="w-3 h-3" /> Low Stock
                       </span>
@@ -284,7 +373,7 @@ const PosProductSettingsPage: React.FC = () => {
                       <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${p.isAvailable ? 'translate-x-5' : ''}`} />
                     </button>
                     <span className="text-xs text-slate-500 w-16">{p.isAvailable ? 'Enabled' : 'Disabled'}</span>
-                     <button
+                    <button
                       onClick={() => deleteProduct(p)}
                       disabled={deletingId === p.id}
                       className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
@@ -295,7 +384,7 @@ const PosProductSettingsPage: React.FC = () => {
                   </div>
                 </div>
 
-                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                   <div>
                     <label className="text-xs text-slate-500 mb-1 block">Selling Price (₹)</label>
                     <input type="number" value={draft.sellingPrice}
@@ -308,26 +397,141 @@ const PosProductSettingsPage: React.FC = () => {
                       onChange={e => updateDraft(p.id, 'piecesPerPlate', e.target.value)}
                       className="input-field w-full text-sm" />
                   </div>
+
+                  <div>
+                    <label className="text-xs text-slate-500 mb-1 block">
+                      Pieces / Packet
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={draft.unitsPerPacket}
+                      onChange={e => updateDraft(p.id, 'unitsPerPacket', e.target.value)}
+                      className="input-field w-full text-sm"
+                    />
+                  </div>
                   <div>
                     <label className="text-xs text-slate-500 mb-1 block">Low Stock Alert Below</label>
                     <input type="number" value={draft.lowStockThreshold}
                       onChange={e => updateDraft(p.id, 'lowStockThreshold', e.target.value)}
                       className="input-field w-full text-sm" />
                   </div>
-                                     <div>
-                    <label className="text-xs text-slate-500 mb-1 block">Current Stock</label>
-                    <p className={`text-sm font-semibold pt-2 ${low ? 'text-red-600' : 'text-emerald-600'}`}>
+
+                  <div>
+  <label className="block text-xs font-medium text-slate-300 mb-1">
+    Raw Stock Product
+  </label>
+
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={draft.isRawStockProduct}
+      onChange={(e) =>
+        updateDraft(p.id, 'isRawStockProduct', e.target.checked)
+      }
+      className="h-4 w-4"
+    />
+    <span className="text-sm text-slate-300">
+      Use as raw stock
+    </span>
+  </label>
+</div>
+
+                  <div>
+                    <label className="text-xs text-slate-500 mb-1 block">
+                      Stock Mapping
+                    </label>
+
+                    <select
+                      value={draft.stockProductId}
+                      onChange={e =>
+                        updateDraft(p.id, 'stockProductId', e.target.value)
+                      }
+                      className="input-field w-full text-sm"
+                    >
+                      <option value="">Own Stock</option>
+
+                      {products
+                        .filter(stockProduct => stockProduct.id !== p.id)
+                        .map(stockProduct => (
+                          <option key={stockProduct.id} value={stockProduct.id}>
+                            {stockProduct.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-slate-500 mb-1 block">
+                      Current Stock
+                    </label>
+
+                    <p
+                      className={`text-sm font-semibold pt-2 ${low ? 'text-red-600' : 'text-emerald-600'
+                        }`}
+                    >
                       {stockLabel(p)}
+                    </p>
+
+                    {p.stockUpdatedAt && (
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        Updated:{' '}
+                        {new Date(p.stockUpdatedAt).toLocaleString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-slate-500 mb-1 block">
+                      Add Stock (Packets)
+                    </label>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        min="1"
+                        value={stockPackets[p.id] || ''}
+                        onChange={e =>
+                          setStockPackets(prev => ({
+                            ...prev,
+                            [p.id]: e.target.value,
+                          }))
+                        }
+                        placeholder="Packets"
+                        className="input-field w-full text-sm"
+                      />
+
+                      <button
+                        onClick={() => addStock(p)}
+                        disabled={stockUpdatingId === p.id}
+                        className="px-3 py-2 rounded-lg text-xs font-medium bg-[#E3422C] text-white hover:bg-[#c93a24] disabled:opacity-50 whitespace-nowrap"
+                      >
+                        {stockUpdatingId === p.id ? 'Adding...' : 'Add'}
+                      </button>
+                    </div>
+
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      1 packet = {p.unitsPerPacket ?? 1} pieces
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => saveProduct(p)}
-                  disabled={savingId === p.id}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white hover:bg-[#c93a24] disabled:opacity-50 transition-all"
-                >
-                  <Save className="w-3.5 h-3.5" /> {savingId === p.id ? 'Saving...' : 'Save Changes'}
-                </button>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => saveProduct(p)}
+                    disabled={savingId === p.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#E3422C] text-white hover:bg-[#c93a24] disabled:opacity-50 transition-all"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    {savingId === p.id ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
               </div>
             );
           })}

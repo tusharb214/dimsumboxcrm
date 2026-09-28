@@ -1,20 +1,4 @@
-export interface PosSettings {
-  id?: number;
-  outletName?: string;
-  address?: string;
-  gstNumber?: string;
-  contactNumber?: string;
-  gstEnabled?: boolean;
-  gstPercentage?: number;
-  invoicePrefix?: string;
-  invoiceFooter?: string;
-  receiptTemplate?: string;
-  paymentMethodsEnabled?: string;
-  receiptPrinterConfig?: string;
-  kitchenPrinterConfig?: string;
-  setupCompleted?: boolean;
-  setupCompletedAt?: string;
-}
+ 
 
 export interface RestaurantDetailsPayload {
   outletName: string;
@@ -55,30 +39,35 @@ export interface RestaurantTable {
   unitsPerPacket?: number;
   piecesPerPlate?: number;
   stockPieces?: number;
+  stockUpdatedAt?: string;
+  stockProductId?: number;
   lowStockThreshold?: number;
-}
+  isRawStockProduct?: boolean;
+} 
 
-  export interface UpdateFranchiseProductPayload {
+ export interface UpdateFranchiseProductPayload {
   sellingPrice?: number;
   isAvailable?: boolean;
   piecesPerPlate?: number;
   lowStockThreshold?: number;
-  category?: string;
+  unitsPerPacket?: number;
+  stockProductId?: number | null;
+  isRawStockProduct?: boolean;
 }
 
-export interface CreateFranchiseProductPayload {
+ export interface CreateFranchiseProductPayload {
   name: string;
   category?: string;
   sellingPrice: number;
   piecesPerPlate?: number;
+  unitsPerPacket?: number;
   stockPieces?: number;
   lowStockThreshold?: number;
+  stockProductId?: number | null;
 }
 
-export interface AddStockPayload {
-  quantityPieces: number;
-  date: string;   // yyyy-MM-dd
-  note?: string;
+ export interface AddStockPayload {
+  packets: number;
 }
 
 export interface StockHistoryEntry {
@@ -144,6 +133,7 @@ export interface PosOrderItemResult {
   lineTotal: number;
 }
 
+ 
  export interface PosOrderResponse {
   id: number;
   invoiceNumber: string;
