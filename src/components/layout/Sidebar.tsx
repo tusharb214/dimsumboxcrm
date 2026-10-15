@@ -35,6 +35,7 @@ const navItems: Record<UserRole, { label: string; icon: React.ElementType; path:
      { label: 'Users',        icon: Users,           path: '/admin/users' },
      { label: 'Pending Payments',     icon: Wallet,   path: '/admin/pending-payments' },
      { label: 'Products',     icon: Package,         path: '/admin/products' },  
+      { label: 'Warehouse', icon: Boxes, path: '/admin/warehouse' },
    { label: 'Categories',   icon: Tags,            path: '/admin/categories' },
      { label: 'Reports',      icon: BarChart3,       path: '/admin/reports' },
   { label: 'Notifications',icon: Bell,            path: '/admin/notifications' },

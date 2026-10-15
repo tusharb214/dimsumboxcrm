@@ -67,15 +67,15 @@ const PosProductSettingsPage: React.FC = () => {
   useEffect(() => { load(); }, []);
 
   const updateDraft = (
-  id: number,
-  field: keyof Draft,
-  value: string | boolean
-) => {
-  setDrafts(prev => ({
-    ...prev,
-    [id]: { ...prev[id], [field]: value },
-  }));
-};
+    id: number,
+    field: keyof Draft,
+    value: string | boolean
+  ) => {
+    setDrafts(prev => ({
+      ...prev,
+      [id]: { ...prev[id], [field]: value },
+    }));
+  };
 
 
   const toggleAvailable = async (p: FranchiseProduct) => {
@@ -228,13 +228,22 @@ const PosProductSettingsPage: React.FC = () => {
   };
 
   const stockLabel = (p: FranchiseProduct) => {
-    const pieces = p.stockPieces ?? 0;
-    const unitsPerPacket = p.unitsPerPacket && p.unitsPerPacket > 0 ? p.unitsPerPacket : 1;
+    const stockProduct = p.stockProductId
+      ? products.find(x => x.id === p.stockProductId)
+      : p;
+
+    const pieces = stockProduct?.stockPieces ?? 0;
+
+    const unitsPerPacket =
+      stockProduct?.unitsPerPacket && stockProduct.unitsPerPacket > 0
+        ? stockProduct.unitsPerPacket
+        : 1;
+
     const packets = Math.floor(pieces / unitsPerPacket);
     const loose = pieces % unitsPerPacket;
+
     return `${packets} Packets + ${loose} Pieces`;
   };
-
   const isLow = (p: FranchiseProduct) =>
     (p.stockPieces ?? 0) <= (p.lowStockThreshold ?? 20);
 
@@ -310,7 +319,7 @@ const PosProductSettingsPage: React.FC = () => {
                 className="input-field w-full text-sm"
               />
             </div>
-          
+
 
 
             <div>
@@ -400,15 +409,28 @@ const PosProductSettingsPage: React.FC = () => {
 
                   <div>
                     <label className="text-xs text-slate-500 mb-1 block">
-                      Pieces / Packet
+                      {draft.stockProductId ? 'Stock Unit' : 'Pieces / Packet'}
                     </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={draft.unitsPerPacket}
-                      onChange={e => updateDraft(p.id, 'unitsPerPacket', e.target.value)}
-                      className="input-field w-full text-sm"
-                    />
+
+                    {draft.stockProductId ? (
+                      <div className="input-field w-full text-sm bg-slate-100 text-slate-500">
+                        1 Packet = {
+                          products.find(
+                            x => x.id === Number(draft.stockProductId)
+                          )?.unitsPerPacket ?? 1
+                        } Pieces
+                      </div>
+                    ) : (
+                      <input
+                        type="number"
+                        min="1"
+                        value={draft.unitsPerPacket}
+                        onChange={e =>
+                          updateDraft(p.id, 'unitsPerPacket', e.target.value)
+                        }
+                        className="input-field w-full text-sm"
+                      />
+                    )}
                   </div>
                   <div>
                     <label className="text-xs text-slate-500 mb-1 block">Low Stock Alert Below</label>
@@ -418,24 +440,24 @@ const PosProductSettingsPage: React.FC = () => {
                   </div>
 
                   <div>
-  <label className="block text-xs font-medium text-slate-300 mb-1">
-    Raw Stock Product
-  </label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Raw Stock Product
+                    </label>
 
-  <label className="flex items-center gap-2 cursor-pointer">
-    <input
-      type="checkbox"
-      checked={draft.isRawStockProduct}
-      onChange={(e) =>
-        updateDraft(p.id, 'isRawStockProduct', e.target.checked)
-      }
-      className="h-4 w-4"
-    />
-    <span className="text-sm text-slate-300">
-      Use as raw stock
-    </span>
-  </label>
-</div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draft.isRawStockProduct}
+                        onChange={(e) =>
+                          updateDraft(p.id, 'isRawStockProduct', e.target.checked)
+                        }
+                        className="h-4 w-4"
+                      />
+                      <span className="text-sm text-slate-300">
+                        Use as raw stock
+                      </span>
+                    </label>
+                  </div>
 
                   <div>
                     <label className="text-xs text-slate-500 mb-1 block">
@@ -452,7 +474,11 @@ const PosProductSettingsPage: React.FC = () => {
                       <option value="">Own Stock</option>
 
                       {products
-                        .filter(stockProduct => stockProduct.id !== p.id)
+                        .filter(
+                          stockProduct =>
+                            stockProduct.id !== p.id &&
+                            stockProduct.isRawStockProduct === true
+                        )
                         .map(stockProduct => (
                           <option key={stockProduct.id} value={stockProduct.id}>
                             {stockProduct.name}
@@ -470,7 +496,12 @@ const PosProductSettingsPage: React.FC = () => {
                       className={`text-sm font-semibold pt-2 ${low ? 'text-red-600' : 'text-emerald-600'
                         }`}
                     >
-                      {stockLabel(p)}
+                      {stockLabel({
+                        ...p,
+                        stockProductId: draft.stockProductId
+                          ? Number(draft.stockProductId)
+                          : p.stockProductId,
+                      })}
                     </p>
 
                     {p.stockUpdatedAt && (
@@ -517,7 +548,11 @@ const PosProductSettingsPage: React.FC = () => {
                     </div>
 
                     <p className="text-[11px] text-slate-400 mt-1">
-                      1 packet = {p.unitsPerPacket ?? 1} pieces
+                      1 packet = {
+                        p.stockProductId
+                          ? products.find(x => x.id === p.stockProductId)?.unitsPerPacket ?? 1
+                          : p.unitsPerPacket ?? 1
+                      } pieces
                     </p>
                   </div>
                 </div>

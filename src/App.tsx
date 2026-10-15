@@ -33,6 +33,7 @@ import AdminReportsPage from './pages/admin/AdminReportsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminPendingPaymentsPage from './pages/admin/AdminPendingPaymentsPage';
+import WarehousePage from './pages/admin/WarehousePage';
 
 import KitchenDashboard from './pages/kitchen/KitchenDashboard';
 import { KitchenApprovalsPage } from "./pages/kitchen/KitchenSubPages";
@@ -95,6 +96,7 @@ const App: React.FC = () => (
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="reports" element={<AdminReportsPage />} />
+          <Route path="warehouse" element={<WarehousePage />} />
           <Route path="notifications" element={<AdminNotificationsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>

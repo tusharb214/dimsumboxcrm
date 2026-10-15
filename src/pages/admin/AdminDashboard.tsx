@@ -1,302 +1,1060 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
- import {
-  ShoppingBag,
-  IndianRupee,
-  Clock,
+ 
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import {
+  Boxes,
+  Package,
+  PackagePlus,
   Truck,
-  Eye,
+  History,
+  IndianRupee,
+  RefreshCw,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { adminApi, dashboardApi } from '../../api/services';
-import { Order, Kitchen, User } from '../../types';
-import StatCard from '../../components/common/StatCard';
-import StatusBadge from '../../components/common/StatusBadge';
-import { CardSkeleton, TableSkeleton, Skeleton } from '../../components/common/Skeleton';
+import { warehouseApi } from '../../api/services';
 
+type Tab = 'stock' | 'inward' | 'dispatch' | 'transactions';
 
-const isToday = (isoDate?: string) => {
-  if (!isoDate) return false;
-  const d = new Date(isoDate);
-  const now = new Date();
-  return (
-    d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
-  );
+interface Material {
+  id: number;
+  name: string;
+  category?: string;
+  unitsPerPacket?: number;
+  isActive?: boolean;
+}
+
+interface Franchise {
+  id: number;
+  name: string;
+  email?: string;
+}
+
+interface Stock {
+  id?: number;
+  materialId: number;
+  materialName: string;
+  category?: string;
+  unitsPerPacket?: number;
+  quantityPieces: number;
+  averageCostPerPiece?: number;
+}
+
+interface Transaction {
+  id: number;
+  materialName?: string;
+  transactionType?: string;
+  packets?: number;
+  pieces?: number;
+  totalCost?: number;
+  supplierName?: string;
+  franchiseName?: string;
+  referenceNumber?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
+const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
+  { id: 'stock', label: 'Warehouse Stock', icon: Boxes },
+  { id: 'inward', label: 'Stock Inward', icon: PackagePlus },
+  { id: 'dispatch', label: 'Stock Dispatch', icon: Truck },
+  { id: 'transactions', label: 'Transactions', icon: History },
+];
+
+const inputClass =
+  'w-full min-w-0 rounded-xl border border-[#ffeee7] bg-white px-4 py-3 text-sm text-black outline-none placeholder:text-gray-400 focus:border-[#E3422C] focus:ring-2 focus:ring-[#E3422C]/15';
+
+const labelClass = 'mb-2 block text-sm font-medium text-black';
+const panelClass =
+  'rounded-2xl border border-[#E3422C]/70 bg-white shadow-sm';
+
+const money = (value?: number) =>
+  `₹${Number(value || 0).toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+  })}`;
+
+const unwrap = (response: any): any => {
+  let result = response?.data;
+  if (result?.data !== undefined) result = result.data;
+  return result;
 };
 
-const formatDate = (iso?: string) =>
-  iso ? new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+const formatDate = (value?: string) => {
+  if (!value) return '-';
+  const date = new Date(value);
 
-const AdminDashboard: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [kitchens, setKitchens] = useState<Kitchen[]>([]);
-  const [, setUsers] = useState<User[]>([]);
-  const [dashStats, setDashStats] = useState<any>(null);
+  return Number.isNaN(date.getTime())
+    ? '-'
+    : date.toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      });
+};
+
+const PrimaryButton: React.FC<
+  React.PropsWithChildren<{
+    disabled?: boolean;
+    type?: 'button' | 'submit';
+  }>
+> = ({ children, disabled, type = 'button' }) => (
+  <button
+    type={type}
+    disabled={disabled}
+    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#E3422C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#c93220] disabled:cursor-not-allowed disabled:opacity-60"
+  >
+    {children}
+  </button>
+);
+
+const WarehousePage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<Tab>('stock');
+
+  const [stock, setStock] = useState<Stock[]>([]);
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [franchises, setFranchises] = useState<Franchise[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    Promise.all([
-      adminApi.getAllOrders().catch(() => ({ data: { data: [] } })),
-      adminApi.getAllKitchens().catch(() => ({ data: { data: [] } })),
-      adminApi.getAllUsers().catch(() => ({ data: { data: [] } })),
-    ])
-      .then(([o, k, u]) => {
-        setOrders(o.data?.data ?? []);
-        setKitchens(k.data?.data ?? []);
-        setUsers(u.data?.data ?? []);
-      })
-      .finally(() => setLoading(false));
+  const [stockSearch, setStockSearch] = useState('');
+  const [transactionSearch, setTransactionSearch] = useState('');
 
-    dashboardApi
-      .getAdminDashboard()
-      .then((r) => setDashStats(r.data?.data))
-      .catch(() => { });
+  const [inward, setInward] = useState({
+    materialId: '',
+    packets: '1',
+    piecesPerPacket: '',
+    costPerPacket: '',
+    supplierName: '',
+    notes: '',
+  });
+
+  const [dispatch, setDispatch] = useState({
+    materialId: '',
+    franchiseId: '',
+    packets: '1',
+    notes: '',
+  });
+
+  const loadData = useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
+
+    try {
+      const [stockRes, materialsRes, franchisesRes, transactionsRes] =
+        await Promise.all([
+          warehouseApi.getStock(),
+          warehouseApi.getMaterials(),
+          warehouseApi.getFranchises(),
+          warehouseApi.getTransactions(),
+        ]);
+
+      const stockData = unwrap(stockRes);
+      const materialData = unwrap(materialsRes);
+      const franchiseData = unwrap(franchisesRes);
+      const transactionData = unwrap(transactionsRes);
+
+      setStock(Array.isArray(stockData) ? stockData : []);
+      setMaterials(Array.isArray(materialData) ? materialData : []);
+      setFranchises(Array.isArray(franchiseData) ? franchiseData : []);
+      setTransactions(
+        Array.isArray(transactionData) ? transactionData : []
+      );
+    } catch (error) {
+      console.error('Warehouse loading error:', error);
+      toast.error('Unable to load warehouse data.');
+    } finally {
+      if (showLoader) setLoading(false);
+    }
   }, []);
 
-  // ---- Stats (real orders, with dashStats override when API provides it) ----
-  const todaysOrders = orders.filter((o) => isToday(o.createdAt));
-  const todaysOrdersCount = dashStats?.todaysOrders ?? todaysOrders.length;
-  const todaysSales = dashStats?.todaysSales ?? todaysOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
-  const pendingCount = dashStats?.pendingOrders ?? orders.filter((o) => o.status === 'REQUESTED').length;
-  const dispatchedToday =
-    dashStats?.dispatchedToday ??
-    orders.filter((o) => o.status === 'DISPATCHED' && isToday(o.updatedAt || o.createdAt)).length;
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
 
-  // ---- Top outlets by sales, derived from real orders + kitchens ----
-  const topOutlets = useMemo(() => {
-    const salesByKitchen: Record<string, number> = {};
-    orders.forEach((o) => {
-      const name = o.kitchenName || kitchens.find((k) => k.id === o.kitchenId)?.name;
-      if (!name) return;
-      salesByKitchen[name] = (salesByKitchen[name] || 0) + (o.totalAmount || 0);
-    });
-    return Object.entries(salesByKitchen)
-      .map(([name, sales]) => ({ name, sales }))
-      .sort((a, b) => b.sales - a.sales)
-      .slice(0, 5);
-  }, [orders, kitchens]);
+  const activeMaterials = useMemo(
+    () => materials.filter((material) => material.isActive !== false),
+    [materials]
+  );
 
-  const recentOrders = orders.slice(0, 5);
+  const selectedInward = activeMaterials.find(
+    (material) => String(material.id) === inward.materialId
+  );
 
-  return (
-    // <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
-    <div className="max-w-[1600px] mx-auto px-6 pt-2 pb-6 space-y-4  animate-[fadeIn_0.3s_ease-out]">
-    
+  const selectedDispatch = activeMaterials.find(
+    (material) => String(material.id) === dispatch.materialId
+  );
 
-      {/* Stat cards */}
-      {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-4"> */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl">
-      {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-4"> */}
-        {loading ? (
-          Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)
-        ) : (
-          <>
-            <StatCard title="Today's Orders" value={todaysOrdersCount} icon={ShoppingBag} color="sky" />
-            <StatCard
-              title="Today's Sales"
-              value={`₹${todaysSales.toLocaleString('en-IN')}`}
-              icon={IndianRupee}
-              color="emerald"
-            />
-            <StatCard title="Pending Orders" value={pendingCount} icon={Clock} color="amber" />
-            <StatCard title="Dispatched Today" value={dispatchedToday} icon={Truck} color="purple" />
-          </>
-        )}
-      </div>
+  const totalPieces = stock.reduce(
+    (sum, item) => sum + Number(item.quantityPieces || 0),
+    0
+  );
 
-      {/* <div className="grid lg:grid-cols-3 gap-6"> */}
-      <div className="grid lg:grid-cols-3 gap-6 items-start">
-        {/* Recent orders table */}
-        {/* <div className="lg:col-span-2 card overflow-hidden"> */}
-        <div className="lg:col-span-2 card overflow-hidden min-w-0">
-          <div className="px-5 py-4 border-b border-[#ffeee7]">
-            <h2 className="text-sm font-semibold text-black">Recent Orders</h2>
-          </div>
+  const totalValue = stock.reduce(
+    (sum, item) =>
+      sum +
+      Number(item.quantityPieces || 0) *
+        Number(item.averageCostPerPiece || 0),
+    0
+  );
 
-          {loading ? (
-            <TableSkeleton rows={5} cols={6} />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-xs text-slate-500 border-b border-[#E3422C]">
-                    {/* <th className="px-5 py-3 font-medium">Order ID</th> */}
-                    <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">order ID</th>
-                    <th className="px-4 py-2.5 font-medium">Outlet</th>
-                    <th className="px-4 py-2.5 font-medium">Order Date</th>
-                    <th className="px-4 py-2.5 font-medium">Amount</th>
-                    <th className="px-4 py-2.5 font-medium">Payment</th>
-                    <th className="px-4 py-2.5 font-medium">Order Status</th>
-                    <th className="px-4 py-2.5 font-medium text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {recentOrders.map((order) => {
-                    // Payment status isn't part of the Order model yet - shown
-                    // as a simple derived badge until a real field exists.
-                    const isPaid = ['DELIVERED', 'COMPLETED', 'DISPATCHED'].includes(order.status);
-                    return (
-                      <tr key={order.id} className="hover:bg-white/[0.03] transition-colors">
-                        <td className="px-5 py-3 font-mono text-xs text-black                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            whitespace-nowrap">
-                          #{String(order.id).slice(-6).toUpperCase()}
-                        </td>
-                        <td className="px-4 py-2.5 text-black whitespace-nowrap">
-                          {order.kitchenName || 'Unassigned'}
-                        </td>
-                        <td className="px-4 py-2.5 text-black whitespace-nowrap">{formatDate(order.createdAt)}</td>
-                        <td className="px-4 py-2.5 text-black whitespace-nowrap">
-                          ₹{(order.totalAmount || 0).toLocaleString('en-IN')}
-                        </td>
-                        <td className="px-4 py-2.5 whitespace-nowrap">
-                          <span className={isPaid ? 'badge-success' : 'badge-warning'}>
-                            {isPaid ? 'Paid' : 'Pending'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5 whitespace-nowrap">
-                          <StatusBadge status={order.status} />
-                        </td>
-                        <td className="px-5 py-3 text-right">
-                          <Link
-                            to={`/admin/orders/${order.id}`}
-                            className="inline-flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white/5 text-black hover:text-sky-400 transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {recentOrders.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="text-center text-slate-500 text-sm py-8">
-                        No orders yet
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+  const piecesPerPacket = Number(
+    inward.piecesPerPacket || selectedInward?.unitsPerPacket || 0
+  );
 
-          <div className="px-5 py-4 border-t  border-[#ffeee7]">
-            <Link
-              to="/admin/orders"
-              className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-[#ffeee7] text-sm text-black hover:bg-white/5 hover:text-white transition-colors"
-            >
-              View All Orders
-            </Link>
-          </div>
+  const totalInwardPieces =
+    Math.max(0, Number(inward.packets || 0)) *
+    Math.max(0, piecesPerPacket);
+
+  const totalDispatchPieces =
+    Math.max(0, Number(dispatch.packets || 0)) *
+    Number(selectedDispatch?.unitsPerPacket || 0);
+
+  const filteredStock = stock.filter((item) =>
+    `${item.materialName} ${item.category || ''}`
+      .toLowerCase()
+      .includes(stockSearch.trim().toLowerCase())
+  );
+
+  const filteredTransactions = transactions.filter((item) =>
+    [
+      item.materialName,
+      item.transactionType,
+      item.supplierName,
+      item.franchiseName,
+      item.referenceNumber,
+      item.notes,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(transactionSearch.trim().toLowerCase())
+  );
+
+  const handleInward = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const packets = Number(inward.packets);
+    const cost = Number(inward.costPerPacket);
+
+    if (!inward.materialId) {
+      toast.error('Select a material.');
+      return;
+    }
+
+    if (
+      !Number.isInteger(packets) ||
+      packets <= 0
+    ) {
+      toast.error('Enter a valid packet quantity.');
+      return;
+    }
+
+    if (
+      !Number.isInteger(piecesPerPacket) ||
+      piecesPerPacket <= 0
+    ) {
+      toast.error('Enter a valid pieces-per-packet quantity.');
+      return;
+    }
+
+    if (
+      inward.costPerPacket.trim() === '' ||
+      !Number.isFinite(cost) ||
+      cost < 0
+    ) {
+      toast.error('Enter a valid cost per packet.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      // The current API does not accept piecesPerPacket.
+      // Update the backend DTO and service to persist this value.
+      await warehouseApi.stockInward({
+        materialId: Number(inward.materialId),
+        packets,
+        costPerPacket: cost,
+        supplierName: inward.supplierName.trim() || undefined,
+        notes: inward.notes.trim() || undefined,
+      });
+
+      toast.success('Stock inward recorded successfully.');
+
+      setInward({
+        materialId: '',
+        packets: '1',
+        piecesPerPacket: '',
+        costPerPacket: '',
+        supplierName: '',
+        notes: '',
+      });
+
+      await loadData(false);
+      setActiveTab('stock');
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || 'Failed to add stock.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDispatch = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const packets = Number(dispatch.packets);
+
+    if (!dispatch.materialId || !dispatch.franchiseId) {
+      toast.error('Select a material and franchise.');
+      return;
+    }
+
+    if (!Number.isInteger(packets) || packets <= 0) {
+      toast.error('Enter a valid packet quantity.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await warehouseApi.dispatchStock({
+        materialId: Number(dispatch.materialId),
+        franchiseId: Number(dispatch.franchiseId),
+        packets,
+        notes: dispatch.notes.trim() || undefined,
+      });
+
+      toast.success('Stock dispatched successfully.');
+
+      setDispatch({
+        materialId: '',
+        franchiseId: '',
+        packets: '1',
+        notes: '',
+      });
+
+      await loadData(false);
+      setActiveTab('stock');
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || 'Failed to dispatch stock.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const StatCard: React.FC<{
+    title: string;
+    value: string;
+    icon: React.ElementType;
+    color: string;
+  }> = ({ title, value, icon: Icon, color }) => (
+    <div className={`${panelClass} min-w-0 p-4 sm:p-5`}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+            {title}
+          </p>
+          <p className="mt-2 break-words text-2xl font-bold text-black sm:text-3xl">
+            {value}
+          </p>
         </div>
-
-        {/* Right sidebar */}
-        <div className="space-y-4 w-[300px]">
-        
-          {/* Payment overview */}
-          <div className="card p-3">
-            <h2 className="text-sm font-semibold text-white mb-3">Payment Overview</h2>
-            {loading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-7 w-32" />
-              </div>
-            ) : (
-              <>
-                 <div>
-                  <p className="text-xs text-black">Total Outstanding</p>
-                  <p className="text-xl font-bold text-white mt-1">
-                    ₹{(dashStats?.paymentOverview?.totalOutstanding ?? 0).toLocaleString('en-IN')}
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <p className="text-xs text-red-400 font-medium">Overdue Outlets</p>
-                  <p className="text-xl font-bold text-white mt-1">
-                    {dashStats?.paymentOverview?.overdueOutlets ?? 0}
-                  </p>
-                </div>
-                <button className="mt-4 w-full py-2 rounded-xl border  border-[#ffeee7] text-sky-400 text-sm font-medium hover:bg-sky-500/10 transition-colors">
-                  View Outstanding Report
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Top outlets by sales - real, derived from orders + kitchens */}
-          <div className="card p-5">
-            <h2 className="text-sm font-semibold text-white mb-4">Top Outlets by Sales</h2>
-            {loading ? (
-              <div className="space-y-2.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-5 w-full" />
-                ))}
-              </div>
-            ) : (
-              <ol className="space-y-2.5">
-                {topOutlets.map((outlet, idx) => (
-                  <li key={outlet.name} className="flex items-center justify-between text-sm">
-                    <span className="text-black truncate pr-2">
-                      <span className="text-slate-500 mr-1.5">{idx + 1}.</span>
-                      {outlet.name}
-                    </span>
-                    <span className="text-black font-medium whitespace-nowrap">
-                      ₹{outlet.sales.toLocaleString('en-IN')}
-                    </span>
-                  </li>
-                ))}
-                {topOutlets.length === 0 && <p className="text-center text-slate-500 text-sm py-2">No data yet</p>}
-              </ol>
-            )}
-          </div>           
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${color}`}
+        >
+          <Icon size={21} />
         </div>
-      </div>
-
-      {/* Sales overview chart */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-white">Sales Overview</h2>
-        </div>
-        {loading ? (
-          <Skeleton className="h-[240px] w-full" />
-        ) : (
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart
-              // data={dashStats?.salesOverview ?? dummySalesOverview}
-              data={dashStats?.salesOverview ?? []}
-              margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-              <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1e293b',
-                  border: '1px solid #ffeee7',  
-                  borderRadius: '12px',
-                  color: '#f1f5f9',
-                  fontSize: '12px',
-                }}
-                formatter={(value: any) => [`₹${Number(value ?? 0).toLocaleString('en-IN')}`, 'Sales']}
-              />
-              <Area
-                type="monotone"
-                dataKey="sales"
-                stroke="#0ea5e9"
-                strokeWidth={2.5}
-                fill="url(#salesGradient)"
-                dot={{ r: 3, fill: '#0ea5e9', strokeWidth: 0 }}
-                activeDot={{ r: 5 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        )}
       </div>
     </div>
   );
+
+  const SideInfo: React.FC<{
+    kind: 'inward' | 'dispatch';
+  }> = ({ kind }) => {
+    const isInward = kind === 'inward';
+    const Icon = isInward ? PackagePlus : Truck;
+
+    return (
+      <aside
+        className="h-fit min-w-0 rounded-2xl border border-[#ffeee7] p-5 sm:p-6"
+        style={{ backgroundColor: '#FFF0E8', color: '#000000' }}
+      >
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white">
+          <Icon size={22} color="#E3422C" />
+        </div>
+
+        <h3
+          className="text-lg font-bold"
+          style={{ color: '#000000' }}
+        >
+          {isInward ? 'Stock Inward' : 'Stock Dispatch'}
+        </h3>
+
+        <p
+          className="mt-2 text-sm leading-6"
+          style={{ color: '#333333' }}
+        >
+          {isInward
+            ? 'Record supplier deliveries and the number of pieces in each packet.'
+            : 'Choose the material and destination franchise before dispatching stock.'}
+        </p>
+
+        <div className="mt-5 border-t border-[#E3422C]/20 pt-4">
+          <p
+            className="text-xs font-semibold uppercase tracking-wide"
+            style={{ color: '#333333' }}
+          >
+            {isInward ? 'Current Material Types' : 'Available Stock'}
+          </p>
+
+          <p
+            className="mt-1 text-2xl font-bold"
+            style={{ color: '#000000' }}
+          >
+            {isInward
+              ? activeMaterials.length
+              : totalPieces.toLocaleString('en-IN')}
+
+            {!isInward && (
+              <span className="ml-1 text-sm font-normal text-gray-600">
+                pieces
+              </span>
+            )}
+          </p>
+
+          {!isInward && (
+            <p
+              className="mt-2 text-sm"
+              style={{ color: '#333333' }}
+            >
+              Franchises: {franchises.length}
+            </p>
+          )}
+        </div>
+      </aside>
+    );
+  };
+
+  const EmptyState: React.FC<{ message: string }> = ({ message }) => (
+    <div className="px-4 py-12 text-center">
+      <Package size={34} className="mx-auto mb-3 text-gray-400" />
+      <p className="text-sm text-gray-600">{message}</p>
+    </div>
+  );
+
+  return (
+    <main className="mx-auto w-full max-w-[1600px] min-w-0 space-y-5 px-3 pb-8 pt-3 sm:px-5 lg:px-6">
+      <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-[#E3422C]">
+            Admin / Inventory
+          </p>
+          <h1 className="mt-1 text-2xl font-bold text-black sm:text-3xl">
+            Warehouse Management
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-gray-600">
+            Manage central stock, supplier inward and franchise dispatches.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void loadData()}
+          disabled={loading}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#E3422C]/30 bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-[#FFF0E8] disabled:opacity-60 sm:w-auto"
+        >
+          <RefreshCw
+            size={16}
+            className={loading ? 'animate-spin' : ''}
+          />
+          Refresh data
+        </button>
+      </header>
+
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+        <StatCard
+          title="Material Types"
+          value={String(stock.length)}
+          icon={Boxes}
+          color="border-blue-200 bg-blue-50 text-blue-600"
+        />
+        <StatCard
+          title="Total Stock Pieces"
+          value={totalPieces.toLocaleString('en-IN')}
+          icon={Package}
+          color="border-emerald-200 bg-emerald-50 text-emerald-600"
+        />
+        <StatCard
+          title="Estimated Stock Value"
+          value={money(totalValue)}
+          icon={IndianRupee}
+          color="border-amber-200 bg-amber-50 text-amber-600"
+        />
+        <StatCard
+          title="Transactions"
+          value={String(transactions.length)}
+          icon={History}
+          color="border-purple-200 bg-purple-50 text-purple-600"
+        />
+      </section>
+
+      <section className={`${panelClass} min-w-0 overflow-hidden`}>
+        <nav className="border-b border-[#ffeee7] px-3 pt-3 sm:px-5 sm:pt-4">
+          <div className="flex gap-2 overflow-x-auto pb-3">
+            {tabs.map(({ id, label: title, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveTab(id)}
+                aria-pressed={activeTab === id}
+                className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold sm:px-4 ${
+                  activeTab === id
+                    ? 'bg-[#E3422C] text-white'
+                    : 'bg-[#FFF0E8] text-black hover:bg-[#ffe4d7]'
+                }`}
+              >
+                <Icon size={17} />
+                {title}
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        {activeTab === 'stock' && (
+          <div className="min-w-0 p-3 sm:p-5">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-black">
+                  Warehouse Stock
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Current inventory for all materials.
+                </p>
+              </div>
+
+              <input
+                className={`${inputClass} sm:max-w-xs`}
+                type="search"
+                value={stockSearch}
+                onChange={(event) => setStockSearch(event.target.value)}
+                placeholder="Search material or category"
+              />
+            </div>
+
+            {loading ? (
+              <p className="py-10 text-center text-sm text-gray-600">
+                Loading warehouse stock...
+              </p>
+            ) : filteredStock.length === 0 ? (
+              <EmptyState
+                message={
+                  stock.length
+                    ? 'No materials match your search.'
+                    : 'No stock available yet. Record stock inward first.'
+                }
+              />
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-[#ffeee7]">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead className="bg-[#FFF0E8]">
+                    <tr className="border-b border-[#E3422C]/20 text-xs uppercase tracking-wide text-gray-700">
+                      <th className="px-4 py-4">Material</th>
+                      <th className="px-4 py-4">Category</th>
+                      <th className="px-4 py-4">Pieces / Packet</th>
+                      <th className="px-4 py-4">Stock Pieces</th>
+                      <th className="px-4 py-4">Avg. Cost / Piece</th>
+                      <th className="px-4 py-4 text-right">Stock Value</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#ffeee7]">
+                    {filteredStock.map((item, index) => (
+                      <tr
+                        key={item.id ?? item.materialId ?? index}
+                        className="hover:bg-[#FFF9F5]"
+                      >
+                        <td className="px-4 py-4 font-semibold text-black">
+                          {item.materialName}
+                        </td>
+                        <td className="px-4 py-4 text-gray-700">
+                          {item.category || '-'}
+                        </td>
+                        <td className="px-4 py-4 text-gray-700">
+                          {item.unitsPerPacket ?? '-'}
+                        </td>
+                        <td className="px-4 py-4 font-semibold text-black">
+                          {Number(item.quantityPieces || 0).toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-4 py-4 text-gray-700">
+                          {money(item.averageCostPerPiece)}
+                        </td>
+                        <td className="px-4 py-4 text-right font-semibold text-[#E3422C]">
+                          {money(
+                            Number(item.quantityPieces || 0) *
+                              Number(item.averageCostPerPiece || 0)
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'inward' && (
+          <div className="grid min-w-0 grid-cols-1 gap-5 p-3 sm:p-5 lg:grid-cols-3">
+            <div className="min-w-0 lg:col-span-2">
+              <div className="mb-5">
+                <h2 className="text-lg font-bold text-black">
+                  Add Stock Inward
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Record materials received from your supplier.
+                </p>
+              </div>
+
+              <form onSubmit={handleInward} className="space-y-5">
+                <div>
+                  <label className={labelClass} htmlFor="in-material">
+                    Material *
+                  </label>
+                  <select
+                    id="in-material"
+                    className={inputClass}
+                    value={inward.materialId}
+                    required
+                    onChange={(event) => {
+                      const material = activeMaterials.find(
+                        (item) => String(item.id) === event.target.value
+                      );
+
+                      setInward((previous) => ({
+                        ...previous,
+                        materialId: event.target.value,
+                        piecesPerPacket: material?.unitsPerPacket
+                          ? String(material.unitsPerPacket)
+                          : '',
+                      }));
+                    }}
+                  >
+                    <option value="">Select material</option>
+                    {activeMaterials.map((material) => (
+                      <option key={material.id} value={material.id}>
+                        {material.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {!activeMaterials.length && (
+                    <p className="mt-2 text-xs text-[#C93220]">
+                      No active materials found. Add a material first.
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className={labelClass} htmlFor="in-packets">
+                      Packets received *
+                    </label>
+                    <input
+                      id="in-packets"
+                      className={inputClass}
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      value={inward.packets}
+                      onChange={(event) =>
+                        setInward((previous) => ({
+                          ...previous,
+                          packets: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label className={labelClass} htmlFor="in-pieces">
+                      Pieces per packet *
+                    </label>
+                    <input
+                      id="in-pieces"
+                      className={inputClass}
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      placeholder="e.g. 25"
+                      value={inward.piecesPerPacket}
+                      onChange={(event) =>
+                        setInward((previous) => ({
+                          ...previous,
+                          piecesPerPacket: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className={labelClass} htmlFor="in-cost">
+                      Cost per packet (₹) *
+                    </label>
+                    <input
+                      id="in-cost"
+                      className={inputClass}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      required
+                      placeholder="Enter packet cost"
+                      value={inward.costPerPacket}
+                      onChange={(event) =>
+                        setInward((previous) => ({
+                          ...previous,
+                          costPerPacket: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="rounded-xl border border-[#ffeee7] bg-[#FFF0E8] px-4 py-3">
+                    <p className="text-sm font-medium text-gray-700">
+                      Total pieces received
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-black">
+                      {totalInwardPieces.toLocaleString('en-IN')}
+                      <span className="text-sm font-normal text-gray-600">
+                        {' '}pieces
+                      </span>
+                    </p>
+                    <p className="mt-1 text-xs text-gray-600">
+                      {inward.packets || 0} packet(s) × {piecesPerPacket || 0} pieces
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor="in-supplier">
+                    Supplier name (optional)
+                  </label>
+                  <input
+                    id="in-supplier"
+                    className={inputClass}
+                    placeholder="Enter supplier name"
+                    value={inward.supplierName}
+                    onChange={(event) =>
+                      setInward((previous) => ({
+                        ...previous,
+                        supplierName: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor="in-notes">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    id="in-notes"
+                    className={inputClass}
+                    rows={3}
+                    placeholder="Invoice number or additional details"
+                    value={inward.notes}
+                    onChange={(event) =>
+                      setInward((previous) => ({
+                        ...previous,
+                        notes: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <PrimaryButton
+                  type="submit"
+                  disabled={submitting || activeMaterials.length === 0}
+                >
+                  <ArrowDownToLine size={17} />
+                  {submitting ? 'Saving...' : 'Add Stock'}
+                </PrimaryButton>
+
+                <p className="text-xs leading-5 text-gray-500">
+                  Backend update required: the current inward API does not
+                  save the Pieces per packet field. Update the backend request
+                  and stock calculation before relying on this value for actual
+                  inventory.
+                </p>
+              </form>
+            </div>
+
+            <SideInfo kind="inward" />
+          </div>
+        )}
+
+        {activeTab === 'dispatch' && (
+          <div className="grid min-w-0 grid-cols-1 gap-5 p-3 sm:p-5 lg:grid-cols-3">
+            <div className="min-w-0 lg:col-span-2">
+              <div className="mb-5">
+                <h2 className="text-lg font-bold text-black">
+                  Dispatch Stock to Franchise
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Record stock sent to a franchise outlet.
+                </p>
+              </div>
+
+              <form onSubmit={handleDispatch} className="space-y-5">
+                <div>
+                  <label className={labelClass} htmlFor="out-material">
+                    Material *
+                  </label>
+                  <select
+                    id="out-material"
+                    className={inputClass}
+                    required
+                    value={dispatch.materialId}
+                    onChange={(event) =>
+                      setDispatch((previous) => ({
+                        ...previous,
+                        materialId: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Select material</option>
+                    {activeMaterials.map((material) => (
+                      <option key={material.id} value={material.id}>
+                        {material.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor="out-franchise">
+                    Franchise outlet *
+                  </label>
+                  <select
+                    id="out-franchise"
+                    className={inputClass}
+                    required
+                    value={dispatch.franchiseId}
+                    onChange={(event) =>
+                      setDispatch((previous) => ({
+                        ...previous,
+                        franchiseId: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Select franchise</option>
+                    {franchises.map((franchise) => (
+                      <option key={franchise.id} value={franchise.id}>
+                        {franchise.name}
+                        {franchise.email ? ` — ${franchise.email}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor="out-packets">
+                    Packets to dispatch *
+                  </label>
+                  <input
+                    id="out-packets"
+                    className={inputClass}
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    value={dispatch.packets}
+                    onChange={(event) =>
+                      setDispatch((previous) => ({
+                        ...previous,
+                        packets: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                {selectedDispatch && (
+                  <div className="rounded-xl border border-[#ffeee7] bg-[#FFF0E8] p-4">
+                    <p className="text-sm text-gray-700">
+                      Dispatch quantity preview
+                    </p>
+                    <p className="mt-1 text-xl font-bold text-black">
+                      {totalDispatchPieces.toLocaleString('en-IN')} pieces
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      {dispatch.packets} packet(s) ×{' '}
+                      {selectedDispatch.unitsPerPacket || 0} pieces
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label className={labelClass} htmlFor="out-notes">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    id="out-notes"
+                    className={inputClass}
+                    rows={3}
+                    placeholder="Delivery reference or details"
+                    value={dispatch.notes}
+                    onChange={(event) =>
+                      setDispatch((previous) => ({
+                        ...previous,
+                        notes: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <PrimaryButton
+                  type="submit"
+                  disabled={
+                    submitting ||
+                    !activeMaterials.length ||
+                    !franchises.length
+                  }
+                >
+                  <ArrowUpFromLine size={17} />
+                  {submitting ? 'Dispatching...' : 'Dispatch Stock'}
+                </PrimaryButton>
+              </form>
+            </div>
+
+            <SideInfo kind="dispatch" />
+          </div>
+        )}
+
+        {activeTab === 'transactions' && (
+          <div className="min-w-0 p-3 sm:p-5">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-black">
+                  Warehouse Transactions
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Review stock inward and dispatch activity.
+                </p>
+              </div>
+
+              <input
+                className={`${inputClass} sm:max-w-xs`}
+                type="search"
+                value={transactionSearch}
+                onChange={(event) =>
+                  setTransactionSearch(event.target.value)
+                }
+                placeholder="Search transactions"
+              />
+            </div>
+
+            {loading ? (
+              <p className="py-10 text-center text-sm text-gray-600">
+                Loading transactions...
+              </p>
+            ) : filteredTransactions.length === 0 ? (
+              <EmptyState
+                message={
+                  transactions.length
+                    ? 'No transactions match your search.'
+                    : 'No warehouse transactions recorded yet.'
+                }
+              />
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-[#ffeee7]">
+                <table className="w-full min-w-[950px] text-left text-sm">
+                  <thead className="bg-[#FFF0E8]">
+                    <tr className="border-b border-[#E3422C]/20 text-xs uppercase tracking-wide text-gray-700">
+                      {[
+                        'Date',
+                        'Material',
+                        'Transaction',
+                        'Packets',
+                        'Pieces',
+                        'Total Cost',
+                        'Supplier / Franchise',
+                        'Reference / Notes',
+                      ].map((heading) => (
+                        <th key={heading} className="px-4 py-4">
+                          {heading}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#ffeee7]">
+                    {filteredTransactions.map((item, index) => {
+                      const isInward = String(item.transactionType || '')
+                        .toUpperCase()
+                        .includes('INWARD');
+
+                      return (
+                        <tr
+                          key={item.id ?? index}
+                          className="hover:bg-[#FFF9F5]"
+                        >
+                          <td className="whitespace-nowrap px-4 py-4 text-gray-700">
+                            {formatDate(item.createdAt)}
+                          </td>
+                          <td className="px-4 py-4 font-semibold text-black">
+                            {item.materialName || '-'}
+                          </td>
+                          <td className="px-4 py-4">
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                isInward
+                                  ? 'bg-emerald-50 text-emerald-700'
+                                  : 'bg-[#FFF0E8] text-[#C93220]'
+                              }`}
+                            >
+                              {item.transactionType || '-'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-gray-700">
+                            {item.packets ?? '-'}
+                          </td>
+                          <td className="px-4 py-4 text-gray-700">
+                            {item.pieces ?? '-'}
+                          </td>
+                          <td className="px-4 py-4 font-semibold text-black">
+                            {money(item.totalCost)}
+                          </td>
+                          <td className="px-4 py-4 text-gray-700">
+                            {item.supplierName || item.franchiseName || '-'}
+                          </td>
+                          <td className="max-w-[240px] px-4 py-4 text-gray-700">
+                            <div
+                              className="truncate"
+                              title={item.referenceNumber || item.notes || ''}
+                            >
+                              {item.referenceNumber || item.notes || '-'}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+    </main>
+  );
 };
 
-export default AdminDashboard;
+export default WarehousePage;

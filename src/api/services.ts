@@ -156,7 +156,45 @@ export const adminApi = {
     apiClient.get('/admin/orders/pending-payments'),
   markPaymentReceived: (orderId: string) =>
     apiClient.put(`/admin/orders/${orderId}/mark-payment-received`),
+
+
+  
+
+
 };
+
+
+export const warehouseApi = {
+  getStock: () =>
+    apiClient.get('/admin/warehouse/stock'),
+
+  getMaterials: () =>
+    apiClient.get('/admin/warehouse/materials'),
+
+  getFranchises: () =>
+    apiClient.get('/admin/warehouse/franchises'),
+
+  getTransactions: () =>
+    apiClient.get('/admin/warehouse/transactions'),
+
+  stockInward: (data: {
+    materialId: number;
+    packets: number;
+    costPerPacket: number;
+    supplierName?: string;
+    notes?: string;
+  }) =>
+    apiClient.post('/admin/warehouse/inward', data),
+
+  dispatchStock: (data: {
+    materialId: number;
+    franchiseId: number;
+    packets: number;
+    notes?: string;
+  }) =>
+    apiClient.post('/admin/warehouse/dispatch', data),
+};
+
 
 // ─── KITCHEN ──────────────────────────────────────────────────────
 export const kitchenApi = {
